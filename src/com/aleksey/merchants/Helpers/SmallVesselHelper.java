@@ -1,7 +1,9 @@
 package com.aleksey.merchants.Helpers;
 
+import static com.aleksey.merchants.Containers.MilkJugAndBucket.getMilkConteinerWeight;
 import java.util.ArrayList;
 
+import static com.aleksey.merchants.Containers.MilkJugAndBucket.isMilkContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -33,6 +35,12 @@ public class SmallVesselHelper
                 continue;
             
             int invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
+            
+            // dont allow cut buckets and Jugs at small vessels on give goods from storage
+            int milkWeight = getMilkConteinerWeight(invItemStack);
+            if (milkWeight > 0  &&  milkWeight != invQuantity )
+                continue;
+
             int decQuantity = invQuantity < quantity ? invQuantity: quantity;
             
             ItemHelper.increaseStackQuantity(invItemStack, -decQuantity);
@@ -69,7 +77,7 @@ public class SmallVesselHelper
             if(invItemStack == null || !ItemHelper.areItemEquals(invItemStack, itemStack))
                 continue;
             
-            int invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
+            int invQuantity = ItemHelper.getItemStackQuantity(invItemStack);            
             int addQuantity = invQuantity + quantity > maxQuantity ? maxQuantity - invQuantity: quantity;
             
             ItemHelper.increaseStackQuantity(invItemStack, addQuantity);
@@ -116,7 +124,14 @@ public class SmallVesselHelper
             ItemStack vesselItemStack = vesselItemStacks[i];
             
             if(vesselItemStack != null && ItemHelper.areItemEquals(vesselItemStack, itemStack))
+            {    
                 quantity += ItemHelper.getItemStackQuantity(vesselItemStack);
+                            
+                //int milkWeight = getMilkConteinerWeight(vesselItemStack);
+                //if ( milkWeight > 0 && quantity != milkWeight )
+                //    quantity = 0;
+                
+            }    
         }
         
         return quantity;
@@ -233,7 +248,7 @@ public class SmallVesselHelper
             _exceptions.add(TFCItems.bismuthIngot);
             _exceptions.add(TFCItems.sterlingSilverIngot);
             _exceptions.add(TFCItems.tinIngot);
-            _exceptions.add(TFCItems.zincIngot);
+            _exceptions.add(TFCItems.zincIngot);            
         }
         
         Item item = itemstack.getItem();
@@ -241,8 +256,8 @@ public class SmallVesselHelper
         if(item instanceof IBag || item instanceof ItemMeltedMetal || item instanceof ItemPotteryBase)
             return false;
         
-        if(item instanceof IFood)
-            return true;
+        if(item instanceof IFood && !isMilkContainer(itemstack) ) 
+            return true;        
 
         if (item instanceof ISize && ((ISize)item).getSize(itemstack).stackSize >= _vesselSlotSize.stackSize)
                 return false;

@@ -1,5 +1,7 @@
 package com.aleksey.merchants.Containers;
 
+import static com.aleksey.merchants.Containers.MilkJugAndBucket.getMilkConteinerWeight;
+import static com.aleksey.merchants.Containers.MilkJugAndBucket.isMilkContainer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -841,8 +843,12 @@ public class ContainerStall extends ContainerTFC
     
     private ItemStack splitFoodWeight(ItemStack itemStack)
     {
+        if ( isMilkContainer(itemStack) ){
+            return itemStack;
+        }
+
         IFood food = (IFood)itemStack.getItem();
-        
+                
         float newWeight;
         
         newWeight = Food.getWeight(itemStack) / 2;
@@ -858,6 +864,10 @@ public class ContainerStall extends ContainerTFC
     
     private ItemStack addFoodWeight(ItemStack slotItemStack, ItemStack playerItemStack, boolean isAll)
     {
+        if (isMilkContainer(slotItemStack)){
+            return slotItemStack;
+        }
+
         IFood food = (IFood)slotItemStack.getItem();
         
         float playerWeight;
@@ -872,7 +882,7 @@ public class ContainerStall extends ContainerTFC
         }
         else
             playerWeight = 10;
-        
+      
         float newSlotWeight = Food.getWeight(slotItemStack) + playerWeight;
         
         if(newSlotWeight > food.getFoodMaxWeight(slotItemStack))
@@ -881,8 +891,8 @@ public class ContainerStall extends ContainerTFC
         ItemFoodTFC.createTag(slotItemStack, newSlotWeight);
         
         return slotItemStack;
-    }
-    
+    }   
+        
     private ItemStack getFoodItemStack(ItemStack srcItemStack, boolean isAll)
     {
         float weight;
@@ -899,6 +909,9 @@ public class ContainerStall extends ContainerTFC
         }
         else
             weight = 10;
+        
+        int newMilkWeight = getMilkConteinerWeight(srcItemStack);        
+        weight = (newMilkWeight==0f) ? weight : newMilkWeight;
         
         ItemStack resultItemStack = srcItemStack.copy();
         
@@ -1013,6 +1026,10 @@ public class ContainerStall extends ContainerTFC
                 continue;
             
             int invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
+            
+            int milkWeight = getMilkConteinerWeight(invItemStack);
+            if ( milkWeight > 0 && invQuantity != milkWeight )
+                continue;
             
             if(invQuantity == 0)
                 continue;

@@ -1,5 +1,6 @@
 package com.aleksey.merchants.WarehouseContainers;
 
+import static com.aleksey.merchants.Containers.MilkJugAndBucket.getMilkConteinerWeight;
 import java.util.ArrayList;
 
 import net.minecraft.inventory.IInventory;
@@ -40,9 +41,17 @@ public abstract class Container implements IWarehouseContainer
             int invQuantity = 0;
             
             if(ItemHelper.areItemEquals(itemStack, invItemStack))
+            {                
                 invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
+                
+                int milkWeight = getMilkConteinerWeight(invItemStack);
+                if (milkWeight > 0 && invQuantity != milkWeight){
+                    invQuantity = 0;
+                }
+            }    
             else if(invItemStack.getItem() instanceof ItemPotterySmallVessel)
                 invQuantity = SmallVesselHelper.getItemStackQuantity(itemStack, invItemStack);
+                        
             
             if(invQuantity <= 0)
                 continue;

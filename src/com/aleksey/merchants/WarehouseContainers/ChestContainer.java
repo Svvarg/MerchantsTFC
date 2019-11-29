@@ -1,5 +1,7 @@
 package com.aleksey.merchants.WarehouseContainers;
 
+import static com.aleksey.merchants.Containers.MilkJugAndBucket.getMilkConteinerWeight;
+import static com.aleksey.merchants.Containers.MilkJugAndBucket.isMilkContainer;
 import java.util.ArrayList;
 
 import net.minecraft.inventory.IInventory;
@@ -56,7 +58,9 @@ public class ChestContainer extends Container
         
         int quantity;
         
-        quantity = searchFreeSpace_NonEmptySlots(tileEntity, itemStack, requiredQuantity, resultList);
+        int milkWeight = getMilkConteinerWeight(itemStack);
+        quantity = ( milkWeight > 0 ) ? (int) milkWeight :
+                searchFreeSpace_NonEmptySlots(tileEntity, itemStack, requiredQuantity, resultList);
         
         if(quantity > 0)
             quantity = searchFreeSpace_EmptySlots(tileEntity, itemStack, quantity, resultList);
