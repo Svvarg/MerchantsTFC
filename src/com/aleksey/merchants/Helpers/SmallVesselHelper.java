@@ -1,9 +1,9 @@
 package com.aleksey.merchants.Helpers;
 
-import static com.aleksey.merchants.Containers.MilkJugAndBucket.getMilkConteinerWeight;
+import static com.aleksey.merchants.Containers.ExtendedLogic.getMilkConteinerWeight;
 import java.util.ArrayList;
 
-import static com.aleksey.merchants.Containers.MilkJugAndBucket.isMilkContainer;
+import static com.aleksey.merchants.Containers.ExtendedLogic.isMilkContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;

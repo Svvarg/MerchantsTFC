@@ -1,5 +1,6 @@
 package com.aleksey.merchants.Helpers;
 
+import static com.aleksey.merchants.Containers.ExtendedLogic.getMilkConteinerWeight;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -235,6 +236,14 @@ public class WarehouseManager
     private void addItemStackQuantity(ItemStack itemStack)
     {
         int quantity = ItemHelper.getItemStackQuantity(itemStack);
+        
+        // stall not split milkjug and bucket therefore cant combine 18oz+18oz for giving 20 oz bucket as good
+        //for correct displaying quantity milk jug and bucket, ignore incomplete milk containers
+        int milkWeight = getMilkConteinerWeight(itemStack);
+        if (milkWeight > 0 && quantity != milkWeight) {
+            quantity = 0;
+        }
+        
         String itemKey = ItemHelper.getItemKey(itemStack);
 
         if(_quantities.containsKey(itemKey))

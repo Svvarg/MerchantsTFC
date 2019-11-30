@@ -1,7 +1,7 @@
 package com.aleksey.merchants.WarehouseContainers;
 
-import static com.aleksey.merchants.Containers.MilkJugAndBucket.getMilkConteinerWeight;
-import static com.aleksey.merchants.Containers.MilkJugAndBucket.isMilkContainer;
+import static com.aleksey.merchants.Containers.ExtendedLogic.getMilkConteinerWeight;
+import static com.aleksey.merchants.Containers.ExtendedLogic.isMilkContainer;
 import java.util.ArrayList;
 
 import net.minecraft.inventory.IInventory;
