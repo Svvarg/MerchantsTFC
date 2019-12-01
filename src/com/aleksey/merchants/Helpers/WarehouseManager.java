@@ -253,8 +253,8 @@ public class WarehouseManager
         
         // stall not split milkjug and bucket therefore cant combine 18oz+18oz for giving 20 oz bucket as good
         //for correct displaying quantity milk jug and bucket, ignore incomplete milk containers
-        int milkWeight = getNoSplitFoodWeight(itemStack);
-        if (milkWeight > 0 && quantity != milkWeight) {
+        int nsFoodWeight = getNoSplitFoodWeight(itemStack);
+        if (nsFoodWeight > 0 && quantity != nsFoodWeight) {
             quantity = 0;
         }
         

@@ -58,8 +58,8 @@ public class ChestContainer extends Container
         
         int quantity;
         
-        int milkWeight = getNoSplitFoodWeight(itemStack);
-        quantity = ( milkWeight > 0 ) ? (int) milkWeight :
+        int nsFoodWeight = getNoSplitFoodWeight(itemStack);
+        quantity = ( nsFoodWeight > 0 ) ? (int) nsFoodWeight :
                 searchFreeSpace_NonEmptySlots(tileEntity, itemStack, requiredQuantity, resultList);
         
         if(quantity > 0)

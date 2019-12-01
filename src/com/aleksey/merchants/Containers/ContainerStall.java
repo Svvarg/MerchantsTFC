@@ -597,7 +597,9 @@ public class ContainerStall extends ContainerTFC
     {
         boolean flag1 = slot == null || !slot.getHasStack();
 
-        if (slot != null && slot.getHasStack() && itemStack != null && itemStack.isItemEqual(slot.getStack()) && ItemStack.areItemStackTagsEqual(slot.getStack(), itemStack))
+        //if (slot != null && slot.getHasStack() && itemStack != null && itemStack.isItemEqual(slot.getStack()) && ItemStack.areItemStackTagsEqual(slot.getStack(), itemStack))
+        if (slot != null && slot.getHasStack() && itemStack != null && itemStack.isItemEqual(slot.getStack()) 
+                && ExtendedLogic.areItemStackTagsEqualEx(slot.getStack(), itemStack))
         {
             int i = sizeMatters ? 0 : itemStack.stackSize;
             flag1 |= slot.getStack().stackSize + i <= itemStack.getMaxStackSize();
@@ -1029,8 +1031,8 @@ public class ContainerStall extends ContainerTFC
             
             int invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
             
-            int milkWeight = getNoSplitFoodWeight(invItemStack);
-            if ( milkWeight > 0 && invQuantity != milkWeight )
+            int nsFoodWeight = getNoSplitFoodWeight(invItemStack);
+            if ( nsFoodWeight > 0 && invQuantity != nsFoodWeight )
                 continue;
             
             if(invQuantity == 0)

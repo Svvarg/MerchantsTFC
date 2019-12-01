@@ -27,6 +27,10 @@ public class SmallVesselHelper
     {
         ItemStack[] vesselItemStacks = getVesselItemStacks(vessel);
         
+        //hey man! new small vessel have null nbt tag!
+        if (vesselItemStacks == null)
+            return;
+
         for(int i = 0; i < vesselItemStacks.length && quantity > 0; i++)
         {
             ItemStack invItemStack = vesselItemStacks[i];
@@ -37,8 +41,8 @@ public class SmallVesselHelper
             int invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
             
             // dont allow cut buckets and Jugs at small vessels on give goods from storage
-            int milkWeight = getNoSplitFoodWeight(invItemStack);
-            if (milkWeight > 0  &&  milkWeight != invQuantity )
+            int nsFoodWeight = getNoSplitFoodWeight(invItemStack);
+            if (nsFoodWeight > 0  &&  nsFoodWeight != invQuantity )
                 continue;
 
             int decQuantity = invQuantity < quantity ? invQuantity: quantity;
@@ -55,7 +59,7 @@ public class SmallVesselHelper
     {
         ItemStack[] vesselItemStacks = getVesselItemStacks(vessel);
         
-        if(vesselItemStacks == null)
+        if ( vesselItemStacks == null )
             vesselItemStacks = new ItemStack[4];
         
         quantity = increaseItemStackQuantity_NonEmptySlots(quantity, itemStack, vesselItemStacks);
@@ -90,6 +94,9 @@ public class SmallVesselHelper
     
     private static int increaseItemStackQuantity_EmptySlots(int quantity, ItemStack itemStack, ItemStack[] vesselItemStacks)
     {
+        if ( vesselItemStacks == null )
+            return 0;
+            
         int maxQuantity = ItemHelper.getItemStackMaxQuantity_SmallVessel(itemStack);
         
         for(int i = 0; i < vesselItemStacks.length && quantity > 0; i++)
@@ -117,6 +124,10 @@ public class SmallVesselHelper
             return 0;
         
         ItemStack[] vesselItemStacks = getVesselItemStacks(vessel);
+        // hey man! new small Vessel have null nbt tag!
+        if (vesselItemStacks == null )
+            return 0;
+        
         int quantity = 0;
         
         for(int i = 0; i < vesselItemStacks.length; i++)
@@ -126,10 +137,8 @@ public class SmallVesselHelper
             if(vesselItemStack != null && ItemHelper.areItemEquals(vesselItemStack, itemStack))
             {    
                 quantity += ItemHelper.getItemStackQuantity(vesselItemStack);
-                            
-                //int milkWeight = getMilkConteinerWeight(vesselItemStack);
-                //if ( milkWeight > 0 && quantity != milkWeight )
-                //    quantity = 0;
+                
+                // noSplitFood from ExtendedLogic dont allow put this food type on smallvessel by stall
                 
             }    
         }
@@ -143,6 +152,7 @@ public class SmallVesselHelper
             return 0;
         
         ItemStack[] vesselItemStacks = getVesselItemStacks(vessel);
+       
         int maxQuantity = ItemHelper.getItemStackMaxQuantity_SmallVessel(itemStack);
         
         if(vesselItemStacks == null)
@@ -173,6 +183,9 @@ public class SmallVesselHelper
         ItemStack[] result = new ItemStack[4];
 
         NBTTagList nbttaglist = vessel.getTagCompound().getTagList("Items", 10);
+        
+        if ( nbttaglist == null) 
+            return null;
         
         for(int i = 0; i < nbttaglist.tagCount(); i++)
         {

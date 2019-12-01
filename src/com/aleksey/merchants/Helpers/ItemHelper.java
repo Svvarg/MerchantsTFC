@@ -1,5 +1,6 @@
 package com.aleksey.merchants.Helpers;
 
+import com.aleksey.merchants.Containers.ExtendedLogic;
 import static com.aleksey.merchants.Containers.ExtendedLogic.PERMISSIBLEDECLAY;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -25,7 +26,8 @@ public class ItemHelper {
 
         return itemStack1.getItem() instanceof IFood
                 ? Food.areEqual(itemStack1, itemStack2)
-                : ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);
+                //: ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);
+                : ExtendedLogic.areItemStackTagsEqualEx(itemStack1, itemStack2);
     }
 
     public static final String getItemKey(ItemStack itemStack) {
@@ -75,9 +77,9 @@ public class ItemHelper {
 
         if (item instanceof IFood) {
             
-            int milkWeight = getNoSplitFoodWeight(itemStack);
-            if ( milkWeight > 0 ) {
-                return milkWeight;
+            int nsFoodWeight = getNoSplitFoodWeight(itemStack);
+            if ( nsFoodWeight > 0 ) {
+                return nsFoodWeight;
             }
             return (int) ((IFood) itemStack.getItem()).getFoodMaxWeight(itemStack);
         }

@@ -44,8 +44,8 @@ public abstract class Container implements IWarehouseContainer
             {                
                 invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
                 
-                int milkWeight = getNoSplitFoodWeight(invItemStack);
-                if (milkWeight > 0 && invQuantity != milkWeight)
+                int nsfoodWeight = getNoSplitFoodWeight(invItemStack);
+                if (nsfoodWeight > 0 && invQuantity != nsfoodWeight)
                 {
                     invQuantity = 0;
                 }
