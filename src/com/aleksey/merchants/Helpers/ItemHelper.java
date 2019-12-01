@@ -1,5 +1,6 @@
 package com.aleksey.merchants.Helpers;
 
+import static com.aleksey.merchants.Containers.ExtendedLogic.PERMISSIBLEDECLAY;
 import static com.aleksey.merchants.Containers.ExtendedLogic.getMilkConteinerWeight;
 import static com.aleksey.merchants.Containers.ExtendedLogic.isMilkContainer;
 import net.minecraft.inventory.IInventory;
@@ -54,7 +55,9 @@ public class ItemHelper {
         if (itemStack.getItem() instanceof IFood) {
             IFood food = (IFood) itemStack.getItem();
             float foodDecay = removeDecay ? Math.max(Food.getDecay(itemStack), 0) : 0;
-            if (foodDecay < 1 && isMilkContainer(itemStack) ) {
+            
+            //for no split tfcfood for possible trade with small-permissible decay value
+            if (foodDecay <= PERMISSIBLEDECLAY && isMilkContainer(itemStack) ) {
                 foodDecay = 0;                
             }
             

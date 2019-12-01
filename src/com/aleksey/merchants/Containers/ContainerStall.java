@@ -844,6 +844,7 @@ public class ContainerStall extends ContainerTFC
     private ItemStack splitFoodWeight(ItemStack itemStack)
     {
         if ( isMilkContainer(itemStack) ){
+            //no split
             return itemStack;
         }
 
@@ -865,6 +866,7 @@ public class ContainerStall extends ContainerTFC
     private ItemStack addFoodWeight(ItemStack slotItemStack, ItemStack playerItemStack, boolean isAll)
     {
         if (isMilkContainer(slotItemStack)){
+            // no add
             return slotItemStack;
         }
 
@@ -895,23 +897,23 @@ public class ContainerStall extends ContainerTFC
         
     private ItemStack getFoodItemStack(ItemStack srcItemStack, boolean isAll)
     {
+        
         float weight;
         
-        if(isAll)
+        weight = getMilkConteinerWeight(srcItemStack);// no split & add 
+        if (weight==0)
         {
-            IFood food = (IFood)srcItemStack.getItem();
-
-            weight = Food.getWeight(srcItemStack);
-            weight = 10 * (int)(weight / 10);
-            
-            if(weight == 0)
+            if(isAll)
+            {
+                IFood food = (IFood)srcItemStack.getItem();
+                weight = Food.getWeight(srcItemStack);
+                weight = 10 * (int)(weight / 10);
+                if(weight == 0)
+                    weight = 10;
+            }
+            else
                 weight = 10;
-        }
-        else
-            weight = 10;
-        
-        int newMilkWeight = getMilkConteinerWeight(srcItemStack);        
-        weight = (newMilkWeight==0f) ? weight : newMilkWeight;
+        }    
         
         ItemStack resultItemStack = srcItemStack.copy();
         

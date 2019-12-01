@@ -30,7 +30,7 @@ import com.bioxx.tfc.api.Interfaces.IFood;
 public class WarehouseManager
 {
     private static final int _searchContainerRadius = 3;
-    private static final int _searchWarehouseDistance = 10;
+    private static final int _searchWarehouseDistance = 14;
 
     private ArrayList<Point> _containerLocations;
     private Hashtable<String, Integer> _quantities;
