@@ -1,5 +1,6 @@
 package com.aleksey.merchants.Helpers;
 
+import com.aleksey.merchants.Containers.ExtendedLogic;
 import java.util.ArrayList;
 
 import net.minecraft.item.Item;
@@ -35,7 +36,12 @@ public class SmallVesselHelper
         {
             ItemStack invItemStack = vesselItemStacks[i];
             
-            if(invItemStack == null || !ItemHelper.areItemEquals(invItemStack, itemStack))
+            //if(invItemStack == null || !ItemHelper.areItemEquals(invItemStack, itemStack))
+            
+            //importance of following the sequence of Stacks! First itemStack - item frome Stall Slot, after vesselIStack
+            //This for correct work trade with diff smithing bonus(can buy and sell items with more bonus that stay at stall
+            if(invItemStack == null || !ExtendedLogic.areItemEquals(itemStack, invItemStack))
+            
                 continue;
             
             int invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
@@ -134,7 +140,12 @@ public class SmallVesselHelper
         {
             ItemStack vesselItemStack = vesselItemStacks[i];
             
-            if(vesselItemStack != null && ItemHelper.areItemEquals(vesselItemStack, itemStack))
+            //if(vesselItemStack != null && ItemHelper.areItemEquals(vesselItemStack, itemStack))
+            
+            //importance of following the sequence of Stacks! First itemStack - item frome Stall Slot, after vesselIStack
+            //This for correct work trade with diff smithing bonus(can buy and sell items with more bonus that stay at stall
+            if(vesselItemStack != null && ExtendedLogic.areItemEquals(itemStack, vesselItemStack ))
+                
             {    
                 quantity += ItemHelper.getItemStackQuantity(vesselItemStack);
                 

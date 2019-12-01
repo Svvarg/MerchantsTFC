@@ -1,5 +1,6 @@
 package com.aleksey.merchants.WarehouseContainers;
 
+import com.aleksey.merchants.Containers.ExtendedLogic;
 import java.util.ArrayList;
 
 import net.minecraft.inventory.IInventory;
@@ -19,8 +20,8 @@ public abstract class Container implements IWarehouseContainer
     @Override
     public int searchItems(
             TileEntity tileEntity,
-            ItemStack itemStack,
-            int requiredQuantity,
+            ItemStack itemStack, 
+            int requiredQuantity, 
             ArrayList<ItemTileEntity> resultList
             )
     {
@@ -39,8 +40,9 @@ public abstract class Container implements IWarehouseContainer
                 continue;
             
             int invQuantity = 0;
-            
-            if(ItemHelper.areItemEquals(itemStack, invItemStack))
+                                        
+           // if(ItemHelper.areItemEquals(itemStack, invItemStack))
+            if(ExtendedLogic.areItemEquals(itemStack, invItemStack))
             {                
                 invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
                 

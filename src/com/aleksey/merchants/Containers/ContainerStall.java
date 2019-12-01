@@ -597,9 +597,8 @@ public class ContainerStall extends ContainerTFC
     {
         boolean flag1 = slot == null || !slot.getHasStack();
 
-        //if (slot != null && slot.getHasStack() && itemStack != null && itemStack.isItemEqual(slot.getStack()) && ItemStack.areItemStackTagsEqual(slot.getStack(), itemStack))
-        if (slot != null && slot.getHasStack() && itemStack != null && itemStack.isItemEqual(slot.getStack()) 
-                && ExtendedLogic.areItemStackTagsEqualEx(slot.getStack(), itemStack))
+        if (slot != null && slot.getHasStack() && itemStack != null && itemStack.isItemEqual(slot.getStack()) && ItemStack.areItemStackTagsEqual(slot.getStack(), itemStack))
+        //if (slot != null && slot.getHasStack() && itemStack != null && itemStack.isItemEqual(slot.getStack()) && ExtendedLogic.areItemStackTagsEqualEx(slot.getStack(), itemStack))
         {
             int i = sizeMatters ? 0 : itemStack.stackSize;
             flag1 |= slot.getStack().stackSize + i <= itemStack.getMaxStackSize();
@@ -1026,7 +1025,8 @@ public class ContainerStall extends ContainerTFC
         {
             ItemStack invItemStack = inventoryplayer.getStackInSlot(i);
             
-            if(invItemStack == null || !ItemHelper.areItemEquals(payItemStack, invItemStack))
+            //if(invItemStack == null || !ItemHelper.areItemEquals(payItemStack, invItemStack))
+            if(invItemStack == null || !ExtendedLogic.areItemEquals(payItemStack, invItemStack))
                 continue;
             
             int invQuantity = ItemHelper.getItemStackQuantity(invItemStack);

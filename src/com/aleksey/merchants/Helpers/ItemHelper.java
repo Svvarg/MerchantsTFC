@@ -15,7 +15,7 @@ import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeigh
 
 public class ItemHelper {
 
-    public static final boolean areItemEquals(ItemStack itemStack1, ItemStack itemStack2) {
+    public static final boolean areItemEquals(ItemStack itemStack1, ItemStack itemStack2 ) {
         if (itemStack1 == null || itemStack2 == null) {
             return false;
         }
@@ -26,8 +26,8 @@ public class ItemHelper {
 
         return itemStack1.getItem() instanceof IFood
                 ? Food.areEqual(itemStack1, itemStack2)
-                //: ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);
-                : ExtendedLogic.areItemStackTagsEqualEx(itemStack1, itemStack2);
+                : ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);
+                //: ExtendedLogic.areItemStackTagsEqualEx(itemStack1, itemStack2, putToNonEmptySlot);
     }
 
     public static final String getItemKey(ItemStack itemStack) {
