@@ -1,7 +1,5 @@
 package com.aleksey.merchants.WarehouseContainers;
 
-import static com.aleksey.merchants.Containers.ExtendedLogic.getMilkConteinerWeight;
-import static com.aleksey.merchants.Containers.ExtendedLogic.isMilkContainer;
 import java.util.ArrayList;
 
 import net.minecraft.inventory.IInventory;
@@ -22,6 +20,8 @@ import com.bioxx.tfc.Containers.ContainerChestTFC;
 import com.bioxx.tfc.Containers.Slots.SlotChest;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 import com.bioxx.tfc.TileEntities.TEChest;
+import static com.aleksey.merchants.Containers.ExtendedLogic.isNoSplitFood;
+import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
 
 public class ChestContainer extends Container
 {
@@ -58,7 +58,7 @@ public class ChestContainer extends Container
         
         int quantity;
         
-        int milkWeight = getMilkConteinerWeight(itemStack);
+        int milkWeight = getNoSplitFoodWeight(itemStack);
         quantity = ( milkWeight > 0 ) ? (int) milkWeight :
                 searchFreeSpace_NonEmptySlots(tileEntity, itemStack, requiredQuantity, resultList);
         

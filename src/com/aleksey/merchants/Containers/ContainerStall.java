@@ -1,7 +1,5 @@
 package com.aleksey.merchants.Containers;
 
-import static com.aleksey.merchants.Containers.ExtendedLogic.getMilkConteinerWeight;
-import static com.aleksey.merchants.Containers.ExtendedLogic.isMilkContainer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +28,8 @@ import com.bioxx.tfc.Core.Player.PlayerInventory;
 import com.bioxx.tfc.Food.ItemFoodTFC;
 import com.bioxx.tfc.api.Interfaces.IFood;
 import com.bioxx.tfc.api.Food;
+import static com.aleksey.merchants.Containers.ExtendedLogic.isNoSplitFood;
+import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
 
 //slotClick is based on https://github.com/Mr-J/AdvancedBackpackMod/blob/master/unrelated/slotClick%2BComments%2BRename%2BHelpers.java.txt
 
@@ -843,7 +843,7 @@ public class ContainerStall extends ContainerTFC
     
     private ItemStack splitFoodWeight(ItemStack itemStack)
     {
-        if ( isMilkContainer(itemStack) ){
+        if ( isNoSplitFood(itemStack) ){
             //no split
             return itemStack;
         }
@@ -865,7 +865,7 @@ public class ContainerStall extends ContainerTFC
     
     private ItemStack addFoodWeight(ItemStack slotItemStack, ItemStack playerItemStack, boolean isAll)
     {
-        if (isMilkContainer(slotItemStack)){
+        if (isNoSplitFood(slotItemStack)){
             // no add
             return slotItemStack;
         }
@@ -900,7 +900,7 @@ public class ContainerStall extends ContainerTFC
         
         float weight;
         
-        weight = getMilkConteinerWeight(srcItemStack);// no split & add 
+        weight = getNoSplitFoodWeight(srcItemStack);// no split & add 
         if (weight==0)
         {
             if(isAll)
@@ -1029,7 +1029,7 @@ public class ContainerStall extends ContainerTFC
             
             int invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
             
-            int milkWeight = getMilkConteinerWeight(invItemStack);
+            int milkWeight = getNoSplitFoodWeight(invItemStack);
             if ( milkWeight > 0 && invQuantity != milkWeight )
                 continue;
             

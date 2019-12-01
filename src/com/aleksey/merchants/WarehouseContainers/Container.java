@@ -1,6 +1,5 @@
 package com.aleksey.merchants.WarehouseContainers;
 
-import static com.aleksey.merchants.Containers.ExtendedLogic.getMilkConteinerWeight;
 import java.util.ArrayList;
 
 import net.minecraft.inventory.IInventory;
@@ -13,6 +12,7 @@ import com.aleksey.merchants.api.IWarehouseContainer;
 import com.aleksey.merchants.api.ItemSlot;
 import com.aleksey.merchants.api.ItemTileEntity;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
+import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
 
 public abstract class Container implements IWarehouseContainer
 {
@@ -44,7 +44,7 @@ public abstract class Container implements IWarehouseContainer
             {                
                 invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
                 
-                int milkWeight = getMilkConteinerWeight(invItemStack);
+                int milkWeight = getNoSplitFoodWeight(invItemStack);
                 if (milkWeight > 0 && invQuantity != milkWeight)
                 {
                     invQuantity = 0;

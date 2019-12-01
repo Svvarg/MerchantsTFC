@@ -1,5 +1,6 @@
 package com.aleksey.merchants.Containers;
 
+import com.bioxx.tfc.Food.ItemSalad;
 import com.bioxx.tfc.Items.Tools.ItemCustomBucketMilk;
 import com.bioxx.tfc.api.Interfaces.IFood;
 import net.minecraft.item.ItemStack;
@@ -13,22 +14,26 @@ public class ExtendedLogic {
     //private static final String BUCKETMILK = "com.bioxx.tfc.Items.Tools.ItemCustomBucketMilk";
     private static final String JUGMILK = "ItemCeramicJugMilk";
     private static final int BUCKETMILKWEIGHT = 20;
+    private static final int SALADWEIGHT = 20;
     private static final int JUGMILKWEIGHT = 80;
     public static final int PERMISSIBLEDECLAY = 3;
     
+    //for towny private system. dont work with containers on another chunks
+    public static boolean seeContainersOnlyWarehouseChunk = true; 
+    
 
     /**
-     * Check the ItemStack of the fact that it is Milk Jug or Bukket
+     * Check the ItemStack of the fact that it is Milk Jug, Bukket or Salad
      * is not split TFC Food
      */
-    public static boolean isMilkContainer(ItemStack srcItemStack)
+    public static boolean isNoSplitFood(ItemStack srcItemStack)
     {        
         if (srcItemStack == null) {
             return false;
         }
         
         Class<?> cls = srcItemStack.getItem().getClass();
-        if ( cls == ItemCustomBucketMilk.class )
+        if ( cls == ItemCustomBucketMilk.class || cls == ItemSalad.class )
             return true;
         
         String itemClass = srcItemStack.getItem().getClass().toString();
@@ -37,9 +42,9 @@ public class ExtendedLogic {
     }
     
     /**
-     *  weight for no-split tfcFood such as milk jugs and buckets 
+     *  base weight for no-split tfcFood such as milk jugs, buckets or Salad
      */
-    public static int getMilkConteinerWeight(ItemStack srcItemStack)
+    public static int getNoSplitFoodWeight(ItemStack srcItemStack)
     {
         
         if (srcItemStack != null && srcItemStack.getItem() instanceof IFood )
@@ -47,6 +52,9 @@ public class ExtendedLogic {
             Class<?> cls = srcItemStack.getItem().getClass();
             if ( cls == ItemCustomBucketMilk.class )
                 return BUCKETMILKWEIGHT;
+            
+            if (cls == ItemSalad.class)
+                return SALADWEIGHT;
 
             String itemClass = srcItemStack.getItem().getClass().toString();
             if (itemClass == null) {

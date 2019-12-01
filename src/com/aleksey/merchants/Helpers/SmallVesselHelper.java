@@ -1,9 +1,7 @@
 package com.aleksey.merchants.Helpers;
 
-import static com.aleksey.merchants.Containers.ExtendedLogic.getMilkConteinerWeight;
 import java.util.ArrayList;
 
-import static com.aleksey.merchants.Containers.ExtendedLogic.isMilkContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,6 +15,8 @@ import com.bioxx.tfc.api.Enums.EnumSize;
 import com.bioxx.tfc.api.Interfaces.IBag;
 import com.bioxx.tfc.api.Interfaces.IFood;
 import com.bioxx.tfc.api.Interfaces.ISize;
+import static com.aleksey.merchants.Containers.ExtendedLogic.isNoSplitFood;
+import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
 
 public class SmallVesselHelper
 {    
@@ -37,7 +37,7 @@ public class SmallVesselHelper
             int invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
             
             // dont allow cut buckets and Jugs at small vessels on give goods from storage
-            int milkWeight = getMilkConteinerWeight(invItemStack);
+            int milkWeight = getNoSplitFoodWeight(invItemStack);
             if (milkWeight > 0  &&  milkWeight != invQuantity )
                 continue;
 
@@ -256,7 +256,7 @@ public class SmallVesselHelper
         if(item instanceof IBag || item instanceof ItemMeltedMetal || item instanceof ItemPotteryBase)
             return false;
         
-        if(item instanceof IFood && !isMilkContainer(itemstack) ) 
+        if(item instanceof IFood && !isNoSplitFood(itemstack) ) 
             return true;        
 
         if (item instanceof ISize && ((ISize)item).getSize(itemstack).stackSize >= _vesselSlotSize.stackSize)

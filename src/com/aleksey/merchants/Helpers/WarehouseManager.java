@@ -1,6 +1,6 @@
 package com.aleksey.merchants.Helpers;
 
-import static com.aleksey.merchants.Containers.ExtendedLogic.getMilkConteinerWeight;
+import com.aleksey.merchants.Containers.ExtendedLogic;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -26,6 +26,7 @@ import com.aleksey.merchants.api.Point;
 import com.aleksey.merchants.api.WarehouseContainerList;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 import com.bioxx.tfc.api.Interfaces.IFood;
+import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
 
 public class WarehouseManager
 {
@@ -181,16 +182,29 @@ public class WarehouseManager
         int startZ = info.Z - _searchContainerRadius;
         int endZ = info.Z + _searchContainerRadius;
         
+        int wareHouseChunkX = info.X >> 4;
+        int wareHouseChunkZ = info.Z >> 4;
+        
         for(int x = startX; x <= endX; x++)
         {
             for(int y = startY; y <= endY; y++)
             {
                 for(int z = startZ; z <= endZ; z++)
                 {
+                    
                     TileEntity tileEntity = world.getTileEntity(x, y, z);
                     
                     if(WarehouseContainerList.getContainer(tileEntity) != null)
                     {
+                        if (ExtendedLogic.seeContainersOnlyWarehouseChunk)
+                        {
+                            //dont see containers on difrent chunk for towny
+                            int chunkX = x >> 4;
+                            int chunkZ = z >> 4;                    
+                            if (chunkX != wareHouseChunkX || chunkZ != wareHouseChunkZ )
+                                continue;
+                        }
+                        
                         _containerLocations.add(new Point(x, y, z));
                         
                         calculateQuantities((IInventory)tileEntity);
@@ -239,7 +253,7 @@ public class WarehouseManager
         
         // stall not split milkjug and bucket therefore cant combine 18oz+18oz for giving 20 oz bucket as good
         //for correct displaying quantity milk jug and bucket, ignore incomplete milk containers
-        int milkWeight = getMilkConteinerWeight(itemStack);
+        int milkWeight = getNoSplitFoodWeight(itemStack);
         if (milkWeight > 0 && quantity != milkWeight) {
             quantity = 0;
         }
