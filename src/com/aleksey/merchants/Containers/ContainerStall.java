@@ -39,7 +39,7 @@ public class ContainerStall extends ContainerTFC
     private boolean _isOwnerMode;
     private ArrayList<Integer> _paySlotIndexes;
     private World _world;
-    
+        
     /*
      * slotClick fields
      * 
@@ -948,9 +948,10 @@ public class ContainerStall extends ContainerTFC
             
             _stall.confirmTrade();
             
-            ItemStack newItemStack = goodItemStack.copy();
-            
-            if(newItemStack.getItem() instanceof IFood)
+            //ItemStack newItemStack = goodItemStack.copy();
+            ItemStack newItemStack = _stall._goodItemFromWarehouseContainer;
+                        
+            if(newItemStack.getItem() instanceof IFood)                
                 ItemFoodTFC.createTag(newItemStack, Food.getWeight(newItemStack));
 
             inventoryplayer.setItemStack(newItemStack);
@@ -975,6 +976,13 @@ public class ContainerStall extends ContainerTFC
             return;
         }
         
+        // check real giving goodStackItem form Warehouse container with itemStack at player cursor
+        // example buy a pick head with diffrent durabuff bonus
+        // dont allow stacked it;
+        ItemStack newItemStack2 = _stall._goodItemFromWarehouseContainer;
+        if ( !ItemHelper.areItemEquals(newItemStack2, playerItemStack) )
+            return;
+        
         confirmPay(payItemStack, inventoryplayer);
 
         _stall.confirmTrade();
@@ -996,7 +1004,14 @@ public class ContainerStall extends ContainerTFC
             return false;
         }
         
-        PrepareTradeResult result = _stall.prepareTrade(goodSlotIndex, goodItemStack, payItemStack);
+        // for put Stack to Warehouse not from stall price-slot but from player inventory (NBT)
+        // example for selling items with smithingBonus 
+        _stall._payItemFromPlayerInventory = 
+                ExtendedLogic.getFirstPayItemStackFromPlayer( payItemStack, player, _paySlotIndexes );
+        
+        //PrepareTradeResult result = _stall.prepareTrade(goodSlotIndex, goodItemStack, payItemStack);
+        PrepareTradeResult result = 
+                _stall.prepareTrade(goodSlotIndex, goodItemStack, _stall._payItemFromPlayerInventory);
         
         if(result == PrepareTradeResult.Success)
             return true;

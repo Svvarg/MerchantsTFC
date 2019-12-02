@@ -1,10 +1,16 @@
 package com.aleksey.merchants.Containers;
 
+import com.aleksey.merchants.Helpers.ItemHelper;
+import com.aleksey.merchants.api.ItemSlot;
+import com.aleksey.merchants.api.ItemTileEntity;
+import com.bioxx.tfc.Food.ItemFoodTFC;
 import com.bioxx.tfc.Food.ItemSalad;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
 import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
+import com.bioxx.tfc.Items.ItemTFCArmor;
 import com.bioxx.tfc.Items.ItemTerra;
 import com.bioxx.tfc.Items.Tools.ItemCustomBucketMilk;
+import com.bioxx.tfc.Items.Tools.ItemWeapon;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.getCraftTag;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.getDamageBuff;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.getDurabilityBuff;
@@ -12,7 +18,11 @@ import static com.bioxx.tfc.api.Crafting.AnvilManager.setDamageBuff;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.setDurabilityBuff;
 import com.bioxx.tfc.api.Food;
 import com.bioxx.tfc.api.Interfaces.IFood;
+import java.util.ArrayList;
 import java.util.Map;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -117,6 +127,10 @@ public class ExtendedLogic {
         {
           if ( st1.stackTagCompound == null && st2.stackTagCompound != null ) 
           {
+            if ( st2.stackTagCompound.hasKey("craftingTag") )
+            {  //at Stall withount bonus and outItem with bonus
+                return true;//areSmithingItemEqual( st1, st2 ); 
+            }    
             return false;  
           }
           else 
@@ -137,9 +151,10 @@ public class ExtendedLogic {
                   if (cls == ItemBarrels.class || cls == ItemLargeVessel.class )
                   {
                       return areBarrelsEqual(st1,st2);   
-                  }
+                  }                  
                   
-                  if ( st1.getItem() instanceof ItemTerra && st1.stackTagCompound.hasKey("craftingTag") )
+                  //TFC smithingItem 
+                  if ( st1.stackTagCompound.hasKey("craftingTag") || st2.stackTagCompound.hasKey("craftingTag") )
                   {
                       return areSmithingItemEqual(st1,st2); 
                   }              
@@ -150,7 +165,10 @@ public class ExtendedLogic {
         }        
         return false;
     }        
-    // for compare barrels and LargeVessel without sealTime value;
+    
+    /**
+     * for compare barrels and LargeVessel without sealTime value;
+     */ 
     public static boolean areBarrelsEqual(ItemStack st1, ItemStack st2) {        
         //it`s check no needed
         if (st1 == null || st2 == null || st1.stackTagCompound == null || 
@@ -190,54 +208,165 @@ public class ExtendedLogic {
     }
 
     /** 
-    * For compare Smithing items by bonus for can give goods with 
-    * more bonus that stay at stall in the link item
+    * For compare Smithing items by Smithing Bonus 
+    * for can buy goods with less or equal bonus that stay at stall face in the Slot
+    * or for sell goods with above or equal bounus than have StallFaceSlot
+    * import Stack1 - is Stack From Face-Stall-Slot
     */ 
     public static boolean areSmithingItemEqual(ItemStack st1, ItemStack st2) {        
-        //it`s check no needed
-        if (st1 == null || st2 == null || st1.stackTagCompound == null || 
-                st2.stackTagCompound == null)
-            return true; 
-        //if(is.hasTagCompound() && is.getTagCompound().hasKey("craftingTag"))
-        NBTTagCompound craftTag1 = getCraftTag(st1);
-        NBTTagCompound craftTag2 = getCraftTag(st2);
+        //it`s check no needed but...
+        if (st1 == null || st2 == null ) 
+            return false;       
         
-        if ( craftTag1 != null && craftTag2 != null )
+        NBTTagCompound craftTag1 = null;
+        NBTTagCompound craftTag2 = null;
+        float duraBuff1 = 0;
+        float damageBuff1 = 0;
+        float duraBuff2 = 0;        
+        float damageBuff2 = 0;
+        
+        // can be null
+        if (st1.hasTagCompound() && st1.getTagCompound().hasKey("craftingTag"))
         {
-           float duraBuff1 = getDurabilityBuff(st1);
-           float duraBuff2 = getDurabilityBuff(st2);           
-           
-           float damageBuff1 = getDamageBuff(st1);
-           float damageBuff2 = getDamageBuff(st2);
-           
-           
-           if (duraBuff1 == duraBuff2 && damageBuff1 == damageBuff2) {
-               return st1.stackTagCompound.equals(st2.stackTagCompound);
-           }
-           
-           if ( duraBuff1 > duraBuff2 || damageBuff1 > damageBuff2)
-               return false;
-           
-           craftTag1.removeTag("durabuff");
-           craftTag2.removeTag("durabuff");
-           
-           craftTag1.removeTag("damagebuff");
-           craftTag2.removeTag("damagebuff");
-                      
-           
-           boolean equal = st1.stackTagCompound.equals(st2.stackTagCompound);
-           
-           
-           setDurabilityBuff(st1, duraBuff1);
-           setDurabilityBuff(st2, duraBuff2);
-                   
-           setDamageBuff(st1, duraBuff1);
-           setDamageBuff(st2, duraBuff2);
-         
-           return equal;
+            craftTag1 = getCraftTag(st1);
+            duraBuff1 = getDurabilityBuff(st1);
+            damageBuff1 = getDamageBuff(st1);                      
         }
         
-        return st1.stackTagCompound.equals(st2.stackTagCompound);
+        // can`t be null 
+        if (st2.hasTagCompound() && st2.getTagCompound().hasKey("craftingTag"))
+        {
+            craftTag2 = getCraftTag(st2);
+            duraBuff2 = getDurabilityBuff(st2);
+            damageBuff2 = getDamageBuff(st2);                      
+        } else
+            return false;
+                 
+        if (duraBuff1 == duraBuff2 && damageBuff1 == damageBuff2) 
+        {
+               return st1.stackTagCompound.equals(st2.stackTagCompound);
+        }
+                
+        if (craftTag1 == null && craftTag2 != null)
+            return true;
+        
+        if ( duraBuff1 > duraBuff2 || damageBuff1 > damageBuff2)
+            return false;
+        
+        if (craftTag1 != null)
+        {
+            craftTag1.removeTag("durabuff");
+            if ( damageBuff1 > 0)//armor
+                craftTag1.removeTag("damagebuff");
+        }
+        
+        if (craftTag2 != null)
+        {
+            craftTag2.removeTag("durabuff");
+            if ( damageBuff2 > 0)//armor
+                craftTag2.removeTag("damagebuff");
+        }
+           
+           
+        boolean equal = st1.stackTagCompound.equals(st2.stackTagCompound);
+           
+        
+        if (craftTag1 != null)
+        {
+            if (damageBuff1 > 0)
+                setDamageBuff(st1, damageBuff1);
+            
+            if ( duraBuff1 > 0 ) 
+                setDurabilityBuff(st1, duraBuff1);
+        }    
+        
+        if (craftTag2 != null)
+        {
+            if ( damageBuff2 > 0)
+                setDamageBuff(st2, damageBuff2);
+            
+            if ( duraBuff2 > 0 )
+                setDurabilityBuff(st2, duraBuff2);
+        }    
+        
+        return equal;                        
     }    
     
+    
+    /**
+     * get first itemStack From Warehouse Container List
+     * for sell itemStack not from StallFaceSlot, but from warehouse container 
+     */    
+    public static ItemStack getFirstItemStackFromItemTileEntity( 
+            ArrayList<ItemTileEntity> list, 
+            ItemStack goodStack 
+            ) 
+    {
+        if ( list==null|| list.isEmpty() )
+            return null;
+        
+        ItemTileEntity iTE = list.get(0);
+        if (iTE == null || iTE.Container == null ||iTE.TileEntity == null || iTE.Items == null || iTE.Items.isEmpty())
+            return null;
+        ItemSlot Slot = iTE.Items.get(0);
+        IInventory inv = (IInventory) iTE.TileEntity;
+                  
+        if (Slot == null || inv == null || Slot.SlotIndex < 0 || Slot.SlotIndex >= inv.getSizeInventory() )
+            return null;
+        
+        ItemStack iStack = inv.getStackInSlot( Slot.SlotIndex );
+        
+        if (iStack == null)
+            return null;
+        
+        iStack = iStack.copy();
+        
+        if (iStack.getItem() instanceof IFood )
+        {   //cut decay inside
+            ItemFoodTFC.createTag(iStack, Food.getWeight(goodStack) );
+        }
+        else 
+        {
+            iStack.stackSize = ItemHelper.getItemStackQuantity(goodStack);
+        }
+        
+        return iStack.copy();
+    }
+    
+    /**
+     * for put itemStack to warehouse container with real nbt tag 
+     * from player, not from StallFaceSlot 
+     */
+    public static ItemStack getFirstPayItemStackFromPlayer (
+            ItemStack payItemStack,//for set count
+            EntityPlayer player, 
+            ArrayList<Integer> paySlotIndexes             
+            )
+    {
+      if (player == null || player.inventory==null || paySlotIndexes == null )
+          return null;
+      
+      int firstSlotIndex =  paySlotIndexes.get(0);
+      
+      if (firstSlotIndex < 0 || firstSlotIndex >= player.inventory.getSizeInventory() )
+          return null;
+                  
+      ItemStack payStack = player.inventory.getStackInSlot( firstSlotIndex );
+      
+      if ( payStack == null || payItemStack == null ) 
+          return null;
+      
+      payStack = payStack.copy();
+      
+      if (payStack.getItem() instanceof IFood )
+        {   //cut decay inside
+            ItemFoodTFC.createTag(payStack, Food.getWeight(payItemStack) );
+        }
+        else 
+        {
+            payStack.stackSize = payItemStack.stackSize ;
+        }
+      
+      return payStack;
+    }
 }

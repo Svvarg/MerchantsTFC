@@ -6,7 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 
 public class ItemTileEntity
 {
-	public IWarehouseContainer Container;
+    public IWarehouseContainer Container;
     public TileEntity TileEntity;
     public ArrayList<ItemSlot> Items;
     

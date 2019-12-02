@@ -1,6 +1,7 @@
 package com.aleksey.merchants.Helpers;
 
 import com.aleksey.merchants.Containers.ExtendedLogic;
+import static com.aleksey.merchants.Containers.ExtendedLogic.getFirstItemStackFromItemTileEntity;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -37,6 +38,7 @@ public class WarehouseManager
     private Hashtable<String, Integer> _quantities;
     private ItemStack _goodItemStack;
     private ItemStack _payItemStack;
+    public ItemStack _goodItemFromWarehouseContainer;
     private ArrayList<ItemTileEntity> _goodList;
     private ArrayList<ItemTileEntity> _payList;
     
@@ -147,13 +149,18 @@ public class WarehouseManager
             
             if(payQuantity > 0)
                 payQuantity -= container.searchFreeSpace(world, tileEntity, payStack, payQuantity, extendLimitY, _payList);
-        }
+        } 
         
         _goodItemStack = goodStack.copy();
         _payItemStack = payStack.copy();
         
+        this._goodItemFromWarehouseContainer = null;
+        
         if(goodQuantity == 0 && payQuantity == 0)
+        {
+            this._goodItemFromWarehouseContainer = getFirstItemStackFromItemTileEntity(_goodList,goodStack);            
             return PrepareTradeResult.Success;
+        }    
         
         return goodQuantity > 0 ? PrepareTradeResult.NoGoods: PrepareTradeResult.NoPays;
     }
@@ -330,5 +337,12 @@ public class WarehouseManager
                 _quantities.put(qtyTag.getString("Key"), qtyTag.getInteger("Value"));
             }
         }
+    }
+    
+    /** 
+     * for sale to the buyer item from warehouse containet, but not from stall face slot     
+     */
+    public ItemStack getGoodItemStack() {
+        return this._goodItemFromWarehouseContainer;//( this._goodItemStack != null ) ? this._goodItemStack.copy() : null;        
     }
 }

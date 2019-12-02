@@ -43,6 +43,9 @@ public class TileEntityStall extends NetworkTileEntity implements IInventory
     private String _ownerUserName;
     private WarehouseBookInfo _bookInfo;
 
+    public ItemStack _goodItemFromWarehouseContainer;
+    public ItemStack _payItemFromPlayerInventory;
+    
     public TileEntityStall()
     {
         _storage = new ItemStack[ItemCount];
@@ -142,9 +145,14 @@ public class TileEntityStall extends NetworkTileEntity implements IInventory
             return PrepareTradeResult.NoPays;
         }
         
-        return _bookInfo != null && _warehouse.existWarehouse(this.xCoord, this.yCoord, this.zCoord, _bookInfo, this.worldObj)
+        PrepareTradeResult result = _bookInfo != null && _warehouse.existWarehouse(this.xCoord, this.yCoord, this.zCoord, _bookInfo, this.worldObj)
             ? _warehouse.prepareTrade(goodStack, payStack, _bookInfo, this.worldObj)
             : PrepareTradeResult.NoGoods;
+        
+        this._goodItemFromWarehouseContainer = (PrepareTradeResult.Success == result.Success) ? 
+                _warehouse.getGoodItemStack() : null;
+        
+        return result;        
     }
 
     public void confirmTrade()
