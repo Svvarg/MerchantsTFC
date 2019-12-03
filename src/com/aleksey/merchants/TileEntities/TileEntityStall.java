@@ -149,6 +149,10 @@ public class TileEntityStall extends NetworkTileEntity implements IInventory
             ? _warehouse.prepareTrade(goodStack, payStack, _bookInfo, this.worldObj)
             : PrepareTradeResult.NoGoods;
         
+        /*
+          For sale to the buyer item from warehouse containet, but not from Stall-Face-Slot (real nbt)    
+          compare itemStack From Stall-Face-Slot and Warehouse container at ExtendedLoqic          
+         */
         this._goodItemFromWarehouseContainer = (PrepareTradeResult.Success == result.Success) ? 
                 _warehouse.getGoodItemStack() : null;
         

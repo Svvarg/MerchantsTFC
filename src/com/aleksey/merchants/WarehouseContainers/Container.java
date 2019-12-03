@@ -42,7 +42,10 @@ public abstract class Container implements IWarehouseContainer
             int invQuantity = 0;
                                         
            // if(ItemHelper.areItemEquals(itemStack, invItemStack))
-            if(ExtendedLogic.areItemEquals(itemStack, invItemStack))
+          
+          //how i see searchItems call only for goodStack therefore invIStack first
+          //for sell player itemsWithSmithing < that have StallFaceSlot
+          if(ExtendedLogic.areItemEquals(itemStack, invItemStack ))
             {                
                 invQuantity = ItemHelper.getItemStackQuantity(invItemStack);
                 
@@ -53,8 +56,8 @@ public abstract class Container implements IWarehouseContainer
                 }
             }    
             else if(invItemStack.getItem() instanceof ItemPotterySmallVessel)
+            //    invQuantity = SmallVesselHelper.getItemStackQuantity(itemStack, invItemStack);
                 invQuantity = SmallVesselHelper.getItemStackQuantity(itemStack, invItemStack);
-                        
             
             if(invQuantity <= 0)
                 continue;

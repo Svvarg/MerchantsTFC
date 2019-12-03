@@ -142,7 +142,7 @@ public class SmallVesselHelper
             
             //if(vesselItemStack != null && ItemHelper.areItemEquals(vesselItemStack, itemStack))
             
-            //importance of following the sequence of Stacks! First itemStack - item frome Stall Slot, after vesselIStack
+            //importance of following the sequence of Stacks! First itemStack - itemStack frome StallFaceSlot, after vesselIStack
             //This for correct work trade with diff smithing bonus(can buy and sell items with more bonus that stay at stall
             if(vesselItemStack != null && ExtendedLogic.areItemEquals(itemStack, vesselItemStack ))
                 

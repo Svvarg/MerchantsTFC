@@ -597,8 +597,7 @@ public class ContainerStall extends ContainerTFC
     {
         boolean flag1 = slot == null || !slot.getHasStack();
 
-        if (slot != null && slot.getHasStack() && itemStack != null && itemStack.isItemEqual(slot.getStack()) && ItemStack.areItemStackTagsEqual(slot.getStack(), itemStack))
-        //if (slot != null && slot.getHasStack() && itemStack != null && itemStack.isItemEqual(slot.getStack()) && ExtendedLogic.areItemStackTagsEqualEx(slot.getStack(), itemStack))
+        if (slot != null && slot.getHasStack() && itemStack != null && itemStack.isItemEqual(slot.getStack()) && ItemStack.areItemStackTagsEqual(slot.getStack(), itemStack))        
         {
             int i = sizeMatters ? 0 : itemStack.stackSize;
             flag1 |= slot.getStack().stackSize + i <= itemStack.getMaxStackSize();
@@ -950,6 +949,8 @@ public class ContainerStall extends ContainerTFC
             
             //ItemStack newItemStack = goodItemStack.copy();
             ItemStack newItemStack = _stall._goodItemFromWarehouseContainer;
+            if ( newItemStack == null )//this shoult not happen but for insurance
+                newItemStack = goodItemStack.copy();
                         
             if(newItemStack.getItem() instanceof IFood)                
                 ItemFoodTFC.createTag(newItemStack, Food.getWeight(newItemStack));
@@ -1041,7 +1042,7 @@ public class ContainerStall extends ContainerTFC
             ItemStack invItemStack = inventoryplayer.getStackInSlot(i);
             
             //if(invItemStack == null || !ItemHelper.areItemEquals(payItemStack, invItemStack))
-            if(invItemStack == null || !ExtendedLogic.areItemEquals(payItemStack, invItemStack))
+            if(invItemStack == null || !ExtendedLogic.areItemEquals(payItemStack, invItemStack, true))
                 continue;
             
             int invQuantity = ItemHelper.getItemStackQuantity(invItemStack);

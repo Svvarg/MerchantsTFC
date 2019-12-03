@@ -247,6 +247,9 @@ public class WarehouseManager
                         if(vesselItemStacks[k] != null)
                             addItemStackQuantity(vesselItemStacks[k]);
                     }
+                    // case then in smVessel locate some Items and this smVessel is a good from StallFaceSlot
+                    // if no empty another smVessels this can`t sell to player as goods. Therefore added his to quantity
+                    addItemStackQuantity(itemStack);
                 }
             }
             else
@@ -340,9 +343,11 @@ public class WarehouseManager
     }
     
     /** 
-     * for sale to the buyer item from warehouse containet, but not from stall face slot     
+     * For sale to the buyer item from warehouse containet, but not from Stall-Face-Slot (real nbt)    
+     * compare itemStack From Stall-Face-Slot and Warehouse container at ExtendedLoqic
+     * this for barrel with different sealTime and items have craftingTag = Smithing Bonus(TFC tools-armor-weapon)
      */
     public ItemStack getGoodItemStack() {
-        return this._goodItemFromWarehouseContainer;//( this._goodItemStack != null ) ? this._goodItemStack.copy() : null;        
+        return this._goodItemFromWarehouseContainer;
     }
 }
