@@ -9,8 +9,11 @@ import com.bioxx.tfc.Items.ItemBlocks.ItemAnvil;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBellows;
 import com.bioxx.tfc.Items.ItemBlocks.ItemCrucible;
+import com.bioxx.tfc.Items.ItemBlocks.ItemGrill;
 import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
 import com.bioxx.tfc.Items.ItemBlocks.ItemWoodDoor;
+import com.bioxx.tfc.Items.ItemSluice;
+import com.aleksey.merchants.Containers.ExtendedLogic;
 
 public class SlotStorageRack extends Slot
 {
@@ -29,6 +32,9 @@ public class SlotStorageRack extends Slot
                 || item instanceof ItemLargeVessel
                 || item instanceof ItemBarrels
                 || item instanceof ItemWoodDoor
+                || item instanceof ItemGrill
+                || item instanceof ItemSluice
+                || ExtendedLogic.isValidItemForStorageRack(item)
                 ; 
     }
 }

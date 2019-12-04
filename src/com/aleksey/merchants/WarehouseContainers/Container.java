@@ -43,6 +43,7 @@ public abstract class Container implements IWarehouseContainer
                                         
            // if(ItemHelper.areItemEquals(itemStack, invItemStack))
           
+          //always first call StallFaceSlot in ELogic.areItemEquals
           //how i see searchItems call only for goodStack therefore invIStack first
           //for sell player itemsWithSmithing < that have StallFaceSlot
           if(ExtendedLogic.areItemEquals(itemStack, invItemStack ))
@@ -101,6 +102,7 @@ public abstract class Container implements IWarehouseContainer
             if(invItemStack == null || !(invItemStack.getItem() instanceof ItemPotterySmallVessel))
                 continue;
             
+            //important inside ItemHelper.areItemEquals not ELogic.areItemEquals
             int addQuantity = SmallVesselHelper.getFreeSpace(itemStack, invItemStack);
             
             if(addQuantity <= 0)

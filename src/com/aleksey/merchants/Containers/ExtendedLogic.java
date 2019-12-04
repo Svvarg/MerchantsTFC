@@ -21,6 +21,7 @@ import com.bioxx.tfc.api.Interfaces.IFood;
 import java.util.ArrayList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -48,6 +49,9 @@ public class ExtendedLogic {
     public static final String SEALTIME = "SealTime";
     public static final String SEALED = "Sealed";
     public static final String BARRELTYPE = "barrelType";
+    public static final boolean IGNOREBARRELWOODTYPE = true;//allow trade any one barrel wood type
+    
+    
     
     
     
@@ -108,7 +112,16 @@ public class ExtendedLogic {
         if (itemStack1 == null || itemStack2 == null) {
             return false;
         }
-        // on barrel itemDamage=meta type of barrel can ignore this
+        
+        // on barrel itemDamage=meta type of wood barrel Can ignore this for payMode
+        if  ( IGNOREBARRELWOODTYPE && 
+                itemStack1.getItem() instanceof ItemBarrels 
+                && itemStack2.getItem() instanceof ItemBarrels 
+                && itemStack1.getItem() == itemStack2.getItem() )
+        {
+            return areItemStackTagsEqualEx(itemStack1, itemStack2, payMode);
+        }
+        
         if (itemStack1.getItem() != itemStack2.getItem() || itemStack1.getItemDamage() != itemStack2.getItemDamage()) {
             return false;
         }
@@ -127,10 +140,15 @@ public class ExtendedLogic {
     /**
      *  For Equal TFC items like burrel with date, tools-armor-weapons with SwimingBonus, (food with temperature not realized)
      *                
-     * @param st1  StallFaceSlot pay(payMode) or goods
+     * @param st1  StallFaceSlot pay(payMode) or goods    (Always!)
      * @param st2  warehouse or player inventory   
-     * @param payMode then check payStallFaceSlot(st1) and Player Inventory(st2)
+     * @param payMode then check payStallFaceSlot(st1) and Player Inventory(st2) (preparePay)
      * @return 
+     * Important sequence of arguments 
+     *    st1 - StallFaceSlot (pay and goods)
+     *    st2 - out Stack from warehouse  - no PayMode 
+     *          and Stack from Player Inventory in payMode
+     * 
      */
     public static boolean areItemStackTagsEqualEx(ItemStack st1, ItemStack st2, boolean payMode)  
     {
@@ -153,13 +171,16 @@ public class ExtendedLogic {
               // Don`t allow to combine at stack items, according to the logic suitable for trade
               // then stall search place for price-item in container to put it
               // at searchFreeSpace_NonEmptySlot 
-              if ( st1.stackSize == 1 && st2.stackSize == 1)
+              if (true)//( st1.stackSize == 1 && st2.stackSize == 1)
               {
                  
                   //Compare barrel largeVessel and food
-                  Class<?> cls = st1.getItem().getClass();
+                  //Class<?> cls = st1.getItem().getClass();                  
+                  //if (cls == ItemBarrels.class || cls == ItemLargeVessel.class )
                   
-                  if (cls == ItemBarrels.class || cls == ItemLargeVessel.class )
+                  Item item1 = st1.getItem();
+                  
+                  if (  item1 instanceof ItemBarrels || item1 instanceof  ItemLargeVessel )
                   {
                       return areBarrelsEqual(st1, st2);   
                   }                  
@@ -199,7 +220,7 @@ public class ExtendedLogic {
                 st2.stackTagCompound.getBoolean(SEALED) )
         {
             int sealTime1 = 0;
-            int sealTime2 = -1;
+            int sealTime2 = 0;
             int barrelType1 = 0;
             int barrelType2 = 0;
             
@@ -215,18 +236,25 @@ public class ExtendedLogic {
             {
                 sealTime2 = st2.stackTagCompound.getInteger(SEALTIME);
                 barrelType2 = st2.stackTagCompound.getInteger(BARRELTYPE);                
-            } else 
+            } 
+            
+            //Burrel from playerinventory  as pay  or from warehouse container as goods
+            //if dont have time set now game time moment of trade
+            if (sealTime2 <= 0)
             {
                 /*
                 If barrel or largeVessel fill from another barrel on player hand
                 this barrel dont have sealedTime and barrelType. 
-                Therefore set sealTime on moment of trade
+                Therefore set sealTime on this moment (trade)
                 */
                 sealTime2 = (int)TFC_Time.getTotalHours();                
                 barrelType2 = st2.getItemDamage();
             }
             
-            if ( sealTime1 != 0 && sealTime1 == sealTime2 )//&& barrelType1 == barrelType2 )
+            //case then sealtime = 0 and have nbt tag with sealTime=0
+            // but secand burrel dont have this tag 
+            // or if equal SealTime compare withount remove NBTtags
+            if ( sealTime1 != 0 && sealTime1 == sealTime2 ) // ignore barrelType
                 return st1.stackTagCompound.equals(st2.stackTagCompound);
             
             /*
@@ -249,15 +277,17 @@ public class ExtendedLogic {
                 st2.stackTagCompound.removeTag(BARRELTYPE);
             }
             
+            
             boolean equal = st1.stackTagCompound.equals(st2.stackTagCompound);
            
+            
             //back tags after compare if they were given
             if ( sealTime1 > 0 ) {
                 st1.stackTagCompound.setInteger(SEALTIME, sealTime1);
                 st1.stackTagCompound.setInteger(BARRELTYPE, barrelType1);
             }
                 
-            if (sealTime2 > -1 ) {
+            if (sealTime2 > 0 ) {
                 st2.stackTagCompound.setInteger(SEALTIME, sealTime2);
                 st2.stackTagCompound.setInteger(BARRELTYPE, barrelType2);
             }
@@ -290,7 +320,7 @@ public class ExtendedLogic {
     }
     
     /** 
-    * For compare Smithing items by Smithing Bonus                                  rewrite!!!
+    * For compare Smithing items by Smithing Bonus                                  
     * Allow buying goods with less or equal bonus that stay at StallFaceSlot
     * but with a difference of not more than permissibleSmithingBonus
     * And allow selling pay with more or equal bounus than have StallFaceSlot    
@@ -495,5 +525,37 @@ public class ExtendedLogic {
         }
       
       return payStack;
+    }
+    
+    /**
+     * More items to StorageRack
+     * @param item
+     * @return 
+     */
+    public static boolean isValidItemForStorageRack(Item item) 
+    {
+        
+        if (item==null)
+            return false;
+        
+        String iClass = item.getClass().toString();
+        
+        if (iClass == null || iClass.isEmpty() ) {
+                return false;
+        }
+        return (
+                ( iClass.startsWith("sladki.tfc.ab") && 
+                    ( 
+                       iClass.contains("ItemBlockPotteryKiln") 
+                    || iClass.contains("ItemBlockPotteryKilnChamber")
+                    || iClass.contains("ItemBlockSteamBoiler")
+                    || iClass.contains("ItemBlockAutomatedBellows")
+                    || iClass.contains("ItemBlockWaterFilter")              
+                    )
+                ) 
+                || iClass.contains("taeog.animalcrate.item.ItemCrate")
+                || iClass.contains("udary.tfcudarymod.items.devices.ItemOreCooker")
+                || iClass.contains("tfctech.items.ItemBlocks.ItemWireDrawBench")
+                );
     }
 }

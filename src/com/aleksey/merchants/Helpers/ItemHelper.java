@@ -12,6 +12,7 @@ import com.bioxx.tfc.api.Food;
 import com.bioxx.tfc.api.Interfaces.IFood;
 import static com.aleksey.merchants.Containers.ExtendedLogic.isNoSplitFood;
 import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
+import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
 
 public class ItemHelper {
 
@@ -32,11 +33,19 @@ public class ItemHelper {
 
     public static final String getItemKey(ItemStack itemStack) {
         Item item = itemStack.getItem();
-        String key = String.valueOf(Item.getIdFromItem(item)) + ":" + String.valueOf(itemStack.getItemDamage());
+        String key = "";
+        if (ExtendedLogic.IGNOREBARRELWOODTYPE && item instanceof ItemBarrels)
+        {
+            key = String.valueOf(Item.getIdFromItem(item)); //":" + String.valueOf(itemStack.getItemDamage());
+        }
+        else
+            key = String.valueOf(Item.getIdFromItem(item)) + ":" + String.valueOf(itemStack.getItemDamage());
 
         if (!(item instanceof IFood)) {
             return key;
         }
+        
+        // there put the keys for diffent smithing Bonus items like as for food
 
         key += ":"
                 + (Food.isBrined(itemStack) ? "1" : "0")

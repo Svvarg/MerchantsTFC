@@ -261,7 +261,8 @@ public class WarehouseManager
     {
         int quantity = ItemHelper.getItemStackQuantity(itemStack);
         
-        // stall not split milkjug and bucket therefore cant combine 18oz+18oz for giving 20 oz bucket as good
+        // stall not split milkjug and bucket and Salad 
+        //therefore cant combine 18oz+18oz for giving 20 oz bucket as good
         //for correct displaying quantity milk jug and bucket, ignore incomplete milk containers
         int nsFoodWeight = getNoSplitFoodWeight(itemStack);
         if (nsFoodWeight > 0 && quantity != nsFoodWeight) {
