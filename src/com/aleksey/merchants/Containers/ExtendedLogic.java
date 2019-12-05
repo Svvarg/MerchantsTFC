@@ -44,7 +44,7 @@ public class ExtendedLogic {
     public static final String CRAFTINGTAG = "craftingTag";
     public static final String DURABUFF = "durabuff";
     public static final String DAMAGEBUFF = "damagebuff";
-    public static final float permissibleSmithingBonus = 0.1f;//24*365ч
+    //public static final float permissibleSmithingBonus = 0.1f;
     
     public static final String SEALTIME = "SealTime";
     public static final String SEALED = "Sealed";
@@ -370,7 +370,7 @@ public class ExtendedLogic {
         if (payMode) 
         {   /*
                 Then Check condition st1 - PayStallFaceSlot st2- Stack From PlayerInventory
-                can sell forged item with smithing bonus more that have payStallFaceSlot item
+                can sell forged item with smithing bonus more that have item on payStallFaceSlot
             */
             if ( duraBuff1 > duraBuff2 ) 
                 return false;
@@ -379,26 +379,31 @@ public class ExtendedLogic {
                 return true;
         }
         else
-        {   /* 
-                Buy forged item with smithing bonus
-                can buy that item which have bonus less that have goodStallFaceSlot
-                but with a difference of not more than permissibleSmithingBonus
+        {   /* Buy forged item with smithing bonus
+            
+                allow trade forged item with diffent bonus.
+                Compare goodStallFaceSlot and item from warehouseContainer 
+                by smithing area bonus                
                 1- Stall  2 - Warehouse
-            */
-            boolean suitableForTradeBonus =  ( duraBuff1 - duraBuff2 < permissibleSmithingBonus );
+                        
+             smithing bonus areas 0-<10% 1:10%-<20% 2: 20%-<30% .. 9:90-100%
+             smelted Tools withount bonus is a 0 area (0-9.99% bonus)
+             Correct showing the quantity of goods at Stall by area bonus
+            */         
+            int smArea1 = getSmithingNumArea(duraBuff1);
+            int smArea2 = getSmithingNumArea(duraBuff2);
             
-            if (craftTag1 != null && craftTag2 == null && suitableForTradeBonus )
-                return true;        
-            
-            if (!suitableForTradeBonus || duraBuff1 < duraBuff2 || damageBuff1 < damageBuff2 )
-                return false;
+            if (smArea1 != smArea2)
+                return false;            
         }
         
         removeCraftingTag(craftTag1,damageBuff1);
         removeCraftingTag(craftTag2,damageBuff2);
            
         boolean equal = st1.hasTagCompound() && st1.stackTagCompound.equals(st2.stackTagCompound);
-           
+        
+        //duraBuff2 = (float) Math.random();for debug and check
+        
         restoreBackCraftingtag(st1, craftTag1, duraBuff1, damageBuff1);
         restoreBackCraftingtag(st2, craftTag2, duraBuff2, damageBuff2);
         
@@ -557,5 +562,37 @@ public class ExtendedLogic {
                 || iClass.contains("udary.tfcudarymod.items.devices.ItemOreCooker")
                 || iClass.contains("tfctech.items.ItemBlocks.ItemWireDrawBench")
                 );
+    }
+    
+    
+    //for compare tools weapon armor and for correct quantiti on warehouse
+    public static int getSmithingNumArea(float buff)
+    {
+        if (buff < 0.1) 
+            return 0;
+        if (buff >= 0.9)
+            return 9;
+        return (int) Math.floor( buff * 10 );
+    }
+    
+    /**
+     * For display correct quantity smithing item with different bonus 
+     * id:meta:0     0: 0-<10% 1:10-<20% 2:20-<30% .. 9:90-100%
+     * @return 
+     */
+    public static String getKeyForSmithingItem(ItemStack itemStack,String key)
+    {
+        if (itemStack == null || key == null || key.isEmpty() ) 
+            return "";
+        //Item item = itemStack.getItem();
+        //String.valueOf(Item.getIdFromItem(item)) + ":" + String.valueOf(itemStack.getItemDamage());
+        if ( !( itemStack.hasTagCompound() && itemStack.stackTagCompound.hasKey(CRAFTINGTAG) ))
+            return key;
+        float duraBuff = getDurabilityBuff(itemStack);   
+        if (duraBuff <=0 )
+            return key;
+        int sna = getSmithingNumArea(duraBuff);
+        
+        return key+":"+sna;
     }
 }

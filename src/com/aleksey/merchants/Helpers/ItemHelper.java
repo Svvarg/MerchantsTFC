@@ -36,12 +36,14 @@ public class ItemHelper {
         String key = "";
         if (ExtendedLogic.IGNOREBARRELWOODTYPE && item instanceof ItemBarrels)
         {
+            //ignore wood material(metadata) of burrels
             key = String.valueOf(Item.getIdFromItem(item)); //":" + String.valueOf(itemStack.getItemDamage());
         }
-        else
+        else 
             key = String.valueOf(Item.getIdFromItem(item)) + ":" + String.valueOf(itemStack.getItemDamage());
 
         if (!(item instanceof IFood)) {
+            key = ExtendedLogic.getKeyForSmithingItem(itemStack,key);
             return key;
         }
         

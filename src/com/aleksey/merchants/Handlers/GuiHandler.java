@@ -7,16 +7,19 @@ import net.minecraft.world.World;
 import com.aleksey.merchants.Containers.ContainerAnvilDie;
 import com.aleksey.merchants.Containers.ContainerStall;
 import com.aleksey.merchants.Containers.ContainerStallLimit;
+import com.aleksey.merchants.Containers.ContainerStallSetPayItem;
 import com.aleksey.merchants.Containers.ContainerStorageRack;
 import com.aleksey.merchants.Containers.ContainerTrussel;
 import com.aleksey.merchants.Containers.ContainerWarehouse;
 import com.aleksey.merchants.GUI.GuiAnvilDie;
 import com.aleksey.merchants.GUI.GuiStall;
 import com.aleksey.merchants.GUI.GuiStallLimit;
+import com.aleksey.merchants.GUI.GuiStallSetPayItem;
 import com.aleksey.merchants.GUI.GuiStorageRack;
 import com.aleksey.merchants.GUI.GuiTrussel;
 import com.aleksey.merchants.GUI.GuiTrusselCreate;
 import com.aleksey.merchants.GUI.GuiWarehouse;
+import static com.aleksey.merchants.Handlers.GuiHandler.GuiStallSetPayItem;
 import com.aleksey.merchants.TileEntities.TileEntityAnvilDie;
 import com.aleksey.merchants.TileEntities.TileEntityStall;
 import com.aleksey.merchants.TileEntities.TileEntityStorageRack;
@@ -34,6 +37,8 @@ public class GuiHandler implements IGuiHandler
     public static final int GuiTrussel = 5;
     public static final int GuiAnvilDie = 6;
     public static final int GuiStorageRack = 7;
+    public static final int GuiStallSetPayItem = 8;
+    
     
     @Override
     public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) 
@@ -58,6 +63,10 @@ public class GuiHandler implements IGuiHandler
                 return new ContainerAnvilDie(player.inventory, (TileEntityAnvilDie)te, world, x, y, z);
             case GuiStorageRack:
                 return new ContainerStorageRack(player.inventory, (TileEntityStorageRack)te, world, x, y, z);
+                
+            case GuiStallSetPayItem:
+                return new ContainerStallSetPayItem(player.inventory, (TileEntityStall)te, world, x, y, z);
+                                
             default:
                 return null;
         }
@@ -95,6 +104,10 @@ public class GuiHandler implements IGuiHandler
                 return new GuiAnvilDie(player.inventory, (TileEntityAnvilDie)te, world, x, y, z);
             case GuiStorageRack:
                 return new GuiStorageRack(player.inventory, (TileEntityStorageRack)te, world, x, y, z);
+                
+            case GuiStallSetPayItem:
+                return new GuiStallSetPayItem(player.inventory, (TileEntityStall)te, world, x, y, z);
+                
             default:
                 return null;
         }
