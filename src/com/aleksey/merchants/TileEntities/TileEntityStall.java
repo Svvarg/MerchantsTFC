@@ -1,5 +1,7 @@
 package com.aleksey.merchants.TileEntities;
 
+import com.aleksey.merchants.Containers.EditPriceSlot;
+import com.aleksey.merchants.Containers.ExtendedLogic;
 import java.util.UUID;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,6 +23,7 @@ import com.bioxx.tfc.TileEntities.NetworkTileEntity;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.item.Item;
 
 public class TileEntityStall extends NetworkTileEntity implements IInventory
 {
@@ -34,6 +37,8 @@ public class TileEntityStall extends NetworkTileEntity implements IInventory
     private static final byte _actionId_Buy = 1;
     private static final byte _actionId_SelectLimit = 2;
     private static final byte _actionId_SetLimit = 3;
+    private static final byte _actionId_SelectSetPayItem = 4;//
+    private static final byte _actionId_SetSetPayItem = 5;//
 
     private ItemStack[] _storage;
     private WarehouseManager _warehouse;
@@ -452,6 +457,13 @@ public class TileEntityStall extends NetworkTileEntity implements IInventory
             case _actionId_SetLimit:
                 actionHandlerSetLimit(nbt);
                 break;
+            case _actionId_SelectSetPayItem:
+                actionHandlerSelectSetPayItem(nbt);
+                break;
+            case _actionId_SetSetPayItem:
+                actionHandlerSetSetPayItem(nbt);                
+                break;
+                
         }
     }
 
@@ -580,4 +592,103 @@ public class TileEntityStall extends NetworkTileEntity implements IInventory
         
         player.openGui(MerchantsMod.instance, GuiHandler.GuiOwnerStall, worldObj, xCoord, yCoord, zCoord);        
     }
+    
+    
+    
+    public void actionSelectSetPayItem (int goodSlotIndex)
+    {
+        _activeGoodSlotIndex = goodSlotIndex;
+        
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setByte("Action", _actionId_SelectSetPayItem );
+        
+        nbt.setString("playername", PlayerManagerTFC.getInstance().getClientPlayer().playerName);
+        nbt.setInteger("GoodSlotIndex", goodSlotIndex);
+        
+        this.broadcastPacketInRange(this.createDataPacket(nbt));
+
+        this.worldObj.func_147479_m(xCoord, yCoord, zCoord);
+    }
+            
+    public void actionSetSetPayItem(int priceSlotIndex )
+    {
+        actionSetSetPayItem(priceSlotIndex,0,0,0,0,0,0,0);
+    }
+    
+    public void actionSetSetPayItem(int priceSlotIndex, int id, int meta, int count, int param1, int param2, int param3, int param4 )
+    {
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setByte("Action", _actionId_SetSetPayItem);
+        
+        nbt.setString("playername", PlayerManagerTFC.getInstance().getClientPlayer().playerName);
+        nbt.setInteger("PriceSlotIndex", priceSlotIndex);
+       
+        
+        if (id != 0 && meta >= 0 && meta < 5000 ) 
+        {
+            if (  count < 1 || count > 1000 )
+                count = 1;
+                    
+            if (!EditPriceSlot.isValidToTFCPayItem(id,meta))
+                return;
+            
+            nbt.setBoolean("CreatePayItem", true);
+            nbt.setInteger("id",id);
+            nbt.setInteger("meta",meta);
+            nbt.setInteger("count",count);
+            
+            if (param1>0)
+                nbt.setInteger("p1",param1);
+            if (param2>0)
+                nbt.setInteger("p2",param2);
+            if (param3>0)
+                nbt.setInteger("p3",param3);
+            if (param4>0)
+                nbt.setInteger("p4",param4);            
+        }    
+        
+        this.broadcastPacketInRange(this.createDataPacket(nbt));
+
+        this.worldObj.func_147479_m(xCoord, yCoord, zCoord);    
+    }
+    
+    
+    //sw
+    private void actionHandlerSelectSetPayItem (NBTTagCompound nbt)
+    
+    {
+        _activeGoodSlotIndex = nbt.getInteger("GoodSlotIndex");
+        
+        this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        
+        EntityPlayer player = worldObj.getPlayerEntityByName(nbt.getString("playername"));
+        
+        player.openGui(MerchantsMod.instance, GuiHandler.GuiStallSetPayItem, worldObj, xCoord, yCoord, zCoord);        
+    }
+    
+    private void actionHandlerSetSetPayItem(NBTTagCompound nbt)
+    {
+        if(nbt.hasKey("CreatePayItem"))
+        {
+            int priceSlotIndex = nbt.getInteger("PriceSlotIndex");
+                        
+            for(int i = 0; i < PricesSlotIndexes.length; i++)
+            {
+                if(PricesSlotIndexes[i] == priceSlotIndex)
+                {
+                    ItemStack payStack = EditPriceSlot.createItemStackByParams(nbt);
+                    if (priceSlotIndex>-1 && priceSlotIndex < _storage.length)
+                      _storage[priceSlotIndex] = payStack;
+                    break;
+                }
+            }
+            
+            this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        }
+        
+        EntityPlayer player = worldObj.getPlayerEntityByName(nbt.getString("playername"));
+        
+        player.openGui(MerchantsMod.instance, GuiHandler.GuiOwnerStall, worldObj, xCoord, yCoord, zCoord);        
+    }
+
 }

@@ -21,7 +21,7 @@ public class ContainerStallSetPayItem extends ContainerTFC
 {    
     public ContainerStallSetPayItem(InventoryPlayer inventoryplayer, TileEntityStall stall, World world, int x, int y, int z)
     {
-        addSlotToContainer(new SlotForShowOnly(stall, stall.getActivePriceSlotIndex(), GuiStallSetPayItem.PriceSlotX, GuiStallSetPayItem.SlotY));
+        addSlotToContainer(new SlotForShowOnly(stall, stall.getActivePriceSlotIndex(), GuiStallSetPayItem.PriceSlotX, GuiStallSetPayItem.PriceSlotY));
         
         PlayerInventory.buildInventoryLayout(this, inventoryplayer, 8, GuiStallSetPayItem.WindowHeight - 1 + 5, false, true);
     }

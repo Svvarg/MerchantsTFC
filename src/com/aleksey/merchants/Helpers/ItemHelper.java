@@ -26,9 +26,12 @@ public class ItemHelper {
         }
 
         return itemStack1.getItem() instanceof IFood
-                ? Food.areEqual(itemStack1, itemStack2)
-                : ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);
-                //: ExtendedLogic.areItemStackTagsEqualEx(itemStack1, itemStack2, putToNonEmptySlot);
+                //? Food.areEqual(itemStack1, itemStack2)
+                
+                // consider CookedLevel ignore CookedProFile & FuelProFile
+                ? ExtendedLogic.areFoodEqual(itemStack1, itemStack2) 
+                
+                : ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);                
     }
 
     public static final String getItemKey(ItemStack itemStack) {
@@ -52,11 +55,12 @@ public class ItemHelper {
         key += ":"
                 + (Food.isBrined(itemStack) ? "1" : "0")
                 + (Food.isPickled(itemStack) ? "1" : "0")
-                + (Food.isCooked(itemStack) ? "1" : "0")
+                //+ (Food.isCooked(itemStack) ? "1" : "0")
+                + ExtendedLogic.getCookedLevel(itemStack)// 0 - not Cooked 1 - light 5 - Dark
                 + (Food.isDried(itemStack) ? "1" : "0")
                 + (Food.isSmoked(itemStack) ? "1" : "0")
                 + (Food.isSalted(itemStack) ? "1" : "0");
-
+        
         return key;
     }
 

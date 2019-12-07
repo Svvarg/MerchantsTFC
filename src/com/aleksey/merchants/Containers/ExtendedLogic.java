@@ -1,5 +1,6 @@
 package com.aleksey.merchants.Containers;
 
+import static com.aleksey.merchants.Containers.ExtendedLogic.setCookedLevel;
 import com.aleksey.merchants.Helpers.ItemHelper;
 import static com.aleksey.merchants.Helpers.SmallVesselHelper.getVesselItemStacks;
 import com.aleksey.merchants.api.ItemSlot;
@@ -7,22 +8,46 @@ import com.aleksey.merchants.api.ItemTileEntity;
 import com.bioxx.tfc.Core.TFC_Time;
 import com.bioxx.tfc.Food.ItemFoodTFC;
 import com.bioxx.tfc.Food.ItemSalad;
+import com.bioxx.tfc.Food.ItemSandwich;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
 import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
+import com.bioxx.tfc.Items.ItemBlocks.ItemTerraBlock;
+import com.bioxx.tfc.Items.ItemGem;
+import com.bioxx.tfc.Items.ItemOre;
+import com.bioxx.tfc.Items.ItemOreSmall;
+import com.bioxx.tfc.Items.ItemRawHide;
+import com.bioxx.tfc.Items.ItemTFCArmor;
+import com.bioxx.tfc.Items.ItemTerra;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 import com.bioxx.tfc.Items.Tools.ItemCustomBucketMilk;
+import com.bioxx.tfc.Items.Tools.ItemCustomSword;
+import com.bioxx.tfc.Items.Tools.ItemMiscToolHead;
+import com.bioxx.tfc.Items.Tools.ItemTerraTool;
+import com.bioxx.tfc.Items.Tools.ItemWeapon;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.getCraftTag;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.getDamageBuff;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.getDurabilityBuff;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.setDamageBuff;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.setDurabilityBuff;
 import com.bioxx.tfc.api.Food;
+import static com.bioxx.tfc.api.Food.getInfusion;
+import static com.bioxx.tfc.api.Food.isBrined;
+import static com.bioxx.tfc.api.Food.isCooked;
+import static com.bioxx.tfc.api.Food.isDried;
+import static com.bioxx.tfc.api.Food.isInfused;
+import static com.bioxx.tfc.api.Food.isPickled;
+import static com.bioxx.tfc.api.Food.isSalted;
+import static com.bioxx.tfc.api.Food.isSameSmoked;
+import static com.bioxx.tfc.api.Food.isSmoked;
 import com.bioxx.tfc.api.Interfaces.IFood;
+import com.bioxx.tfc.api.TFCItems;
 import java.util.ArrayList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
 
 /**
@@ -36,7 +61,7 @@ public class ExtendedLogic {
     private static final int BUCKETMILKWEIGHT = 20;
     private static final int SALADWEIGHT = 20;
     private static final int JUGMILKWEIGHT = 80;
-    public static final int PERMISSIBLEDECLAY = 3;
+    public static final int PERMISSIBLEDECLAY = 2;//milk salad!
     public static final int permissibleSealTimeHours = 8760;//24*365ч
     public static final boolean ToNonEmptySlot = true;
     public static final boolean ToEmptySlot = false;
@@ -50,8 +75,6 @@ public class ExtendedLogic {
     public static final String SEALED = "Sealed";
     public static final String BARRELTYPE = "barrelType";
     public static final boolean IGNOREBARRELWOODTYPE = true;//allow trade any one barrel wood type
-    
-    
     
     
     
@@ -125,14 +148,116 @@ public class ExtendedLogic {
         if (itemStack1.getItem() != itemStack2.getItem() || itemStack1.getItemDamage() != itemStack2.getItemDamage()) {
             return false;
         }
-
+/*
         return itemStack1.getItem() instanceof IFood
                 ? Food.areEqual(itemStack1, itemStack2)
                 //: ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);
-                : ExtendedLogic.areItemStackTagsEqualEx(itemStack1, itemStack2 , payMode);
+                : ExtendedLogic.areItemStackTagsEqualEx(itemStack1, itemStack2 , payMode*/
+        boolean equals = false;
+ 
+        if (itemStack1.getItem() instanceof IFood)
+        {
+            //equals = Food.areEqual(itemStack1, itemStack2);
+            equals = areFoodEqual(itemStack1, itemStack2);
+        }else{                    //: ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);
+            equals =  ExtendedLogic.areItemStackTagsEqualEx(itemStack1, itemStack2 , payMode);
+        }    
+        return equals;
     }
     
-    public static final boolean areItemEquals(ItemStack itemStack1, ItemStack itemStack2) {
+    //+1 to ItemFoodTFC standart  here 0 is not cooked
+    public static int getCookedLevel(ItemStack is)
+    {
+        if (is == null || !Food.isCooked(is) )
+            return 0;
+        int cooked = (int) Food.getCooked(is);
+        if (cooked  < 600)
+            return 0;//
+        
+        int cl = (int) Math.floor( ( cooked - 600 )/120 ) + 1;
+        cl = (cl < 1 || cl > 5 ) ? 0 : cl;
+        return cl; //1-5 (0-4 in ItemFoodTFC) +1 0 - notCooked
+    }
+    
+    //for makeupPayItem by params
+    public static boolean setCookedLevel(ItemStack is, int cookedLevel)
+    {
+        if (is == null || cookedLevel < 0 || cookedLevel > 5 )
+            return false;
+        
+        
+        float cooked = 600 + 120 * ( cookedLevel - 1 );
+        cooked = (cooked == 600)? 601 : cooked;// (isCooked float > 600)
+        Food.setCooked(is, cooked);
+        return true;        
+    }
+    
+    //com.bioxx.tfc.api.Food without personal test factor like CookedProfile & FuelProfile
+    // consider CookedLevel, ignore CookedProFile & FuelProFile
+    public static boolean areFoodEqual(ItemStack is1, ItemStack is2)
+    {
+        
+        if (is1== null || is2 == null)
+            return false;
+        
+        if (is1.getItem() instanceof ItemSandwich //&& is2.getItem() instanceof ItemSandwich )
+                || is1.getItem() instanceof ItemSalad  ) 
+        {
+            return areGroupedFoodEquals(is1,is2);
+        }
+        
+        
+        boolean brined = isBrined(is1) == isBrined(is2);//рассол
+        boolean pickled = isPickled(is1) == isPickled(is2);//маринованный brined+vineger
+        
+        boolean isC1 = isCooked(is1);
+        boolean isC2 = isCooked(is2);
+        boolean cooked = ( !isC1 && !isC2 ) || 
+                //access to trade food with equal Cooked temp area value 
+                ( isC1 && isC2 && (  getCookedLevel(is1) == getCookedLevel(is2)  ) );
+        
+        boolean dried = isDried(is1) == isDried(is2);
+        boolean salted = isSalted(is1) == isSalted(is2);
+        boolean infused = (isInfused(is1) && isInfused(is2) && getInfusion(is1).equals(getInfusion(is2)) || !isInfused(is1) && !isInfused(is2));        
+        
+        //ignore
+        //boolean isSmoked = (isSmoked(is1) && isSmoked(is2) && isSameSmoked(is1, is2) || !isSmoked(is1) && !isSmoked(is2);// //FuelProfile 
+        
+        return brined && pickled && cooked && dried && salted && infused;//&& isSmoked;
+    }
+    
+    public static boolean areGroupedFoodEquals(ItemStack is1, ItemStack is2)
+    {
+        if (is1==null|| is2==null)
+            return false;
+        
+        int[] fg1 = Food.getFoodGroups(is1);
+        int[] fg2 = Food.getFoodGroups(is2);
+        
+        
+        if ( fg1==null || fg2 == null || fg1.length != fg2.length)
+            return false;
+                
+        int h = fg1.length;
+        int c = 0;
+        //check FoodIDs with any sequence
+        for (int i = 0; i < fg1.length; i++)
+	{
+            for (int j = 0; j< fg2.length; j++)
+            {
+                if (fg1[i] == fg2[j])
+                {
+                    c++;
+                    break;// 
+                }
+            }    
+	}
+        return (c == fg1.length);
+    }
+    
+    
+    
+    public static boolean areItemEquals(ItemStack itemStack1, ItemStack itemStack2) {
        return areItemEquals( itemStack1, itemStack2, false);     
     } 
     
@@ -595,4 +720,36 @@ public class ExtendedLogic {
         
         return key+":"+sna;
     }
+    
+    public static int strToInt(String s, int error)
+    {
+        
+        try 
+        {
+            return (s == null || s.length() == 0 ) ? error: Integer.parseInt(s);
+        } 
+        catch(NumberFormatException e) 
+        {
+            return error;            
+        }
+    }
+    
+    public static int strToInt(String s){
+        return strToInt(s,0);
+    }
+    
+    public static boolean isChildClass(Class child, Class parent)
+    {
+        Class[] cList = child.getClasses();
+        if (cList==null)
+            return false;
+        
+        for (Class c: cList)
+        {
+           if (c==parent) 
+               return true;
+        }
+        return false;
+    }
 }
+                

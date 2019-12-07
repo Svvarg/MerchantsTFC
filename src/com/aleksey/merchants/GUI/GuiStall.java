@@ -57,6 +57,8 @@ public class GuiStall extends GuiContainerTFC
     
     private static final int _buttonId_clearButton = 0;
     private static final int _buttonId_firstLimitButton = 1;
+    private static final int _buttonId_setPayItemButton = 100;
+    
     
     private static final int _colorDefaultText = 0x555555;
     private static final int _colorSuccessText = 0x00AA00;
@@ -97,6 +99,9 @@ public class GuiStall extends GuiContainerTFC
             
             y += SlotSize;
         }
+        
+        //sw
+        buttonList.add(new GuiButton(_buttonId_setPayItemButton, guiLeft + _pricesTitleY - 10, guiTop + TopSlotY, 7, 16, "i"));
     }
 
     @Override
@@ -106,9 +111,16 @@ public class GuiStall extends GuiContainerTFC
         {
             _stall.actionClearPrices();
         }
-        else if(guibutton.id >= _buttonId_firstLimitButton)
+        else if(guibutton.id >= _buttonId_firstLimitButton && guibutton.id< _buttonId_setPayItemButton)
         {
             _stall.actionSelectLimit(_stall.GoodsSlotIndexes[guibutton.id - _buttonId_firstLimitButton]);
+        }
+        else if (guibutton.id >= _buttonId_setPayItemButton)
+        {
+            //call SetPayItem        
+            int index = guibutton.id - _buttonId_setPayItemButton;
+            if (index>-1 && index < _stall.GoodsSlotIndexes.length)
+                _stall.actionSelectSetPayItem( _stall.GoodsSlotIndexes[index] );
         }
     }
     
