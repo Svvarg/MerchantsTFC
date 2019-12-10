@@ -1,9 +1,13 @@
 package com.aleksey.merchants.Containers;
 
+import static com.aleksey.merchants.Containers.AnimalInCrate.isValidAnimalCrate;
 import static com.aleksey.merchants.Containers.ExtendedLogic.setCookedLevel;
+import com.bioxx.tfc.Core.TFC_Time;
+import com.bioxx.tfc.Food.ItemFoodMeat;
 import com.bioxx.tfc.Food.ItemFoodTFC;
 import com.bioxx.tfc.Food.ItemSalad;
 import com.bioxx.tfc.Food.ItemSandwich;
+import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
 import com.bioxx.tfc.Items.ItemBlocks.ItemTerraBlock;
 import com.bioxx.tfc.Items.ItemTFCArmor;
 import com.bioxx.tfc.Items.ItemTerra;
@@ -21,6 +25,9 @@ import com.bioxx.tfc.api.TFCItems;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 
 /**
  *
@@ -113,8 +120,7 @@ public class EditPriceSlot {
         item = null;
         return true;        
     }
-    
-    
+       
     
     public static int getValidMetaForItem(Item item, int meta)
     {
@@ -183,7 +189,7 @@ public class EditPriceSlot {
         return meta;
     }
     
-    //public static ItemStack makeUpItemStack (int id, int meta, int count, int param1, int param2, int param3, int param4 )
+    
     /**
      * create itemStack for price slot by GuiStallSetPayItem params
      */
@@ -207,12 +213,12 @@ public class EditPriceSlot {
         
         Item item = Item.getItemById(id);            
         
-        meta = getValidMetaForItem(item,meta);
+        meta = getValidMetaForItem(item, meta);
         
-        ItemStack payStack = new ItemStack(item,1,meta);                        
+        ItemStack payStack = new ItemStack(item,1 ,meta );
         if (payStack.getItem() instanceof IFood)
         {
-            payStack.stackSize = 1;//TFCfood amount at nbttag foodWeight
+            //payStack.stackSize = 1;//TFCfood amount at nbttag foodWeight
             
             if ( payStack.getItem() instanceof ItemSalad)
             {                
@@ -221,21 +227,51 @@ public class EditPriceSlot {
             else
                 //dont work with ItemSandwich return null
                 payStack = createSimpleTFCFoodNBTByParam(payStack, count, p1, p2, p3, p4);//can be null!
-        }    
+        } 
+        else if (payStack.getItem() instanceof ItemBarrels)
+        {
+            payStack.stackSize = 1;
+            createBarrelNBTByParam(payStack,p1 ,p2 ,p3 ,p4);
+        }
+        else if (isValidAnimalCrate(payStack) )
+        {
+            AnimalInCrate a = new AnimalInCrate(p1, p2, p3, p4);
+            payStack.stackTagCompound = a.writeToNBT();
+        }
         else
         {
             int maxCount = payStack.getMaxStackSize();
             count =  count >= maxCount ? maxCount : count;
             payStack.stackSize = count;
             
-            if ( !isNotForgedTFCItems(payStack) && p1 > 0 )                
-                setSmithingNBTByParam(payStack, p1);
+            if ( !isNotForgedTFCItems(payStack) && p1 > 0 )//p1 - smithing bonus
+                createSmithingNBTByParam(payStack, p1);
         }    
-        //barrel animalcrate
+        //animalcrate
         return payStack;        
     }
     
-    
+    public static boolean createSmithingNBTByParam(ItemStack iStack, int p1)
+    {
+        if ( iStack==null || p1 <= 0 )
+            return false;
+        
+        int itype = getTFCSmithingItemType(iStack);// 0 NOtfc 1 tool without AD 2 Armor 3 toolwithAD 4 Weapon
+        
+        if ( itype > NOTFC )
+        {
+            float buff = ( p1 >= 100 ) ? 1 : (float)p1 / 100;
+            setDurabilityBuff(iStack, buff);        
+            
+            if (itype == TFCTOOLSADAMAGE || itype == TFCWEAPON)
+            {
+                setDamageBuff(iStack, buff);
+            }       
+            return true;
+        }
+        return false;
+    }
+  
     public static boolean isNotForgedTFCItems(ItemStack iStack)
     {
         if (iStack == null) 
@@ -268,31 +304,9 @@ public class EditPriceSlot {
         }
         return r;
     }
-    
-    public static boolean setSmithingNBTByParam(ItemStack iStack, int p1)
-    {
-        if ( iStack==null || p1 <= 0 )
-            return false;
         
-        int itype = getTFCItemType(iStack);// 0 NOtfc 1 tool without AD 2 Armor 3 toolwithAD 4 Weapon
-        
-        if ( itype > NOTFC )
-        {
-            float buff = ( p1 >= 100 ) ? 1 : (float)p1 / 100;
-            setDurabilityBuff(iStack, buff);        
-            
-            if (itype == TFCTOOLSADAMAGE || itype == TFCWEAPON)
-            {
-                setDamageBuff(iStack, buff);
-            }       
-            return true;
-        }
-        return false;
-    }
-    
-  
     //tools armor tools with AttackDamage weapon
-    public static int getTFCItemType(ItemStack iStack)
+    public static int getTFCSmithingItemType(ItemStack iStack)
     {
         String[] noAttackDamage ={"Saw", "Hoe", "Chisel", "Propick"};
         if (iStack == null)
@@ -325,7 +339,58 @@ public class EditPriceSlot {
         
         return (item != null) && item.getClass().toString().endsWith(" Blade")? TFCWEAPON : NOTFC;//Weapon  saw blade...      
     }
+
     
+    public static ItemStack createSimpleTFCFoodNBTByParam(ItemStack food, int count, int p1, int p2,int p3, int p4)
+    {
+      if (food == null || food.getItem() instanceof ItemSandwich )   
+          return null;
+            
+      float weight = ( count < 10 || count >= 160 )? 160 : 10 * (int)(count / 10);
+      if (ExtendedLogic.isNoSplitFood(food)){
+          weight = ExtendedLogic.getNoSplitFoodWeight(food);
+      }
+      ItemFoodTFC.createTag( food, weight);      
+      p1 = (p1 < 0 && p1 > 5) ? 0 : p1;//Cooked +1 on ItemFoodTFC standart
+      
+      if ( setCookedLevel(food, p1) && Food.isCooked( food))
+      {
+          int[] cookedTasteProfile = new int[] { 0, 0, 0, 0, 0 };
+          Food.setCookedProfile( food, cookedTasteProfile);
+          Food.setFuelProfile(food, cookedTasteProfile);                              
+      }
+      
+      if (p2 > 0 && isItemValidToSalted(food) ) 
+        Food.setSalted( food, true);
+      
+      if (p3 > 0)
+      {
+        Food.setDried( food, Food.DRYHOURS);
+        //diried protein it is the smoked have fuelProfile
+      }
+      
+      if (p4 > 0)
+          setTFCFoodParams(food,p4);//brined pickled smokeCounter        
+      
+      return food;
+    }    
+    
+    public static boolean isItemValidToSalted(ItemStack foodStack)
+    {
+        if (foodStack == null)
+            return false;
+        Item f = foodStack.getItem();
+        return (f == TFCItems.venisonRaw 
+                || f == TFCItems.beefRaw
+                || f == TFCItems.chickenRaw
+                || f == TFCItems.porkchopRaw
+                || f == TFCItems.fishRaw
+                || f == TFCItems.calamariRaw
+                || f == TFCItems.muttonRaw
+                || f == TFCItems.horseMeatRaw               
+                );//instanceof ItemFoodMeat...
+    }
+
     // brined 1x pickled 10x smoked 100x
     public static int getTFCFoodParams(ItemStack food)
     {
@@ -349,15 +414,43 @@ public class EditPriceSlot {
         int smoked =  (int) Math.floor(  param4 % 1000 / 100);
         
         if (brined > 0)
+        {
             Food.setBrined(food, true);
-        if (pickled > 0)
-            Food.setPickled(food, true);
-        if (smoked > 0)
-            Food.setSmokeCounter(food, Food.SMOKEHOURS);//default is 12 then smoked is done        
+            if (pickled > 0)// can be pickled only brined
+                Food.setPickled(food, true);
+        }
+        
+        if ( smoked > 0 && isItemValidToSmoked(food) )
+        {
+            Food.setSmokeCounter(food, Food.SMOKEHOURS);//default is 12 then smoked is done                    
+            //not real fuelProfile only for check isSmoked and for showing "Smoked" at display name
+            int[] fuelProfile = new int[] { 1, 1, 1, 1, 1 };
+            Food.setFuelProfile(food, fuelProfile);
+        }
         return true;        
     }
     
-    
+    /**
+     * From  com.bioxx.tfc.Blocks.BlockSmokeRack
+     */
+    public static boolean isItemValidToSmoked(ItemStack is)
+    {
+        if(is == null)
+            return false;
+        if(is.getItem() instanceof ItemFoodMeat)
+        {
+            if(!Food.isCooked(is) && Food.isBrined(is))
+                return true;
+        }
+        else if(is.getItem() == TFCItems.cheese)
+        {
+            if(!Food.isCooked(is))
+                return true;
+        }
+        return false;
+    }
+
+        
     public static ItemStack createSaladNBTByParam(ItemStack food, int count, int p1, int p2,int p3, int p4)
     {
       if (food==null || ! (food.getItem() instanceof ItemSalad) )
@@ -384,37 +477,88 @@ public class EditPriceSlot {
     }
             
     
-    public static ItemStack createSimpleTFCFoodNBTByParam(ItemStack food, int count, int p1, int p2,int p3, int p4)
+    /**
+     * 
+     * @param payStack
+     * @param p1 Sealed
+     * @param p2 SealTime
+     * @param p3 FluidID
+     * @param p4 FluidAmount
+     * @return 
+     */
+    public static ItemStack createBarrelNBTByParam(ItemStack payStack, int p1, int p2, int p3, int p4)
     {
-      if (food == null || food.getItem() instanceof ItemSandwich )   
-          return null;
-            
-      float weight = ( count < 10 || count >= 160 )? 160 : 10 * (int)(count / 10);
-      if (ExtendedLogic.isNoSplitFood(food)){
-          weight = ExtendedLogic.getNoSplitFoodWeight(food);
-      }
-      ItemFoodTFC.createTag( food, weight);      
-      p1 = (p1 < 0 && p1 > 5) ? 0 : p1;//Cooked +1 on ItemFoodTFC standart
-      setCookedLevel( food, p1);
-      if (Food.isCooked( food))
-      {
-          int[] cookedTasteProfile = new int[] { 0, 0, 0, 0, 0 };
-          Food.setCookedProfile( food, cookedTasteProfile);
-          Food.setFuelProfile(food, cookedTasteProfile);                              
-      }
-      
-      if (p2 > 0) 
-        Food.setSalted( food, true);
-      
-      if (p3 > 0)
-      {
-        Food.setDried( food, Food.DRYHOURS);
-        //diried protein it is the smoked have fuelProfile
-      }
-      
-      if (p4 > 0)
-          setTFCFoodParams(food,p4);//brined pickled smokeCounter        
-      
-      return food;
-    }    
+        if (payStack == null || p1 != 1 || p3<0)
+            return payStack;
+        boolean sealed = ( p1 == 1);
+        int sealTime =  getHoursForYear(p2);
+        if (sealed) {
+            if (payStack.stackTagCompound==null)
+                payStack.stackTagCompound = new NBTTagCompound(); 
+            payStack.stackTagCompound.setBoolean("Sealed", sealed);
+            payStack.stackTagCompound.setInteger("SealTime", sealTime);
+            //payStack.stackTagCompound.setInteger("barrelType", barrelType); 
+            payStack = setFluidID(payStack, p3, p4);
+        }        
+        return payStack;
+    }
+        
+    public static int getYearFromHours(int tHours)
+    {
+        int tDays = tHours / TFC_Time.HOURS_IN_DAY;        
+        int tMonths = tDays / TFC_Time.daysInMonth;
+        int year = tMonths / 12;
+        return 1000 + year;
+    }
+    
+    public static int getHoursForYear(int year)
+    {
+        year = year - 1000;
+        if (year<=0)
+            return 0;
+        int tMonths = year * 12;
+        int tDays = tMonths * TFC_Time.daysInMonth;
+        int tHours = tDays * TFC_Time.HOURS_IN_DAY;
+        return tHours;
+    }
+        
+    //fluid.getFluidID & fluid.amount 
+    public static FluidStack getFluidID(ItemStack barrel)
+    {
+        if (barrel==null || !barrel.hasTagCompound())
+            return null;//-1?
+        //NBTTagCompound fluidNBT = barrel.stackTagCompound.getTag("fluidNBT");
+        FluidStack fluid = FluidStack.loadFluidStackFromNBT(
+                barrel.stackTagCompound.getCompoundTag("fluidNBT") );
+        if (fluid == null)
+            return null;
+        //fluid.amount;
+        return fluid;//.getFluidID();
+        
+    }
+    
+    public static ItemStack setFluidID(ItemStack barrel, int fluidID, int amount )
+    {
+        if (barrel==null || fluidID < 4 || amount<1 )
+            return null;
+        
+       amount = (amount >= 10)? 10000: amount*1000;//ItemBarrels.MAX_LIQUID
+       
+       Fluid fluid = FluidRegistry.getFluid(fluidID);
+       if (fluid == null)
+           return null;
+       
+       FluidStack fluidStack = new FluidStack(fluid, amount);       
+       NBTTagCompound fluidNBT = new NBTTagCompound();
+       if( fluidStack != null )
+           fluidStack.writeToNBT(fluidNBT);       
+       if (barrel.stackTagCompound==null)
+       {           
+           barrel.stackTagCompound = new NBTTagCompound();
+       }
+       barrel.stackTagCompound.setTag("fluidNBT", fluidNBT);
+       return barrel;
+    }
+    
+    
 }

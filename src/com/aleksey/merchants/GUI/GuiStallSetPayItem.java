@@ -5,6 +5,7 @@
  */
 package com.aleksey.merchants.GUI;
 
+import com.aleksey.merchants.Containers.AnimalInCrate;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.entity.RenderItem;
@@ -16,6 +17,7 @@ import net.minecraft.world.World;
 import org.lwjgl.input.Keyboard;
 
 import com.aleksey.merchants.Containers.ContainerStallSetPayItem;
+import static com.aleksey.merchants.Containers.AnimalInCrate.isValidAnimalCrate;
 import com.aleksey.merchants.Containers.EditPriceSlot;
 import com.aleksey.merchants.Containers.ExtendedLogic;
 import static com.aleksey.merchants.Containers.ExtendedLogic.strToInt;
@@ -24,11 +26,15 @@ import com.bioxx.tfc.Containers.ContainerTFC;
 import com.bioxx.tfc.Core.Player.PlayerInventory;
 import com.bioxx.tfc.Food.ItemSalad;
 import com.bioxx.tfc.GUI.GuiContainerTFC;
+import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
+import com.bioxx.tfc.Items.Pottery.ItemPotteryJug;
+import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.getDurabilityBuff;
 import com.bioxx.tfc.api.Food;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import com.bioxx.tfc.api.Interfaces.IFood;
+import net.minecraftforge.fluids.FluidStack;
 
 /**
  *
@@ -174,7 +180,9 @@ public class GuiStallSetPayItem extends GuiContainerTFC
             if (payStack == null)
                 return;
             
-            int id = Item.getIdFromItem( payStack.getItem());
+            Item item = payStack.getItem();
+            int id = Item.getIdFromItem( item ); //for debug payStack.getItem());
+            
             int meta = payStack.getItemDamage();
             int count = payStack.stackSize;
             _idTextField.setText(Integer.toString(id));
@@ -196,11 +204,11 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                 }
                 else if(payStack.getItem() instanceof IFood)
                 {
-                    float weight = Food.getWeight(payStack);
-                    int maxSaladWeight = 20;
+                    float weight = Food.getWeight(payStack);                    
                     
-                    if (payStack.getItem() instanceof ItemSalad )
+                    if ( item instanceof ItemSalad )
                     {
+                        int maxSaladWeight = 20;
                         int [] fg = Food.getFoodGroups(payStack);
                         if ( fg.length == 4){
                             p1 = fg[0];
@@ -214,12 +222,43 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                     {
                         count = ( weight > 0 && weight <=160) ? count = 10 * (int)(weight / 10) : 160;
                         p1 = ExtendedLogic.getCookedLevel(payStack);                       
-                        if (p1 == 0 )// p1=0 not Cooked
-                            _param1TextField.setText(Integer.toString(p1));
                         p2 = Food.isSalted(payStack)? 1 : 0;                   
                         p3 = Food.isDried(payStack) ? 1 : 0;
                         //brined pickled smoked at one param
                         p4 = EditPriceSlot.getTFCFoodParams(payStack);// 
+                    }
+                }
+                //only saled barrels (have nbt)
+                else if ( item instanceof ItemBarrels )
+                {                    
+                    _countTextField.setText(Integer.toString(1));
+                    p1 = (payStack.stackTagCompound.getBoolean("Sealed"))?1:0;
+                    p2 = payStack.stackTagCompound.getInteger("SealTime");
+                    p2 = EditPriceSlot.getYearFromHours(p2);
+                    FluidStack fluidStack = EditPriceSlot.getFluidID(payStack);
+                    if (fluidStack != null)
+                    {
+                        p3 = fluidStack.getFluidID();
+                        if (fluidStack.amount > 0 )
+                            p4 = (int) Math.floor(fluidStack.amount / 1000);
+                    }                        
+                }
+                else if ( item instanceof ItemPotteryJug ||
+                        item instanceof ItemPotterySmallVessel)
+                {
+                    p1 = 1;//flag about not new potteryJug or smallVessel
+                } 
+                else if (payStack.hasTagCompound() && isValidAnimalCrate(payStack) )
+                {
+                    AnimalInCrate a = new AnimalInCrate(payStack.stackTagCompound);
+                    if (a.id > 0 )
+                    {
+                        p1 = a.id;
+                        p2 = a.sex + a.familiarity * 10; // 351 35-famil 1-sex(invert 1-man 0-female)
+                        int speed = a.getSpeedX10();
+                        int jump = a.getJumpHX10();
+                        p3 = speed + jump  * 1000;//45103 jump 4.5m speed 10.3m/s
+                        p4 = a.variant;
                     }
                 }
                 
@@ -233,7 +272,8 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                     _param3TextField.setText(Integer.toString(p3));
                 if ( p4 > 0 ) 
                     _param4TextField.setText(Integer.toString(p4));
-            }
+                
+            }//end have nbt---
         }                     
     }
     

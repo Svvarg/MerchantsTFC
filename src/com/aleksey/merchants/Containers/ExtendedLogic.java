@@ -62,7 +62,7 @@ public class ExtendedLogic {
     private static final int SALADWEIGHT = 20;
     private static final int JUGMILKWEIGHT = 80;
     public static final int PERMISSIBLEDECLAY = 2;//milk salad!
-    public static final int permissibleSealTimeHours = 8760;//24*365ч
+   // public static final int permissibleSealTimeHours = 8760;//24*365ч new way
     public static final boolean ToNonEmptySlot = true;
     public static final boolean ToEmptySlot = false;
     
@@ -129,6 +129,9 @@ public class ExtendedLogic {
         return 0;
     }
     
+    public static boolean areItemEquals(ItemStack itemStack1, ItemStack itemStack2) {
+       return areItemEquals( itemStack1, itemStack2, false);     
+    } 
     
     public static final boolean areItemEquals(ItemStack itemStack1, ItemStack itemStack2, boolean payMode) 
     {
@@ -148,7 +151,7 @@ public class ExtendedLogic {
         if (itemStack1.getItem() != itemStack2.getItem() || itemStack1.getItemDamage() != itemStack2.getItemDamage()) {
             return false;
         }
-/*
+        /*
         return itemStack1.getItem() instanceof IFood
                 ? Food.areEqual(itemStack1, itemStack2)
                 //: ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);
@@ -159,48 +162,65 @@ public class ExtendedLogic {
         {
             //equals = Food.areEqual(itemStack1, itemStack2);
             equals = areFoodEqual(itemStack1, itemStack2);
-        }else{                    //: ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);
+        } 
+        else if (payMode && 
+                //how better check item class if 
+                itemStack1.getItem().getClass().toString().contains("taeog.animalcrate.item.ItemCrate") 
+                )
+        {   //only for payMode for allow sell animals with different characteristics
+            equals = areAnimalsAtCrateEqual(itemStack1, itemStack2, payMode);
+        }
+        else
+        {                    //: ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);
             equals =  ExtendedLogic.areItemStackTagsEqualEx(itemStack1, itemStack2 , payMode);
         }    
         return equals;
+        
     }
     
     //+1 to ItemFoodTFC standart  here 0 is not cooked
-    public static int getCookedLevel(ItemStack is)
+    public static int getCookedLevel(ItemStack food)
     {
-        if (is == null || !Food.isCooked(is) )
+        if (food == null || !Food.isCooked(food) )
             return 0;
-        int cooked = (int) Food.getCooked(is);
+        int cooked = (int) Food.getCooked(food);
         if (cooked  < 600)
             return 0;//
         
         int cl = (int) Math.floor( ( cooked - 600 )/120 ) + 1;
         cl = (cl < 1 || cl > 5 ) ? 0 : cl;
-        return cl; //1-5 (0-4 in ItemFoodTFC) +1 0 - notCooked
+        return cl; //1-5 (0-4 in ItemFoodTFC) +1 (0 - notCooked)
     }
     
-    //for makeupPayItem by params
-    public static boolean setCookedLevel(ItemStack is, int cookedLevel)
+    /**
+     *  For create simple TFC Cooked Food
+     * @param food ItemStack
+     * @param cookedLevel +1 to ItemFoodTFC standart (0 - not cooked)
+     * @return 
+     */    
+    public static boolean setCookedLevel(ItemStack food, int cookedLevel)
     {
-        if (is == null || cookedLevel < 0 || cookedLevel > 5 )
-            return false;
-        
+        if (food == null || cookedLevel < 1 || cookedLevel > 5 )
+            return false;        
         
         float cooked = 600 + 120 * ( cookedLevel - 1 );
         cooked = (cooked == 600)? 601 : cooked;// (isCooked float > 600)
-        Food.setCooked(is, cooked);
+        Food.setCooked(food, cooked);
         return true;        
     }
     
-    //com.bioxx.tfc.api.Food without personal test factor like CookedProfile & FuelProfile
-    // consider CookedLevel, ignore CookedProFile & FuelProFile
+    /** 
+     * com.bioxx.tfc.api.Food without personal test factor like CookedProfile & FuelProfile
+     * consider CookedLevel, ignore CookedProFile & FuelProFile
+     * Smart compare GroupedFood such as salad and sandwich
+     */ 
     public static boolean areFoodEqual(ItemStack is1, ItemStack is2)
     {
         
         if (is1== null || is2 == null)
             return false;
         
-        if (is1.getItem() instanceof ItemSandwich //&& is2.getItem() instanceof ItemSandwich )
+        if (is1.getItem() instanceof ItemSandwich 
                 || is1.getItem() instanceof ItemSalad  ) 
         {
             return areGroupedFoodEquals(is1,is2);
@@ -257,9 +277,7 @@ public class ExtendedLogic {
     
     
     
-    public static boolean areItemEquals(ItemStack itemStack1, ItemStack itemStack2) {
-       return areItemEquals( itemStack1, itemStack2, false);     
-    } 
+
     
     
     /**
@@ -318,7 +336,7 @@ public class ExtendedLogic {
                   }              
               }
               
-              return st1.stackTagCompound.equals(st2.stackTagCompound);              
+              return st1.stackTagCompound != null && st2.stackTagCompound != null && st1.stackTagCompound.equals(st2.stackTagCompound);
           }   
         }        
         return false;
@@ -388,7 +406,11 @@ public class ExtendedLogic {
               Or if StallFaceSlot have barrel withount SealTime for 
               trade(sealing-buing) anyone barrel sealTime
             */
-            if (sealTime1 != 0 && permissibleSealTimeHours < Math.abs( sealTime2 - sealTime1 ) )
+            int sealYear1 =  EditPriceSlot.getYearFromHours(sealTime1);
+            int sealYear2 =  EditPriceSlot.getYearFromHours(sealTime2);
+            
+            //if (sealTime1 != 0 && permissibleSealTimeHours < Math.abs( sealTime2 - sealTime1 ) )
+            if (sealTime1 != 0 && sealYear1 != sealYear2 )
                 return false;
             
             //remove tags for compare
@@ -750,6 +772,39 @@ public class ExtendedLogic {
                return true;
         }
         return false;
+    }
+    
+    
+    /**
+     * AnimalCrate mod compare by AnimalID, Age,  sex, familiarity
+     *  for horse MateSpeed MateJump 
+     * @param st1
+     * @param st2
+     * @return 
+     */
+    public static boolean areAnimalsAtCrateEqual(ItemStack st1, ItemStack st2, boolean payMode)
+    {
+        if (st1==null || st2==null)
+            return false;
+        
+        if (st1.stackTagCompound==null && st2.stackTagCompound==null)
+            return true;//empty crate
+        
+        if (st1.stackTagCompound==null || st2.stackTagCompound==null)
+            return false;
+        
+        boolean equal = false;
+        
+        if (payMode)
+        {
+            AnimalInCrate a1 = new AnimalInCrate(st1.stackTagCompound);
+            AnimalInCrate a2 = new AnimalInCrate(st2.stackTagCompound);
+            equal = a1.isAnimalEqual(a2);
+        }
+        else
+            equal = st1.stackTagCompound.equals(st2.stackTagCompound); 
+                      
+        return equal;
     }
 }
                 
