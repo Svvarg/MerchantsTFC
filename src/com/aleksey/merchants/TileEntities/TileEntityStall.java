@@ -23,15 +23,18 @@ import com.bioxx.tfc.TileEntities.NetworkTileEntity;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 
-public class TileEntityStall extends NetworkTileEntity implements IInventory
+public class TileEntityStall extends NetworkTileEntity implements ISidedInventory//was IInventory //for dont pull items by hopper
 {
     public static final int PriceCount = 5;
     public static final int ItemCount = 2 * PriceCount + 1;
 
     public static final int[] PricesSlotIndexes = new int[] { 0, 2, 4, 6, 8 };
     public static final int[] GoodsSlotIndexes = new int[] { 1, 3, 5, 7, 9 };
+    
+    public static final int[] emptyForHopper = new int[] {};
 
     private static final byte _actionId_ClearPrices = 0;
     private static final byte _actionId_Buy = 1;
@@ -310,7 +313,27 @@ public class TileEntityStall extends NetworkTileEntity implements IInventory
     {
         return false;
     }
+    
 
+    //don`t hopper pull items from TEStall Inventory 
+    @Override
+    public int[] getAccessibleSlotsFromSide(int p_94128_1_)
+    {        
+        return this.emptyForHopper;
+    }
+    
+    @Override//for hopper 
+    public boolean canInsertItem(int p_102007_1_, ItemStack p_102007_2_, int p_102007_3_)
+    {
+        return false;
+    }
+    
+    @Override//for hopper
+    public boolean canExtractItem(int p_102008_1_, ItemStack p_102008_2_, int p_102008_3_)
+    {
+        return false;
+    }
+    
     @Override
     public void writeToNBT(NBTTagCompound nbt)
     {
@@ -691,4 +714,8 @@ public class TileEntityStall extends NetworkTileEntity implements IInventory
         player.openGui(MerchantsMod.instance, GuiHandler.GuiOwnerStall, worldObj, xCoord, yCoord, zCoord);        
     }
 
+    
+
+    
+    
 }
