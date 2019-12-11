@@ -4,5 +4,6 @@ public enum PrepareTradeResult
 {
     Success,
     NoGoods,
-    NoPays
+    NoPays,
+    NoLastIngot
 }

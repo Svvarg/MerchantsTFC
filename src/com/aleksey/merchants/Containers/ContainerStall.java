@@ -1017,8 +1017,10 @@ public class ContainerStall extends ContainerTFC
         if(result == PrepareTradeResult.Success)
             return true;
         
-        if(result == PrepareTradeResult.NoGoods)
+        if(result == PrepareTradeResult.NoGoods)        
             player.addChatComponentMessage(new ChatComponentTranslation("gui.Stall.Message.NoGoods", new Object[0]));
+        else if(result == PrepareTradeResult.NoLastIngot)
+            player.addChatComponentMessage(new ChatComponentTranslation("gui.Stall.Message.NoLastIngot", new Object[0]));
         else
             player.addChatComponentMessage(new ChatComponentTranslation("gui.Stall.Message.NoPaysSpace", new Object[0]));
 

@@ -36,11 +36,11 @@ import net.minecraftforge.fluids.FluidStack;
 
 public class EditPriceSlot {
     // items have craftingTag makeupitem by param
-    private static final int NOTFC = 0;//without damage
-    private static final int TFCTOOLS = 1;//without damage
-    private static final int TFCARMOR = 2;//without damage
-    private static final int TFCTOOLSADAMAGE = 3;//without damage
-    private static final int TFCWEAPON = 4;//without damage
+    public static final int NOTFC = 0;//without damage
+    public static final int TFCTOOLS = 1;//without damage
+    public static final int TFCARMOR = 2;//without damage
+    public static final int TFCTOOLSADAMAGE = 3;//without damage
+     static final int TFCWEAPON = 4;//without damage
 
     
     /**
@@ -236,7 +236,8 @@ public class EditPriceSlot {
         else if (isValidAnimalCrate(payStack) )
         {
             AnimalInCrate a = new AnimalInCrate(p1, p2, p3, p4);
-            payStack.stackTagCompound = a.writeToNBT();
+            // have are restriction on set of any type of Entity 
+            payStack.stackTagCompound = a.writeToNBT();//can return null
         }
         else
         {
@@ -308,22 +309,23 @@ public class EditPriceSlot {
     //tools armor tools with AttackDamage weapon
     public static int getTFCSmithingItemType(ItemStack iStack)
     {
-        String[] noAttackDamage ={"Saw", "Hoe", "Chisel", "Propick"};
+        String[] noAttackDamage = {"Saw", "Hoe", "Chisel", "Propick"};
         if (iStack == null)
             return NOTFC;
         
         Item item = iStack.getItem();        
-        String itemName = item.getUnlocalizedName();
-        
-        if (itemName.isEmpty())
-            return NOTFC;
         
         if (item instanceof ItemWeapon ||
                 item instanceof ItemCustomSword)
         {          
             return TFCWEAPON;//Weapon
         }
-        else if (item instanceof ItemTerraTool || item instanceof ItemMiscToolHead )
+        
+        String itemName = item.getUnlocalizedName();        
+        if (itemName.isEmpty())
+            return NOTFC;
+        
+        if (item instanceof ItemTerraTool || item instanceof ItemMiscToolHead )
         {         
             for (String s :noAttackDamage){
                 if (itemName.contains(s))

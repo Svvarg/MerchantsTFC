@@ -194,16 +194,40 @@ gui.Stall.HasPrices=Price List Specified
 gui.Stall.Message.NoPays=You don't have enough items for payment
 gui.Stall.Message.NoPaysSpace=Not enough space for payment items in warehouse
 gui.Stall.Message.NoGoods=Not enough goods in warehouse
+gui.Stall.Message.NoLastIngot=The last ingot is not for sale
 gui.Stall.Tooltip.NoGoods=No Goods
 gui.Stall.Tooltip.CanBuy=Can Buy
 gui.Stall.Tooltip.NoPaysSpace=No space for pay
 gui.Stall.Tooltip.LimitButton=Click to edit limit
+gui.Stall.Tooltip.SetPayButton=Click to edit pay item
+
+gui.StallSetPay.Tooltip.ID=PayItem ID
+gui.StallSetPay.Tooltip.Meta=Damage or metaData
+gui.StallSetPay.Tooltip.Count=Count
+gui.StallSetPay.Tooltip.NoUsed=Not used
+gui.StallSetPay.Tooltip.SmithingBonus=Smithing Bonus
+gui.StallSetPay.Tooltip.SaladFoodComponentID=ID food
+gui.StallSetPay.Tooltip.PotteryJugUsed=Used Pottery Jug or smallVessel
+gui.StallSetPay.Tooltip.FoodCookedLevel=Cooked Level
+gui.StallSetPay.Tooltip.FoodSalted=Salted
+gui.StallSetPay.Tooltip.FoodDired=Dired
+gui.StallSetPay.Tooltip.FoodBrinedPickledSmoked=Smoked*100 Pickled*10 Brined
+gui.StallSetPay.Tooltip.BarrelSealed=Sealed
+gui.StallSetPay.Tooltip.BarrelSealTime=SealTime (Year)
+gui.StallSetPay.Tooltip.BarrelFluidID=Fluid ID
+gui.StallSetPay.Tooltip.BarrelAmount=Fluid Amount
+gui.StallSetPay.Tooltip.ACrateAnimID=Animal ID
+gui.StallSetPay.Tooltip.ACrateFamAndSex= Familiarity*10 sex(m-1 f-2)
+gui.StallSetPay.Tooltip.ACrateJumpAndSpeed=JumpHeight*100  Speed м/с 
+gui.StallSetPay.Tooltip.ACrateVariant=Look Variant
+
 gui.Stall.NA=-
 
 gui.StallLimit.Title=Limit for Price Item
 gui.StallLimit.Limit=Limit
 gui.StallLimit.Apply=Apply
 gui.StallLimit.Cancel=Cancel
+gui.StallSetPayItem.Title=Manual setting pay item
 
 gui.Warehouse.Title=Warehouse
 gui.Warehouse.Sign=Sign

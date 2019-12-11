@@ -12,6 +12,7 @@ import com.aleksey.merchants.MerchantsMod;
 import com.aleksey.merchants.Containers.ContainerStall;
 import com.aleksey.merchants.Core.WarehouseBookInfo;
 import com.aleksey.merchants.GUI.Buttons.GuiLimitButton;
+import com.aleksey.merchants.GUI.Buttons.GuiSetPayButton;
 import com.aleksey.merchants.Helpers.ItemHelper;
 import com.aleksey.merchants.TileEntities.TileEntityStall;
 import com.bioxx.tfc.TerraFirmaCraft;
@@ -41,7 +42,7 @@ public class GuiStall extends GuiContainerTFC
 
     private static final int _titleX = 0;
     private static final int _titleY = 4;
-    private static final int _pricesTitleX = 6;
+    private static final int _pricesTitleX = 9;
     private static final int _pricesTitleY = 17;
     private static final int _goodsTitleX = 50;
     private static final int _goodsTitleY = 17;
@@ -54,6 +55,8 @@ public class GuiStall extends GuiContainerTFC
     private static final int _clearButtonX = 110;
     private static final int _clearButtonY = 102;
     private static final int _quantityX = 81;
+    private static final int _setPayItemX = 9;
+    
     
     private static final int _buttonId_clearButton = 0;
     private static final int _buttonId_firstLimitButton = 1;
@@ -69,6 +72,7 @@ public class GuiStall extends GuiContainerTFC
     private boolean _isOwnerMode;
     private QuantityInfo[] _quantities;
     private GuiLimitButton[] _limitButtons;
+    private GuiSetPayButton[] _setPayButtons;
 
     public GuiStall(InventoryPlayer inventoryplayer, TileEntityStall stall, boolean isOwnerMode, World world, int x, int y, int z)
     {
@@ -92,16 +96,19 @@ public class GuiStall extends GuiContainerTFC
         int y = guiTop + TopSlotY;
         
         _limitButtons = new GuiLimitButton[_stall.GoodsSlotIndexes.length];
+        _setPayButtons = new GuiSetPayButton[_stall.GoodsSlotIndexes.length];
         
         for(int i = 0; i < _limitButtons.length; i++)
         {
             buttonList.add(_limitButtons[i] = new GuiLimitButton(_buttonId_firstLimitButton + i, guiLeft + _quantityX, y));
             
+            buttonList.add( _setPayButtons[i] = new GuiSetPayButton(_buttonId_setPayItemButton + i,guiLeft + _setPayItemX, y ));
+            //_pricesTitleX
             y += SlotSize;
         }
         
         //sw
-        buttonList.add(new GuiButton(_buttonId_setPayItemButton, guiLeft + _pricesTitleY - 10, guiTop + TopSlotY, 7, 16, "i"));
+        //buttonList.add(new GuiButton(_buttonId_setPayItemButton, guiLeft + _pricesTitleY - 10, guiTop + TopSlotY, 7, 16, "i"));
     }
 
     @Override
@@ -137,6 +144,12 @@ public class GuiStall extends GuiContainerTFC
             
             if(limitTooltip != null)
                 drawTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, limitTooltip);
+            
+            String setPayTooltip = getSetPayItemTooltip(mouseX, mouseY);
+            
+            if(setPayTooltip != null)
+                drawTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, setPayTooltip);
+            
         }
     }
     
@@ -175,7 +188,7 @@ public class GuiStall extends GuiContainerTFC
         
         return null;
     }
-
+    
     private String getLimitTooltip(int mouseX, int mouseY)
     {
         if(!_isOwnerMode)
@@ -209,6 +222,41 @@ public class GuiStall extends GuiContainerTFC
         
         return null;
     }
+
+    private String getSetPayItemTooltip(int mouseX, int mouseY)
+    {
+        if(!_isOwnerMode)
+            return null;
+        
+        int w = (width - xSize) / 2;
+        int h = (height - ySize) / 2;
+        
+        if(mouseX < w + _setPayItemX || mouseX > w + _setPayItemX + GuiSetPayButton._setPayItemWeight)
+            return null;
+        
+        int y = h + TopSlotY;
+        
+        for(int i = 0; i < _setPayButtons.length; i++)
+        {
+            if(mouseY < y)
+                return null;
+            
+            if(mouseY < y + 7)
+            {
+                //int limit = _stall.getLimitByGoodSlotIndex(_stall.GoodsSlotIndexes[i]);
+                //String limitText = limit > 0 ? String.valueOf(limit): StatCollector.translateToLocal("gui.Stall.NA");
+                String toolTip = StatCollector.translateToLocal("gui.Stall.Tooltip.SetPayButton");
+                int textWidth = this.fontRendererObj.getStringWidth(toolTip);
+                
+                return mouseX < w + _setPayItemX + textWidth ? StatCollector.translateToLocal("gui.Stall.Tooltip.SetPayButton"): null;
+            }
+            
+            y += SlotSize;
+        }
+        
+        return null;
+    }
+
     
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int mouseX, int mouseY)

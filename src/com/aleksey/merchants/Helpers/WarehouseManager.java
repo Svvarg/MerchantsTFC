@@ -28,6 +28,7 @@ import com.aleksey.merchants.api.WarehouseContainerList;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 import com.bioxx.tfc.api.Interfaces.IFood;
 import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
+import com.bioxx.tfc.Items.ItemIngot;
 
 public class WarehouseManager
 {
@@ -111,10 +112,21 @@ public class WarehouseManager
     
     public PrepareTradeResult prepareTrade(ItemStack goodStack, ItemStack payStack, WarehouseBookInfo info, World world)
     {
-        int goodQuantity = ItemHelper.getItemStackQuantity(goodStack);
-        int payQuantity = ItemHelper.getItemStackQuantity(payStack);
+        int goodQuantity = ItemHelper.getItemStackQuantity(goodStack);       
+        int payQuantity = ItemHelper.getItemStackQuantity(payStack);        
         
-        if(goodQuantity == 0 || getQuantity(goodStack) < goodQuantity)
+        int goodQuantityOnWarehouse = getQuantity(goodStack);
+        if (goodQuantityOnWarehouse > 0 && goodStack.getItem() instanceof ItemIngot)
+        {
+            //not sell the last ingot from the warehouse            
+            if (goodQuantityOnWarehouse == 1 || ( goodQuantityOnWarehouse  == goodQuantity ) )
+                return PrepareTradeResult.NoLastIngot;
+            
+            goodQuantityOnWarehouse -= 1;
+        }
+        
+        //if(goodQuantity == 0 || getQuantity(goodStack) < goodQuantity)
+        if(goodQuantity == 0 || goodQuantityOnWarehouse < goodQuantity)
             return PrepareTradeResult.NoGoods;
         
         _goodList = new ArrayList<ItemTileEntity>();

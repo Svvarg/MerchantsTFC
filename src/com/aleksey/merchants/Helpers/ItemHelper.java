@@ -13,6 +13,8 @@ import com.bioxx.tfc.api.Interfaces.IFood;
 import static com.aleksey.merchants.Containers.ExtendedLogic.isNoSplitFood;
 import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
+import com.bioxx.tfc.Items.Pottery.ItemPotteryJug;
+import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 
 public class ItemHelper {
 
@@ -45,13 +47,21 @@ public class ItemHelper {
         else 
             key = String.valueOf(Item.getIdFromItem(item)) + ":" + String.valueOf(itemStack.getItemDamage());
 
+        //for correct quantity display of new and used jug and smallvessel
+        //used jugs have "blowTime" tag with random value  
+        //used vessels have empty "Items" tag
+        if (item instanceof ItemPotteryJug || item instanceof ItemPotterySmallVessel)
+        {
+            key =  itemStack.hasTagCompound() ? key+":1" : key;
+            return key;
+        }
+        
         if (!(item instanceof IFood)) {
             key = ExtendedLogic.getKeyForSmithingItem(itemStack,key);
             return key;
         }
         
-        // there put the keys for diffent smithing Bonus items like as for food
-
+       
         key += ":"
                 + (Food.isBrined(itemStack) ? "1" : "0")
                 + (Food.isPickled(itemStack) ? "1" : "0")
@@ -120,8 +130,13 @@ public class ItemHelper {
         if (itemStack.getItem() instanceof IFood) {
             IFood food = (IFood) itemStack.getItem();
             float newQuantity = Food.getWeight(itemStack) + quantity;
-
+                        
             Food.setWeight(itemStack, newQuantity);
+            
+            // destroy garbage rotten food scraps 
+            if ( newQuantity < 2 && Food.getDecay(itemStack) > 0.4f )
+                itemStack.stackSize = 0;
+            
         } else {
             itemStack.stackSize += quantity;
         }

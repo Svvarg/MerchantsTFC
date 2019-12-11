@@ -81,9 +81,13 @@ public class IngotPileContainer extends Container
     {
         TEIngotPile ingotPile = (TEIngotPile)goodTileEntity.TileEntity;
         IInventory inventory = (IInventory)ingotPile;
-        int quantity = ItemHelper.getItemStackQuantity(goodItemStack);
+        int quantity = ItemHelper.getItemStackQuantity(goodItemStack);        
         
-        if (inventory.getStackInSlot(0).stackSize < quantity)
+        //ItemStack stackOnPile = inventory.getStackInSlot(0);
+        //int quantityOnPile = stackOnPile==null ? 0 : stackOnPile.stackSize;
+                
+        if (inventory.getStackInSlot(0).stackSize < quantity)        
+        //if ( quantityOnPile < quantity)
             return;
         
         ingotPile.injectContents(0, -quantity);

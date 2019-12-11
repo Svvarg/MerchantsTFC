@@ -734,7 +734,7 @@ public class ExtendedLogic {
         //Item item = itemStack.getItem();
         //String.valueOf(Item.getIdFromItem(item)) + ":" + String.valueOf(itemStack.getItemDamage());
         if ( !( itemStack.hasTagCompound() && itemStack.stackTagCompound.hasKey(CRAFTINGTAG) ))
-            return key;
+            return key;       
         float duraBuff = getDurabilityBuff(itemStack);   
         if (duraBuff <=0 )
             return key;

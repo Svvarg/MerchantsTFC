@@ -43,7 +43,7 @@ public class TileEntityStall extends NetworkTileEntity implements ISidedInventor
     private static final byte _actionId_SelectSetPayItem = 4;//
     private static final byte _actionId_SetSetPayItem = 5;//
 
-    private ItemStack[] _storage;
+    private ItemStack[] _storage; 
     private WarehouseManager _warehouse;
     private int[] _limits;
     private int _activeGoodSlotIndex;

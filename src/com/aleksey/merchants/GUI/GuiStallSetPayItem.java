@@ -56,8 +56,8 @@ public class GuiStallSetPayItem extends GuiContainerTFC
     private static final int _titleX = 0;
     private static final int _titleY = 4;
     
-    private static final int _limitLabelX = 6;
-    private static final int _limitLabelY = 43;
+    //private static final int _limitLabelX = 6;
+    //private static final int _limitLabelY = 43;
     private static final int _limitLabelWidth = 47;
 
     private static final int _fieldWidth = 48;
@@ -100,9 +100,7 @@ public class GuiStallSetPayItem extends GuiContainerTFC
 
     private TileEntityStall _stall;
     private int _priceSlotIndex;
-    //private int _goodSlotIndex;
-    
-    //private GuiTextField _limitTextField;
+
     private GuiTextField _idTextField;
     private GuiTextField _metaTextField;
     private GuiTextField _countTextField;
@@ -111,17 +109,36 @@ public class GuiStallSetPayItem extends GuiContainerTFC
     private GuiTextField _param3TextField;
     private GuiTextField _param4TextField;
     
-    private ContainerStallSetPayItem inventory;
-    /*
-    private int payId;
-    private int payMeta;
-    private int payCount;
-    private int payParam1;
-    private int payParam2;
-    private int payParam3;
-    private int payParam4;
-    */
+    private int payItemType;
+    private static final int ITNO = 0;
+    private static final int ITFORGED = 1;
+    private static final int ITSIMPLEFOOD = 2;
+    private static final int ITFOODSALAD = 3;
+    private static final int ITFOODSANDWICH = 4;
+    private static final int ITBARREL = 5;
+    private static final int ITPOTTERYJUG = 6;
+    private static final int ITANIMALCRATE = 7;
     
+    public static final String[] simplefoodt = new String[] {"","FoodCookedLevel","FoodSalted","FoodDired","FoodBrinedPickledSmoked"};                
+    public static final String[] barrelt = new String[] {"","BarrelSealed","BarrelSealTime","BarrelFluidID","BarrelAmount"};
+    public static final String[] animalcrate = new String[] {"","ACrateAnimID","ACrateFamAndSex","ACrateJumpAndSpeed","ACrateVariant"};
+
+    
+    private static final int FNO = 0;
+    private static final int FID = 1;
+    private static final int FMETA = 2;
+    private static final int FCOUNT = 3;
+    
+    private static final int FP0 = 10;
+    private static final int FP1 = 11;
+    private static final int FP2 = 12;
+    private static final int FP3 = 13;
+    private static final int FP4 = 14;
+    
+    
+    
+    
+    private ContainerStallSetPayItem inventory;
 
     public  GuiStallSetPayItem(InventoryPlayer inventoryplayer, TileEntityStall stall, World world, int x, int y, int z)
     {
@@ -171,9 +188,12 @@ public class GuiStallSetPayItem extends GuiContainerTFC
         this.buttonList.add(new GuiButton(_buttonId_applyButton, guiLeft + _applyButtonX, guiTop + _buttonY, 50, 20, StatCollector.translateToLocal("gui.StallLimit.Apply")));
         this.buttonList.add(new GuiButton(_buttonId_cancelButton, guiLeft + _cancelButtonX, guiTop + _buttonY, 50, 20, StatCollector.translateToLocal("gui.StallLimit.Cancel")));
     }
-
+    /**
+     * By PayItemStack from SlallSlot set params to fields
+     * and tooltip for this type of payItem
+     */
     private void fillPayStackParamToField(){
-        
+        this.payItemType = ITNO;
         if (_priceSlotIndex>-1&& _priceSlotIndex < _stall.getSizeInventory())
         {
             ItemStack payStack = _stall.getStackInSlot(_priceSlotIndex);
@@ -197,10 +217,10 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                 int p4 = 0;
                 if ( payStack.stackTagCompound.hasKey("craftingTag") )
                 {
+                    this.payItemType = ITFORGED;
                     int duraBuff = (int) Math.floor( getDurabilityBuff(payStack) * 100 );
-                    if (duraBuff >0)
-                        p1 = duraBuff;//_param1TextField.setText(Integer.toString(duraBuff));
-                   
+                    if (duraBuff > 0)
+                        p1 = duraBuff;//_param1TextField.setText(Integer.toString(duraBuff));                    
                 }
                 else if(payStack.getItem() instanceof IFood)
                 {
@@ -208,6 +228,7 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                     
                     if ( item instanceof ItemSalad )
                     {
+                        this.payItemType = ITFOODSALAD;
                         int maxSaladWeight = 20;
                         int [] fg = Food.getFoodGroups(payStack);
                         if ( fg.length == 4){
@@ -216,21 +237,23 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                             p3 = fg[2];
                             p4 = fg[3];
                         }
-                       count = ( weight > 0 && weight < maxSaladWeight ) ? count = 10 * (int)(weight / 10) : maxSaladWeight;
+                       count = ( weight > 0 && weight < maxSaladWeight ) ? count = 10 * (int)(weight / 10) : maxSaladWeight;                       
                     }
                     else //Simple TFC Food
                     {
+                        this.payItemType = ITSIMPLEFOOD;
                         count = ( weight > 0 && weight <=160) ? count = 10 * (int)(weight / 10) : 160;
                         p1 = ExtendedLogic.getCookedLevel(payStack);                       
                         p2 = Food.isSalted(payStack)? 1 : 0;                   
                         p3 = Food.isDried(payStack) ? 1 : 0;
                         //brined pickled smoked at one param
-                        p4 = EditPriceSlot.getTFCFoodParams(payStack);// 
+                        p4 = EditPriceSlot.getTFCFoodParams(payStack);                        
                     }
                 }
                 //only saled barrels (have nbt)
                 else if ( item instanceof ItemBarrels )
                 {                    
+                    this.payItemType = ITBARREL;
                     _countTextField.setText(Integer.toString(1));
                     p1 = (payStack.stackTagCompound.getBoolean("Sealed"))?1:0;
                     p2 = payStack.stackTagCompound.getInteger("SealTime");
@@ -246,10 +269,12 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                 else if ( item instanceof ItemPotteryJug ||
                         item instanceof ItemPotterySmallVessel)
                 {
+                    this.payItemType = ITPOTTERYJUG;
                     p1 = 1;//flag about not new potteryJug or smallVessel
                 } 
                 else if (payStack.hasTagCompound() && isValidAnimalCrate(payStack) )
                 {
+                    this.payItemType = ITANIMALCRATE;
                     AnimalInCrate a = new AnimalInCrate(payStack.stackTagCompound);
                     if (a.id > 0 )
                     {
@@ -273,7 +298,30 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                 if ( p4 > 0 ) 
                     _param4TextField.setText(Integer.toString(p4));
                 
-            }//end have nbt---
+            } //end have nbt---
+            else 
+            {  //without NBT can work without it. For Usability 
+               // determine type of payItem for tooltip;
+               if ( item instanceof ItemSalad )
+                    this.payItemType = ITFOODSALAD;
+               
+               else if ( item instanceof IFood )
+                   this.payItemType = ITSIMPLEFOOD;
+               
+               else if ( item instanceof ItemBarrels )
+                   this.payItemType = ITBARREL;
+               
+               else if ( item instanceof ItemPotteryJug ||
+                        item instanceof ItemPotterySmallVessel)
+                   this.payItemType = ITPOTTERYJUG;
+               
+               else if ( !EditPriceSlot.isNotForgedTFCItems(payStack) && 
+                       EditPriceSlot.getTFCSmithingItemType(payStack) != EditPriceSlot.NOTFC)
+                   this.payItemType = ITFORGED;
+               
+               else if ( isValidAnimalCrate(payStack))
+                   this.payItemType = ITANIMALCRATE;
+            }
         }                     
     }
     
@@ -294,10 +342,11 @@ public class GuiStallSetPayItem extends GuiContainerTFC
     @Override
     protected void keyTyped(char key, int par2)
     {
-        
+        //int c=(int)key;//200 up 208 down 203 left 205 right 211 delete
         if(key >= '0' && key <= '9'
             || key == '\u0008'//Backspace
             || key == '\u007F'//Delete
+            || par2 == 203 || par2 == 205 || par2 == 211   
             )
         {
             _idTextField.textboxKeyTyped(key, par2);
@@ -308,7 +357,7 @@ public class GuiStallSetPayItem extends GuiContainerTFC
             _param3TextField.textboxKeyTyped(key, par2);
             _param4TextField.textboxKeyTyped(key, par2);
         }
-        else if (key=='\u0009')//TAB
+        else if (key=='\u0009' || par2 == 208)//TAB or arrow down
         {
             if (_idTextField.isFocused())
             {
@@ -345,6 +394,45 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                 _param4TextField.setFocused(false);
                 _idTextField.setFocused(true);
             }    
+        }
+        else if(par2 == 200)// arrow up
+        {
+            if (_idTextField.isFocused())
+            {
+                _idTextField.setFocused(false);
+                _param4TextField.setFocused(true);
+            }    
+            else if (_metaTextField.isFocused())
+            {
+                _metaTextField.setFocused(false);
+                _idTextField.setFocused(true);
+            }    
+            else if (_countTextField.isFocused())
+            {
+                _countTextField.setFocused(false);
+                _metaTextField.setFocused(true);
+            }                
+            else if (_param1TextField.isFocused())
+            {
+                _param1TextField.setFocused(false);
+                _countTextField.setFocused(true);                
+            }
+            else if (_param2TextField.isFocused())
+            {
+                _param2TextField.setFocused(false);
+                _param1TextField.setFocused(true);
+            }                
+            else if (_param3TextField.isFocused())
+            {
+                _param3TextField.setFocused(false);
+                _param2TextField.setFocused(true);            
+            }
+            else if (_param4TextField.isFocused())
+            {
+                _param4TextField.setFocused(false);
+                _param3TextField.setFocused(true);
+            }    
+        
         }
         else if(key == 13)//enter
         {// showing?             
@@ -390,8 +478,98 @@ public class GuiStallSetPayItem extends GuiContainerTFC
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
+         //drawTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, "ToolTip");
+         int i = getFieldUnderMouse(mouseX , mouseY);
+         String tooltip = "";
+         if (i == FID)
+             tooltip =  StatCollector.translateToLocal("gui.StallSetPay.Tooltip.ID");
+         else if (i == FMETA)
+             tooltip =  StatCollector.translateToLocal("gui.StallSetPay.Tooltip.Meta");
+         else if (i == FCOUNT)
+             tooltip =  StatCollector.translateToLocal("gui.StallSetPay.Tooltip.Count");
+         else if (i >= FP1 && i<=FP4)
+         {
+             //depenging on the type of payItem
+             tooltip = getToolTipFor( i - FP0 );
+         }
+         if (tooltip != null && !tooltip.isEmpty())
+             drawTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, tooltip);
     }
 
+        
+    public String getToolTipFor(int p)
+    {
+        if (this.payItemType == ITNO || p <0 || p>4)
+            return null;    
+        
+        String r = null;
+        
+        switch (this.payItemType)
+        {
+            case ITFORGED:
+                r = ( p == 1) ? "SmithingBonus" : "NoUsed";
+                break;
+                
+            case ITSIMPLEFOOD:
+                if (p > 0 && p < simplefoodt.length)                     
+                    r = simplefoodt[p];                
+                break;
+                
+            case ITFOODSALAD:
+                r = "SaladFoodComponentID";
+                break;
+                
+            case ITBARREL:
+                if (p > 0&& p < barrelt.length)                     
+                    r = barrelt[p];                                
+                break;
+                
+            case ITPOTTERYJUG:
+                r = ( p == 1) ? "PotteryJugUsed" : "NoUsed";
+                break;
+                
+            case ITANIMALCRATE:
+                if (p > 0&& p < animalcrate.length)                     
+                    r = animalcrate[p];                
+                break;            
+        }
+        
+        return ( r == null )? null : StatCollector.translateToLocal("gui.StallSetPay.Tooltip."+r);    
+    }
+            
+    public static boolean isCursonUnderField(GuiTextField field, int mouseX, int mouseY, int w , int h)
+    {
+        if (field == null || field.height == 0 || field.width ==0 )
+            return false;
+        
+        
+        return (mouseY > field.yPosition && mouseY < field.yPosition + field.height )
+            && (mouseX > field.xPosition && mouseX < field.xPosition + field.width);
+    }
+            
+    public int getFieldUnderMouse(int mouseX, int mouseY)
+    {
+        int w = (width - xSize) / 2;
+        int h = (height - ySize) / 2;
+        
+        if ( isCursonUnderField(this._idTextField, mouseX, mouseY, w, h))
+            return FID;
+        else if ( isCursonUnderField(this._metaTextField, mouseX, mouseY, w, h))
+            return FMETA;
+        else if ( isCursonUnderField(this._countTextField, mouseX, mouseY, w, h))
+            return FCOUNT;
+        else if ( isCursonUnderField(this._param1TextField, mouseX, mouseY, w, h))
+            return FP1;
+        else if ( isCursonUnderField(this._param2TextField, mouseX, mouseY, w, h))
+            return FP2;
+        else if ( isCursonUnderField(this._param3TextField, mouseX, mouseY, w, h))
+            return FP3;
+        else if ( isCursonUnderField(this._param4TextField, mouseX, mouseY, w, h))
+            return FP4;
+            
+        return FNO;
+    }        
+    
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int mouseX, int mouseY)
     {
@@ -402,8 +580,9 @@ public class GuiStallSetPayItem extends GuiContainerTFC
         int v = 0;
 
         drawTexturedModalRect(w, h, 0, v, xSize, ySize);
-        
-        drawCenteredString(StatCollector.translateToLocal("gui.StallSetPayItem.Title")+":" +_priceSlotIndex , w + _titleX, h + _titleY, WindowWidth, _colorDefaultText);
+        //+":" +_priceSlotIndex
+        drawCenteredString(StatCollector.translateToLocal("gui.StallSetPayItem.Title"),
+                w + _titleX, h + _titleY, WindowWidth, _colorDefaultText);
         
         _idTextField.drawTextBox();
         _metaTextField.drawTextBox();

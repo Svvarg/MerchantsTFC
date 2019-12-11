@@ -31,7 +31,7 @@ public class AnimalInCrate {
     public static final String GMAXHEALTH = "generic.maxHealth";
     public static final String GMOVEMENTSPEED = "generic.movementSpeed";
     public static final String GJUMPSTRENGTH = "horse.jumpStrength";
-    
+    public boolean allowSetOnlyTFCAnimal = true;
     
     
     //public static final String  = "";
@@ -154,8 +154,11 @@ public class AnimalInCrate {
             return null;
         
         NBTTagCompound nbt = new NBTTagCompound();
-        String name = getAnimalNameByID(id);
-        if ( name==null || name.isEmpty())
+        String name = getAnimalNameByID(id);        
+        if ( name == null || name.isEmpty())
+            return null;
+        //restriction to set any MC Entity
+        if ( allowSetOnlyTFCAnimal && !name.contains("TFC") )
             return null;
         nbt.setString(ID, name);        
         nbt.setInteger(SEX, (sex > 0) ? sex-1 : 0 );//1 man 2 female
