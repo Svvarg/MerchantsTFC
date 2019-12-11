@@ -209,7 +209,7 @@ gui.StallSetPay.Tooltip.NoUsed=Не используется
 gui.StallSetPay.Tooltip.SmithingBonus=Кузнечный бонус
 gui.StallSetPay.Tooltip.SaladFoodComponentID=ID компонента салата
 gui.StallSetPay.Tooltip.PotteryJugUsed=Флаг не нового кувшина или сосуда
-gui.StallSetPay.Tooltip.FoodCookedLevel=Степень термообработки(0 сырая, 5 максимальная)
+gui.StallSetPay.Tooltip.FoodCookedLevel=Термообработка(0 сырая, 5 максимальная)
 gui.StallSetPay.Tooltip.FoodSalted=Флаг солёная
 gui.StallSetPay.Tooltip.FoodDired=Флаг сушёная
 gui.StallSetPay.Tooltip.FoodBrinedPickledSmoked=Копчёная*100 Маринованная*10 Засоленная
@@ -218,8 +218,8 @@ gui.StallSetPay.Tooltip.BarrelSealTime=Год закрытия
 gui.StallSetPay.Tooltip.BarrelFluidID=ID жидкости
 gui.StallSetPay.Tooltip.BarrelAmount=Кол-во жидкости (литры)
 gui.StallSetPay.Tooltip.ACrateAnimID=ID животного
-gui.StallSetPay.Tooltip.ACrateFamAndSex= Степень приручения*10  пол(м-1, ж-2)
-gui.StallSetPay.Tooltip.ACrateJumpAndSpeed=Высота прыжка*100  скорость м/с 
+gui.StallSetPay.Tooltip.ACrateFamAndSex=Приручение*10 пол(1м, 2ж)
+gui.StallSetPay.Tooltip.ACrateJumpAndSpeed=Высота прыжка*100 скорость м/с 
 gui.StallSetPay.Tooltip.ACrateVariant=Внешний вида
 
 

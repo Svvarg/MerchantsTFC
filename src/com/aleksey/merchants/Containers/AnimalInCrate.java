@@ -31,8 +31,10 @@ public class AnimalInCrate {
     public static final String GMAXHEALTH = "generic.maxHealth";
     public static final String GMOVEMENTSPEED = "generic.movementSpeed";
     public static final String GJUMPSTRENGTH = "horse.jumpStrength";
-    public boolean allowSetOnlyTFCAnimal = true;
-    
+    public static boolean allowSetOnlyTFCAnimal = true;
+    public static String TFCAnimalsList = "";
+    public static final String[] InvalidTFCAnimal = {"skeletonTFC","zombieTFC","spiderTFC","slimeTFC","ghastTFC","caveSpiderTFC","blazeTFC", "endermanTFC","pigZombieTFC","boarTFC","banditTFC","minecartTFC","arrowTFC","standTFC","creeperTFC","irongolemTFC"};
+   // public static final String[] sexx= {" ","\u2642", "\u2640" };
     
     //public static final String  = "";
     public int id;
@@ -155,11 +157,11 @@ public class AnimalInCrate {
         
         NBTTagCompound nbt = new NBTTagCompound();
         String name = getAnimalNameByID(id);        
-        if ( name == null || name.isEmpty())
+        if ( name == null || name.isEmpty() || 
+                //can set only valid tfc animal
+                ( allowSetOnlyTFCAnimal && !isValidTFCAnimal(name) ) )
             return null;
-        //restriction to set any MC Entity
-        if ( allowSetOnlyTFCAnimal && !name.contains("TFC") )
-            return null;
+            
         nbt.setString(ID, name);        
         nbt.setInteger(SEX, (sex > 0) ? sex-1 : 0 );//1 man 2 female
         nbt.setInteger(AGE, age);
@@ -306,4 +308,37 @@ public class AnimalInCrate {
         int d = jumpHeightX10 / 5;
         return (d < 1 || d >= strength.length)? 0: strength[d];        
     }
+    
+    public static String getListOfAnimals()
+    {        
+        if ( TFCAnimalsList==null || TFCAnimalsList.isEmpty() )
+        {
+            int h = EntityList.IDtoClassMapping.size();
+            String r = "";
+            for (int i = 0; i < h; i++) {
+                String name = getAnimalNameByID(i);
+                if ( isValidTFCAnimal(name) )
+                      r += String.format("%s  %s\n", Integer.toString(i), name);
+                
+            }
+            TFCAnimalsList = r; 
+        }
+        return TFCAnimalsList;
+    }
+    
+    public static boolean isValidTFCAnimal(String name)
+    {
+        if (name==null || name.isEmpty() || ! name.contains("TFC"))
+            return false;
+        
+        for (int i = 0; i < InvalidTFCAnimal.length; i++) 
+        {
+            String badName = InvalidTFCAnimal[i];
+            if (name.contains(badName))
+                return false;            
+        }        
+        return true;
+    } 
+    
+    
 }

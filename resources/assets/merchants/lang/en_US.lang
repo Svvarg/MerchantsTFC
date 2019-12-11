@@ -215,9 +215,9 @@ gui.StallSetPay.Tooltip.FoodBrinedPickledSmoked=Smoked*100 Pickled*10 Brined
 gui.StallSetPay.Tooltip.BarrelSealed=Sealed
 gui.StallSetPay.Tooltip.BarrelSealTime=SealTime (Year)
 gui.StallSetPay.Tooltip.BarrelFluidID=Fluid ID
-gui.StallSetPay.Tooltip.BarrelAmount=Fluid Amount
+gui.StallSetPay.Tooltip.BarrelAmount=Fluid Amount (Liters)
 gui.StallSetPay.Tooltip.ACrateAnimID=Animal ID
-gui.StallSetPay.Tooltip.ACrateFamAndSex= Familiarity*10 sex(m-1 f-2)
+gui.StallSetPay.Tooltip.ACrateFamAndSex= Familiarity*10 sex(1m, 2f)
 gui.StallSetPay.Tooltip.ACrateJumpAndSpeed=JumpHeight*100  Speed м/с 
 gui.StallSetPay.Tooltip.ACrateVariant=Look Variant
 

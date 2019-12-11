@@ -34,7 +34,11 @@ import com.bioxx.tfc.api.Food;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import com.bioxx.tfc.api.Interfaces.IFood;
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraftforge.fluids.FluidStack;
+import org.lwjgl.opengl.GL11;
 
 /**
  *
@@ -135,6 +139,7 @@ public class GuiStallSetPayItem extends GuiContainerTFC
     private static final int FP3 = 13;
     private static final int FP4 = 14;
     
+    private AnimalInCrate animal; 
     
     
     
@@ -194,6 +199,8 @@ public class GuiStallSetPayItem extends GuiContainerTFC
      */
     private void fillPayStackParamToField(){
         this.payItemType = ITNO;
+        this.animal = null;
+                
         if (_priceSlotIndex>-1&& _priceSlotIndex < _stall.getSizeInventory())
         {
             ItemStack payStack = _stall.getStackInSlot(_priceSlotIndex);
@@ -275,15 +282,15 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                 else if (payStack.hasTagCompound() && isValidAnimalCrate(payStack) )
                 {
                     this.payItemType = ITANIMALCRATE;
-                    AnimalInCrate a = new AnimalInCrate(payStack.stackTagCompound);
-                    if (a.id > 0 )
+                    this.animal = new AnimalInCrate(payStack.stackTagCompound);
+                    if (this.animal.id > 0 )
                     {
-                        p1 = a.id;
-                        p2 = a.sex + a.familiarity * 10; // 351 35-famil 1-sex(invert 1-man 0-female)
-                        int speed = a.getSpeedX10();
-                        int jump = a.getJumpHX10();
+                        p1 = this.animal.id;
+                        p2 = this.animal.sex + this.animal.familiarity * 10; // 351 35-famil 1-sex(invert 1-man 0-female)
+                        int speed = this.animal.getSpeedX10();
+                        int jump = this.animal.getJumpHX10();
                         p3 = speed + jump  * 1000;//45103 jump 4.5m speed 10.3m/s
-                        p4 = a.variant;
+                        p4 = this.animal.variant;
                     }
                 }
                 
@@ -475,6 +482,18 @@ public class GuiStallSetPayItem extends GuiContainerTFC
         );
     }
     
+    public void drawTooltipEx(int mx, int my, String text)
+    {
+        List<String> list = new ArrayList<String>();
+        String[] a = text.split("\n");
+        for (String line : a)
+            list.add(line);        
+        this.drawHoveringText(list, mx, my + 15, this.fontRendererObj);
+        RenderHelper.disableStandardItemLighting();
+        GL11.glDisable(GL11.GL_LIGHTING);
+        //GL11.glDisable(GL11.GL_DEPTH_TEST);
+    }    
+    
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
@@ -493,12 +512,13 @@ public class GuiStallSetPayItem extends GuiContainerTFC
              tooltip = getToolTipFor( i - FP0 );
          }
          if (tooltip != null && !tooltip.isEmpty())
-             drawTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, tooltip);
+             drawTooltipEx(mouseX - this.guiLeft, mouseY - this.guiTop, tooltip);
     }
 
         
     public String getToolTipFor(int p)
     {
+        String bonus ="";
         if (this.payItemType == ITNO || p <0 || p>4)
             return null;    
         
@@ -526,15 +546,41 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                 
             case ITPOTTERYJUG:
                 r = ( p == 1) ? "PotteryJugUsed" : "NoUsed";
+                bonus = "0 new \n 1 - used";
                 break;
                 
             case ITANIMALCRATE:
-                if (p > 0&& p < animalcrate.length)                     
-                    r = animalcrate[p];                
+                if (p > 0&& p < animalcrate.length)
+                {
+                    r = animalcrate[p];
+                    if (p==1)
+                        bonus= AnimalInCrate.getListOfAnimals();
+                    else if (p==2 && this.animal != null)
+                    {
+                        String sexx =" ";
+                        if (animal.sex == 1) //man
+                            sexx = " \u2642";
+                        else if (animal.sex == 2)
+                            sexx = " \u2640";
+                        if (animal.sex > 0 )
+                            bonus = animal.familiarity + " - Familiarity \n" + animal.sex+ sexx;
+                            
+                    }                            
+                    else if (p==3 && this.animal != null)
+                    {
+                        float jumpH = animal.getJumpHX10();
+                        jumpH = (jumpH > 0)? (float) jumpH /10 : 0;
+                        float speed = animal.getSpeedX10();     
+                        speed = (speed>0)? (float) speed / 10 : 0;
+                        if ( jumpH > 0 || speed > 0)
+                            bonus =  String.format("%.1f m \n%.1f m/s", jumpH, speed );
+                    }
+                    
+                }
                 break;            
         }
-        
-        return ( r == null )? null : StatCollector.translateToLocal("gui.StallSetPay.Tooltip."+r);    
+        bonus =  bonus.isEmpty() ? "" : "\n"+bonus; 
+        return ( r == null )? null : StatCollector.translateToLocal("gui.StallSetPay.Tooltip."+r) + bonus;    
     }
             
     public static boolean isCursonUnderField(GuiTextField field, int mouseX, int mouseY, int w , int h)
