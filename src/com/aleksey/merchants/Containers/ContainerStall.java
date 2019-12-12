@@ -1,5 +1,6 @@
 package com.aleksey.merchants.Containers;
 
+import com.aleksey.merchants.Extended.ExtendedLogic;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,8 +29,8 @@ import com.bioxx.tfc.Core.Player.PlayerInventory;
 import com.bioxx.tfc.Food.ItemFoodTFC;
 import com.bioxx.tfc.api.Interfaces.IFood;
 import com.bioxx.tfc.api.Food;
-import static com.aleksey.merchants.Containers.ExtendedLogic.isNoSplitFood;
-import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
+import static com.aleksey.merchants.Extended.ExtendedLogic.isNoSplitFood;
+import static com.aleksey.merchants.Extended.ExtendedLogic.getNoSplitFoodWeight;
 
 //slotClick is based on https://github.com/Mr-J/AdvancedBackpackMod/blob/master/unrelated/slotClick%2BComments%2BRename%2BHelpers.java.txt
 

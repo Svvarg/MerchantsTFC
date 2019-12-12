@@ -1,8 +1,13 @@
-package com.aleksey.merchants.Containers;
+package com.aleksey.merchants.Extended;
 
+import static com.aleksey.merchants.Extended.Integration.ItemCrateClass;
+import static com.aleksey.merchants.Extended.Integration.isAnimalCrateModLoaded;
+import cpw.mods.fml.common.Loader;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.minecraft.entity.EntityList;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -34,7 +39,6 @@ public class AnimalInCrate {
     public static boolean allowSetOnlyTFCAnimal = true;
     public static String TFCAnimalsList = "";
     public static final String[] InvalidTFCAnimal = {"skeletonTFC","zombieTFC","spiderTFC","slimeTFC","ghastTFC","caveSpiderTFC","blazeTFC", "endermanTFC","pigZombieTFC","boarTFC","banditTFC","minecartTFC","arrowTFC","standTFC","creeperTFC","irongolemTFC"};
-   // public static final String[] sexx= {" ","\u2642", "\u2640" };
     
     //public static final String  = "";
     public int id;
@@ -49,10 +53,18 @@ public class AnimalInCrate {
     public int familiarity;
     public int variant;
     
+    
+   
     public static boolean isValidAnimalCrate(ItemStack stack)
     {
-      return ( stack!=null && stack.getItem().getClass().toString().contains("taeog.animalcrate.item.ItemCrate"));
+      //return (stack!=null && isAnimalCrateModLoaded() && stack.getItem() instanceof taeog.animalcrate.item.ItemCrate);
+      return ( stack!=null && isAnimalCrateModLoaded() && 
+              ItemCrateClass != null && stack.getItem().getClass() == ItemCrateClass
+              //stack.getItem().getClass().toString().contains("taeog.animalcrate.item.ItemCrate")
+              );
     }
+    
+    
     /**
      * Create by AnimalCrateItemStack NBT
      */ 
@@ -341,4 +353,5 @@ public class AnimalInCrate {
     } 
     
     
+  
 }

@@ -1,6 +1,6 @@
 package com.aleksey.merchants.Helpers;
 
-import com.aleksey.merchants.Containers.ExtendedLogic;
+import com.aleksey.merchants.Extended.ExtendedLogic;
 import java.util.ArrayList;
 
 import net.minecraft.item.Item;
@@ -16,8 +16,8 @@ import com.bioxx.tfc.api.Enums.EnumSize;
 import com.bioxx.tfc.api.Interfaces.IBag;
 import com.bioxx.tfc.api.Interfaces.IFood;
 import com.bioxx.tfc.api.Interfaces.ISize;
-import static com.aleksey.merchants.Containers.ExtendedLogic.isNoSplitFood;
-import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
+import static com.aleksey.merchants.Extended.ExtendedLogic.isNoSplitFood;
+import static com.aleksey.merchants.Extended.ExtendedLogic.getNoSplitFoodWeight;
 
 public class SmallVesselHelper
 {    

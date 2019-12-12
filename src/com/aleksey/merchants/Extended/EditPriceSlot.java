@@ -1,7 +1,7 @@
-package com.aleksey.merchants.Containers;
+package com.aleksey.merchants.Extended;
 
-import static com.aleksey.merchants.Containers.AnimalInCrate.isValidAnimalCrate;
-import static com.aleksey.merchants.Containers.ExtendedLogic.setCookedLevel;
+import static com.aleksey.merchants.Extended.AnimalInCrate.isValidAnimalCrate;
+import static com.aleksey.merchants.Extended.ExtendedLogic.setCookedLevel;
 import com.bioxx.tfc.Core.TFC_Time;
 import com.bioxx.tfc.Food.ItemFoodMeat;
 import com.bioxx.tfc.Food.ItemFoodTFC;
@@ -13,7 +13,6 @@ import com.bioxx.tfc.Items.ItemTFCArmor;
 import com.bioxx.tfc.Items.ItemTerra;
 import com.bioxx.tfc.Items.Tools.ItemCustomSword;
 import com.bioxx.tfc.Items.Tools.ItemMiscToolHead;
-import com.bioxx.tfc.Items.Tools.ItemTerraTool;
 import com.bioxx.tfc.Items.Tools.ItemWeapon;
 import com.bioxx.tfc.api.Constant.Global;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.setDamageBuff;
@@ -157,14 +156,17 @@ public class EditPriceSlot {
              }        
             //Exception
             //cookedLimonit Udary has some fun metaData for items like 10 15 25 35 for limonite ore
-            if (maxMeta == 3 && item.getClass().toString().contains("udary.tfcudarymod.items.ores.ItemOre"))
+            //if (maxMeta == 3 && item.getClass().toString().contains("udary.tfcudarymod.items.ores.ItemOre") )
+            if (maxMeta == 3 && item.getClass() == Integration.UdaryItemOreClass)
             {
                 if ( meta != 10 && meta != 15 && meta != 25 && meta != 35)
                     return 25;
                 else 
                     return meta;                                
             }
-            else if (maxMeta ==1 && item.getClass().toString().contains("udary.tfcudarymod.items.ores.ItemOreFlake"))
+            //else if (maxMeta == 1 && item.getClass().toString().contains("udary.tfcudarymod.items.ores.ItemOreFlake"))
+            //OreFlake nikel of silver have 1 or 10 units
+            else if (maxMeta == 1 && item.getClass()== Integration.UdaryItemOreFlakeClass)
             {
                 if ( meta != 1 && meta != 10)
                     return 1;
@@ -303,6 +305,7 @@ public class EditPriceSlot {
                 || i == TFCItems.stoneHammerHead
                 || i == TFCItems.stoneKnife
                 || i == TFCItems.stoneKnifeHead                
+                || i == TFCItems.arrow
                 );
         if (!r)
         {
@@ -321,38 +324,60 @@ public class EditPriceSlot {
         
     //tools armor tools with AttackDamage weapon
     public static int getTFCSmithingItemType(ItemStack iStack)
-    {
-        String[] noAttackDamage = {"Saw", "Hoe", "Chisel", "Propick"};
+    {        
         if (iStack == null)
             return NOTFC;
         
-        Item item = iStack.getItem();        
+        Item item = iStack.getItem();                                
         
-        if (item instanceof ItemWeapon ||
-                item instanceof ItemCustomSword)
-        {          
+        if (item instanceof ItemWeapon 
+                || item instanceof ItemCustomSword
+                //tfcm warhammer and halberd
+                || Integration.isTerraMiscModLoaded() 
+                   && item.getClass() == Integration.TerraMiscItemCustomToolHeadClass)
             return TFCWEAPON;//Weapon
-        }
+       
+        if ( item instanceof com.bioxx.tfc.Items.Tools.ItemCustomSaw 
+                || item instanceof com.bioxx.tfc.Items.Tools.ItemCustomHoe
+                || item instanceof com.bioxx.tfc.Items.Tools.ItemChisel
+                || item instanceof com.bioxx.tfc.Items.Tools.ItemProPick
+                )
+            return TFCTOOLS;
         
-        String itemName = item.getUnlocalizedName();        
-        if (itemName.isEmpty())
-            return NOTFC;
-        
-        if (item instanceof ItemTerraTool || item instanceof ItemMiscToolHead )
-        {         
-            for (String s :noAttackDamage){
-                if (itemName.contains(s))
-                    return TFCTOOLS;//tools withount attackdamage
-            }            
-            return TFCTOOLSADAMAGE;//Tools with attackdamage
-        } 
-        
-        if ( item instanceof ItemTFCArmor ||  
+        if (item instanceof com.bioxx.tfc.Items.Tools.ItemCustomAxe
+                || item instanceof com.bioxx.tfc.Items.Tools.ItemCustomPickaxe
+                || item instanceof com.bioxx.tfc.Items.Tools.ItemCustomScythe
+                || item instanceof com.bioxx.tfc.Items.Tools.ItemCustomShovel
+                || item instanceof com.bioxx.tfc.Items.Tools.ItemHammer
+                )
+        return TFCTOOLSADAMAGE;
+                
+        if (item instanceof ItemTFCArmor ||  
                 //Shield from AutomatedBellowsAddon have duraBuff
-                item.getClass().toString().endsWith("Shield"))
+                item.getClass() == Integration.ABellowsItemRoundShieldClass )                
             return TFCARMOR;
         
-        return (item != null) && item.getClass().toString().endsWith(" Blade")? TFCWEAPON : NOTFC;//Weapon  saw blade...      
+        if ( item.getClass() == Integration.TerraMiscItemCustomLongbowClass )
+            return NOTFC;//no durabuff bonus;
+        
+        if (item instanceof com.bioxx.tfc.Items.Tools.ItemTerraTool ||
+                item instanceof ItemMiscToolHead )
+        {         
+            String[] noAttackDamage = {"Saw", "Hoe", "Chisel", "Propick"};
+            String itemName = item.getUnlocalizedName();                    
+            if ( itemName.isEmpty() )
+                return NOTFC;
+            
+            for (String s :noAttackDamage)
+            {
+                if (itemName.contains(s))
+                    //tools withount attackdamage
+                    return TFCTOOLS;
+            }            
+            return TFCTOOLSADAMAGE;//Tools with attackdamage and blade of weapons            
+        }
+        
+        return NOTFC;        
     }
 
     
@@ -616,8 +641,5 @@ public class EditPriceSlot {
         }
         return TFCFluidsList;
     }
-    
-
-    
     
 }

@@ -1,6 +1,6 @@
 package com.aleksey.merchants.WarehouseContainers;
 
-import com.aleksey.merchants.Containers.ExtendedLogic;
+import com.aleksey.merchants.Extended.ExtendedLogic;
 import java.util.ArrayList;
 
 import net.minecraft.inventory.IInventory;
@@ -13,7 +13,7 @@ import com.aleksey.merchants.api.IWarehouseContainer;
 import com.aleksey.merchants.api.ItemSlot;
 import com.aleksey.merchants.api.ItemTileEntity;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
-import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
+import static com.aleksey.merchants.Extended.ExtendedLogic.getNoSplitFoodWeight;
 
 public abstract class Container implements IWarehouseContainer
 {

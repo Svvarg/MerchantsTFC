@@ -1,7 +1,7 @@
 package com.aleksey.merchants.Helpers;
 
-import com.aleksey.merchants.Containers.ExtendedLogic;
-import static com.aleksey.merchants.Containers.ExtendedLogic.getFirstItemStackFromItemTileEntity;
+import com.aleksey.merchants.Extended.ExtendedLogic;
+import static com.aleksey.merchants.Extended.ExtendedLogic.getFirstItemStackFromItemTileEntity;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -27,7 +27,7 @@ import com.aleksey.merchants.api.Point;
 import com.aleksey.merchants.api.WarehouseContainerList;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 import com.bioxx.tfc.api.Interfaces.IFood;
-import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
+import static com.aleksey.merchants.Extended.ExtendedLogic.getNoSplitFoodWeight;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
 import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
 import com.bioxx.tfc.Items.ItemIngot;
@@ -72,7 +72,7 @@ public class WarehouseManager
         // for ability byu and sell zeroSealTime barrels
         if (itemStack.getItem() instanceof ItemBarrels 
                 || itemStack.getItem() instanceof ItemLargeVessel)
-            return ExtendedLogic.getBarrelQuantity(_quantities, itemStack, itemKey);
+            return ExtendedLogic.getCorrectBarrelsQuantityOnWarehouse(_quantities, itemStack, itemKey);
         
         return _quantities.containsKey(itemKey) ? _quantities.get(itemKey): 0;
     }

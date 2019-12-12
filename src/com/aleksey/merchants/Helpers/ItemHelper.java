@@ -1,8 +1,8 @@
 package com.aleksey.merchants.Helpers;
 
-import com.aleksey.merchants.Containers.EditPriceSlot;
-import com.aleksey.merchants.Containers.ExtendedLogic;
-import static com.aleksey.merchants.Containers.ExtendedLogic.PERMISSIBLEDECLAY;
+import com.aleksey.merchants.Extended.EditPriceSlot;
+import com.aleksey.merchants.Extended.ExtendedLogic;
+import static com.aleksey.merchants.Extended.ExtendedLogic.PERMISSIBLEDECLAY;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,8 +11,8 @@ import com.bioxx.tfc.Food.ItemFoodTFC;
 import com.bioxx.tfc.TileEntities.TEIngotPile;
 import com.bioxx.tfc.api.Food;
 import com.bioxx.tfc.api.Interfaces.IFood;
-import static com.aleksey.merchants.Containers.ExtendedLogic.isNoSplitFood;
-import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
+import static com.aleksey.merchants.Extended.ExtendedLogic.isNoSplitFood;
+import static com.aleksey.merchants.Extended.ExtendedLogic.getNoSplitFoodWeight;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
 import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
 import com.bioxx.tfc.Items.Pottery.ItemPotteryJug;

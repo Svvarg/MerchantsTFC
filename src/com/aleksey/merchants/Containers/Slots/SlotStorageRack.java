@@ -13,7 +13,7 @@ import com.bioxx.tfc.Items.ItemBlocks.ItemGrill;
 import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
 import com.bioxx.tfc.Items.ItemBlocks.ItemWoodDoor;
 import com.bioxx.tfc.Items.ItemSluice;
-import com.aleksey.merchants.Containers.ExtendedLogic;
+import com.aleksey.merchants.Extended.ExtendedLogic;
 
 public class SlotStorageRack extends Slot
 {

@@ -1,7 +1,7 @@
 package com.aleksey.merchants.TileEntities;
 
-import com.aleksey.merchants.Containers.EditPriceSlot;
-import com.aleksey.merchants.Containers.ExtendedLogic;
+import com.aleksey.merchants.Extended.EditPriceSlot;
+import com.aleksey.merchants.Extended.ExtendedLogic;
 import java.util.UUID;
 
 import net.minecraft.entity.player.EntityPlayer;

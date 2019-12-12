@@ -20,8 +20,8 @@ import com.bioxx.tfc.Containers.ContainerChestTFC;
 import com.bioxx.tfc.Containers.Slots.SlotChest;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 import com.bioxx.tfc.TileEntities.TEChest;
-import static com.aleksey.merchants.Containers.ExtendedLogic.isNoSplitFood;
-import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
+import static com.aleksey.merchants.Extended.ExtendedLogic.isNoSplitFood;
+import static com.aleksey.merchants.Extended.ExtendedLogic.getNoSplitFoodWeight;
 
 public class ChestContainer extends Container
 {

@@ -1,6 +1,5 @@
-package com.aleksey.merchants.Containers;
+package com.aleksey.merchants.Extended;
 
-import static com.aleksey.merchants.Containers.ExtendedLogic.setCookedLevel;
 import com.aleksey.merchants.Helpers.ItemHelper;
 import static com.aleksey.merchants.Helpers.SmallVesselHelper.getVesselItemStacks;
 import com.aleksey.merchants.api.ItemSlot;
@@ -11,19 +10,8 @@ import com.bioxx.tfc.Food.ItemSalad;
 import com.bioxx.tfc.Food.ItemSandwich;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
 import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
-import com.bioxx.tfc.Items.ItemBlocks.ItemTerraBlock;
-import com.bioxx.tfc.Items.ItemGem;
-import com.bioxx.tfc.Items.ItemOre;
-import com.bioxx.tfc.Items.ItemOreSmall;
-import com.bioxx.tfc.Items.ItemRawHide;
-import com.bioxx.tfc.Items.ItemTFCArmor;
-import com.bioxx.tfc.Items.ItemTerra;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 import com.bioxx.tfc.Items.Tools.ItemCustomBucketMilk;
-import com.bioxx.tfc.Items.Tools.ItemCustomSword;
-import com.bioxx.tfc.Items.Tools.ItemMiscToolHead;
-import com.bioxx.tfc.Items.Tools.ItemTerraTool;
-import com.bioxx.tfc.Items.Tools.ItemWeapon;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.getCraftTag;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.getDamageBuff;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.getDurabilityBuff;
@@ -37,19 +25,14 @@ import static com.bioxx.tfc.api.Food.isDried;
 import static com.bioxx.tfc.api.Food.isInfused;
 import static com.bioxx.tfc.api.Food.isPickled;
 import static com.bioxx.tfc.api.Food.isSalted;
-import static com.bioxx.tfc.api.Food.isSameSmoked;
-import static com.bioxx.tfc.api.Food.isSmoked;
 import com.bioxx.tfc.api.Interfaces.IFood;
-import com.bioxx.tfc.api.TFCItems;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -60,7 +43,7 @@ import net.minecraftforge.fluids.FluidStack;
 public class ExtendedLogic {
 
     //private static final String BUCKETMILK = "com.bioxx.tfc.Items.Tools.ItemCustomBucketMilk";
-    private static final String JUGMILK = "ItemCeramicJugMilk";
+    //private static final String JUGMILK = "ItemCeramicJugMilk";
     private static final int BUCKETMILKWEIGHT = 20;
     private static final int SALADWEIGHT = 20;
     private static final int JUGMILKWEIGHT = 80;
@@ -94,23 +77,18 @@ public class ExtendedLogic {
     {        
         if (srcItemStack == null) {
             return false;
-        }
-        
+        }        
         Class<?> cls = srcItemStack.getItem().getClass();
-        if ( cls == ItemCustomBucketMilk.class || cls == ItemSalad.class )
-            return true;
-        
-        String itemClass = srcItemStack.getItem().getClass().toString();
-        return itemClass != null && !itemClass.isEmpty() && 
-                ( itemClass.contains(JUGMILK) /*|| itemClass.contains(BUCKETMILK)*/);
+        return ( cls == ItemCustomBucketMilk.class 
+                || cls == ItemSalad.class 
+                || Integration.isUdaryJugMilk(cls) );            
     }
     
     /**
      *  base weight for no-split tfcFood such as milk jugs, buckets or Salad
      */
     public static int getNoSplitFoodWeight(ItemStack srcItemStack)
-    {
-        
+    {        
         if (srcItemStack != null && srcItemStack.getItem() instanceof IFood )
         {       
             Class<?> cls = srcItemStack.getItem().getClass();
@@ -119,15 +97,9 @@ public class ExtendedLogic {
             
             if (cls == ItemSalad.class)
                 return SALADWEIGHT;
-
-            String itemClass = srcItemStack.getItem().getClass().toString();
-            if (itemClass == null) {
-                return 0;
-            }
-            if (itemClass.contains(JUGMILK))
-            {
+            
+            if ( Integration.isUdaryJugMilk(cls) )
                 return JUGMILKWEIGHT;
-            }                
         }
         return 0;
     }
@@ -146,15 +118,15 @@ public class ExtendedLogic {
         if  ( IGNOREBARRELWOODTYPE && 
                 itemStack1.getItem() instanceof ItemBarrels 
                 && itemStack2.getItem() instanceof ItemBarrels 
-                && itemStack1.getItem() == itemStack2.getItem() )
-        {
+                && itemStack1.getItem() == itemStack2.getItem() )        
             return areItemStackTagsEqualEx(itemStack1, itemStack2, payMode);
-        }
         
-        if (itemStack1.getItem() != itemStack2.getItem() || itemStack1.getItemDamage() != itemStack2.getItemDamage()) {
+        
+        if (itemStack1.getItem() != itemStack2.getItem() 
+                || itemStack1.getItemDamage() != itemStack2.getItemDamage() ) 
             return false;
-        }
-        /*
+        
+        /* old code
         return itemStack1.getItem() instanceof IFood
                 ? Food.areEqual(itemStack1, itemStack2)
                 //: ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);
@@ -163,13 +135,11 @@ public class ExtendedLogic {
  
         if (itemStack1.getItem() instanceof IFood)
         {
-            //equals = Food.areEqual(itemStack1, itemStack2);
+            //equals = Food.areEqual(itemStack1, itemStack2); //old
             equals = areFoodEqual(itemStack1, itemStack2);
         } 
-        else if (payMode && 
-                //how better check item class if 
-                itemStack1.getItem().getClass().toString().contains("taeog.animalcrate.item.ItemCrate") 
-                )
+        else if (payMode 
+                && itemStack1.getItem().getClass() == Integration.ItemCrateClass )
         {   //only for payMode for allow sell animals with different characteristics
             equals = areAnimalsAtCrateEqual(itemStack1, itemStack2, payMode);
         }
@@ -249,6 +219,7 @@ public class ExtendedLogic {
         return brined && pickled && cooked && dried && salted && infused;//&& isSmoked;
     }
     
+    
     public static boolean areGroupedFoodEquals(ItemStack is1, ItemStack is2)
     {
         if (is1==null|| is2==null)
@@ -256,8 +227,7 @@ public class ExtendedLogic {
         
         int[] fg1 = Food.getFoodGroups(is1);
         int[] fg2 = Food.getFoodGroups(is2);
-        
-        
+                
         if ( fg1==null || fg2 == null || fg1.length != fg2.length)
             return false;
                 
@@ -278,9 +248,6 @@ public class ExtendedLogic {
         return (c == fg1.length);
     }
     
-    
-    
-
     
     
     /**
@@ -317,27 +284,20 @@ public class ExtendedLogic {
               // Don`t allow to combine at stack items, according to the logic suitable for trade
               // then stall search place for price-item in container to put it
               // at searchFreeSpace_NonEmptySlot 
-              if (true)//( st1.stackSize == 1 && st2.stackSize == 1)
+              //Compare barrel largeVessel
+              Item item1 = st1.getItem();
+              
+              if (  item1 instanceof ItemBarrels || item1 instanceof  ItemLargeVessel )
               {
-                 
-                  //Compare barrel largeVessel and food
-                  //Class<?> cls = st1.getItem().getClass();                  
-                  //if (cls == ItemBarrels.class || cls == ItemLargeVessel.class )
-                  
-                  Item item1 = st1.getItem();
-                  
-                  if (  item1 instanceof ItemBarrels || item1 instanceof  ItemLargeVessel )
-                  {
                       return areBarrelsEqual(st1, st2);   
-                  }                  
-                  
-                  //compare TFC smithingItem by bonus 
-                  if ( ( st1.hasTagCompound() && st1.stackTagCompound.hasKey(CRAFTINGTAG) ) 
-                         || (st2.hasTagCompound() && st2.stackTagCompound.hasKey(CRAFTINGTAG) ) )
-                  {
-                      return areSmithingItemEqual(st1, st2, payMode); 
-                  }              
-              }
+              }                  
+              
+              //compare TFC smithingItem by bonus 
+              if ( ( st1.hasTagCompound() && st1.stackTagCompound.hasKey(CRAFTINGTAG) ) 
+                      || (st2.hasTagCompound() && st2.stackTagCompound.hasKey(CRAFTINGTAG) ) )
+              {
+                  return areSmithingItemEqual(st1, st2, payMode); 
+              }              
               
               return st1.stackTagCompound != null && st2.stackTagCompound != null && st1.stackTagCompound.equals(st2.stackTagCompound);
           }   
@@ -470,7 +430,7 @@ public class ExtendedLogic {
     }
     
     /** 
-    * For compare Smithing items by Smithing Bonus                                  
+    * For compare Forged-Smithing items by Smithing Bonus                                  
     * Allow buying goods with less or equal bonus that stay at StallFaceSlot
     * but with a difference of not more than permissibleSmithingBonus
     * And allow selling pay with more or equal bounus than have StallFaceSlot    
@@ -693,26 +653,27 @@ public class ExtendedLogic {
         if (item==null)
             return false;
         
-        String iClass = item.getClass().toString();
+        Class iClass = item.getClass();
         
-        if (iClass == null || iClass.isEmpty() ) {
+        if (iClass == null ) {
                 return false;
         }
         return (
-                ( iClass.startsWith("sladki.tfc.ab") && 
+                ( Integration.isABellowsModLoaded() && 
                     ( 
-                       iClass.contains("ItemBlockPotteryKiln") 
-                    || iClass.contains("ItemBlockPotteryKilnChamber")
-                    || iClass.contains("ItemBlockSteamBoiler")
-                    || iClass.contains("ItemBlockAutomatedBellows")
-                    || iClass.contains("ItemBlockWaterFilter")              
+                       iClass == Integration.ABellowsBlockPotteryKilnClass
+                    || iClass == Integration.ABellowsBlockPotteryKilnChamberClass
+                    || iClass == Integration.ABellowsBlockSteamBoilerClass
+                    || iClass == Integration.ABellowsBlockAutomatedBellowsClass
+                    || iClass == Integration.ABellowsBlockWaterFilterClass 
                     )
                 ) 
-                || iClass.contains("taeog.animalcrate.item.ItemCrate")
-                || iClass.contains("udary.tfcudarymod.items.devices.ItemOreCooker")
-                || iClass.contains("tfctech.items.ItemBlocks.ItemWireDrawBench")
+                || Integration.ItemCrateClass == iClass
+                || Integration.UdaryItemOreCookerClass== iClass
+                //|| iClass.contains("tfctech.items.ItemBlocks.ItemWireDrawBench")
                 );
     }
+
     
     
     //for compare tools weapon armor and for correct quantiti on warehouse
@@ -836,7 +797,14 @@ public class ExtendedLogic {
         return key;
     }
     
-    public static int getBarrelQuantity(Hashtable<String, Integer> quantities, ItemStack iStack, String itemKey)
+    /**
+     * For Warehouse Correct displayin Barrels Quantity
+     * @param quantities table with all items
+     * @param iStack barrel
+     * @param itemKey standart key for this barrel
+     * @return 
+     */
+    public static int getCorrectBarrelsQuantityOnWarehouse(Hashtable<String, Integer> quantities, ItemStack iStack, String itemKey)
     {
         if (quantities==null || quantities.isEmpty() || iStack == null || 
                 itemKey==null || itemKey.isEmpty() )
@@ -848,7 +816,8 @@ public class ExtendedLogic {
             return quantities.containsKey(itemKey) ? quantities.get(itemKey): 0;
         }
         
-        // case then need calculate all barrels\largeVessels with duifferent sealYear        
+        // case then need calculate all barrels\largeVessels with duifferent sealYear
+        // for zeroBarrel trade
         int q = 0;
         String zeroItemKey = "";        
         int p = itemKey.lastIndexOf(":0");//SealTime is 0
@@ -866,8 +835,7 @@ public class ExtendedLogic {
                 int v = (Integer) entry.getValue();
                 q += v;
             }
-        }            
-        
+        }        
         return q;
     }
     

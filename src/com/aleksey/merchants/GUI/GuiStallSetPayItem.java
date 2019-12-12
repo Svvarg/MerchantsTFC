@@ -5,7 +5,7 @@
  */
 package com.aleksey.merchants.GUI;
 
-import com.aleksey.merchants.Containers.AnimalInCrate;
+import com.aleksey.merchants.Extended.AnimalInCrate;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.entity.RenderItem;
@@ -17,12 +17,11 @@ import net.minecraft.world.World;
 import org.lwjgl.input.Keyboard;
 
 import com.aleksey.merchants.Containers.ContainerStallSetPayItem;
-import static com.aleksey.merchants.Containers.AnimalInCrate.isValidAnimalCrate;
-import com.aleksey.merchants.Containers.EditPriceSlot;
-import com.aleksey.merchants.Containers.ExtendedLogic;
-import static com.aleksey.merchants.Containers.ExtendedLogic.strToInt;
+import static com.aleksey.merchants.Extended.AnimalInCrate.isValidAnimalCrate;
+import com.aleksey.merchants.Extended.EditPriceSlot;
+import com.aleksey.merchants.Extended.ExtendedLogic;
+import static com.aleksey.merchants.Extended.ExtendedLogic.strToInt;
 import com.aleksey.merchants.TileEntities.TileEntityStall;
-import com.bioxx.tfc.Containers.ContainerTFC;
 import com.bioxx.tfc.Core.Player.PlayerInventory;
 import com.bioxx.tfc.Food.ItemSalad;
 import com.bioxx.tfc.GUI.GuiContainerTFC;

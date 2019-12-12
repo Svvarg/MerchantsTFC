@@ -9,6 +9,7 @@ import com.aleksey.merchants.Core.ItemList;
 import com.aleksey.merchants.Core.MerchantsTabs;
 import com.aleksey.merchants.Core.Recipes;
 import com.aleksey.merchants.Core.Player.PlayerTracker;
+import com.aleksey.merchants.Extended.Integration;
 import com.aleksey.merchants.Handlers.ChunkEventHandler;
 import com.aleksey.merchants.Handlers.Network.DieCopyPacket;
 import com.aleksey.merchants.Handlers.Network.InitClientWorldPacket;
@@ -78,5 +79,6 @@ public class MerchantsMod
     @EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
+        Integration.getIntegrationModeLoaded();
     }
 }
