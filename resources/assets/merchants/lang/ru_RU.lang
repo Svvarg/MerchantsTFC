@@ -200,7 +200,7 @@ gui.Stall.Tooltip.CanBuy=Можно купить
 gui.Stall.Tooltip.NoPaysSpace=Нет места для оплаты
 gui.Stall.Tooltip.LimitButton=Нажми для редактирования лимита
 gui.Stall.Tooltip.SetPayButton=Нажми для редактирования вещи-цены
-gui.StallSetPayItem.Title=Ручная установка цены
+gui.StallSetPayItem.Title=Редактор цены
 
 gui.StallSetPay.Tooltip.ID=Идентификатор вещи
 gui.StallSetPay.Tooltip.Meta=Повреждение или мета

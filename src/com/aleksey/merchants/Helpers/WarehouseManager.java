@@ -28,6 +28,8 @@ import com.aleksey.merchants.api.WarehouseContainerList;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 import com.bioxx.tfc.api.Interfaces.IFood;
 import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
+import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
+import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
 import com.bioxx.tfc.Items.ItemIngot;
 
 public class WarehouseManager
@@ -66,6 +68,11 @@ public class WarehouseManager
     public int getQuantity(ItemStack itemStack)
     {
         String itemKey = ItemHelper.getItemKey(itemStack);
+        
+        // for ability byu and sell zeroSealTime barrels
+        if (itemStack.getItem() instanceof ItemBarrels 
+                || itemStack.getItem() instanceof ItemLargeVessel)
+            return ExtendedLogic.getBarrelQuantity(_quantities, itemStack, itemKey);
         
         return _quantities.containsKey(itemKey) ? _quantities.get(itemKey): 0;
     }

@@ -42,6 +42,8 @@ import static com.bioxx.tfc.api.Food.isSmoked;
 import com.bioxx.tfc.api.Interfaces.IFood;
 import com.bioxx.tfc.api.TFCItems;
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Map;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -49,6 +51,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fluids.FluidStack;
 
 /**
  *
@@ -806,5 +809,67 @@ public class ExtendedLogic {
                       
         return equal;
     }
+    
+    /**
+     * uses at ItemHelper getItemKey for correct display quantity of barrels 
+     * and large vessels by sealYear fluidId and fluidAmount
+     */
+    public static String getKeyForBarrel(String key, ItemStack itemStack)
+    {
+        if (itemStack==null || !itemStack.hasTagCompound())
+                return key;            
+      
+        FluidStack fluidStack = EditPriceSlot.getFluid(itemStack);
+        if (fluidStack != null)
+        {
+            int fluidID = fluidStack.getFluidID();
+            int amount = 0;
+            if (fluidStack.amount > 0 )
+                amount = (int) Math.floor(fluidStack.amount / 1000);
+            key += ":"+fluidID+":"+amount;                
+        } 
+        //import position at the end of key-name
+        int sealTime =  itemStack.stackTagCompound.getInteger(ExtendedLogic.SEALTIME);            
+        int sealYear = (sealTime <= 0)? 0 : EditPriceSlot.getYearFromHours(sealTime,true);
+        key += ":"+sealYear;//date+flag has NBT
+            
+        return key;
+    }
+    
+    public static int getBarrelQuantity(Hashtable<String, Integer> quantities, ItemStack iStack, String itemKey)
+    {
+        if (quantities==null || quantities.isEmpty() || iStack == null || 
+                itemKey==null || itemKey.isEmpty() )
+            return 0;        
+                
+        if (iStack.stackTagCompound == null || 
+                iStack.stackTagCompound.getInteger(ExtendedLogic.SEALTIME)>0 )
+        {
+            return quantities.containsKey(itemKey) ? quantities.get(itemKey): 0;
+        }
+        
+        // case then need calculate all barrels\largeVessels with duifferent sealYear        
+        int q = 0;
+        String zeroItemKey = "";        
+        int p = itemKey.lastIndexOf(":0");//SealTime is 0
+        if ( p>0 && p < itemKey.length() )
+        {
+            zeroItemKey = itemKey.substring(0, p);
+        }
+        else 
+            return 0;
+            
+        for (Map.Entry <String, Integer> entry : quantities.entrySet()) {
+            String key = entry.getKey();
+            if (key != null && !key.isEmpty() && key.startsWith(zeroItemKey) )
+            {
+                int v = (Integer) entry.getValue();
+                q += v;
+            }
+        }            
+        
+        return q;
+    }
+    
 }
                 

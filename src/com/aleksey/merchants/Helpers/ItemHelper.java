@@ -1,5 +1,6 @@
 package com.aleksey.merchants.Helpers;
 
+import com.aleksey.merchants.Containers.EditPriceSlot;
 import com.aleksey.merchants.Containers.ExtendedLogic;
 import static com.aleksey.merchants.Containers.ExtendedLogic.PERMISSIBLEDECLAY;
 import net.minecraft.inventory.IInventory;
@@ -13,8 +14,10 @@ import com.bioxx.tfc.api.Interfaces.IFood;
 import static com.aleksey.merchants.Containers.ExtendedLogic.isNoSplitFood;
 import static com.aleksey.merchants.Containers.ExtendedLogic.getNoSplitFoodWeight;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
+import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
 import com.bioxx.tfc.Items.Pottery.ItemPotteryJug;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
+import net.minecraftforge.fluids.FluidStack;
 
 public class ItemHelper {
 
@@ -42,10 +45,15 @@ public class ItemHelper {
         if (ExtendedLogic.IGNOREBARRELWOODTYPE && item instanceof ItemBarrels)
         {
             //ignore wood material(metadata) of burrels
-            key = String.valueOf(Item.getIdFromItem(item)); //":" + String.valueOf(itemStack.getItemDamage());
+            key = String.valueOf(Item.getIdFromItem(item)); 
         }
-        else 
-            key = String.valueOf(Item.getIdFromItem(item)) + ":" + String.valueOf(itemStack.getItemDamage());
+        else
+            key = String.valueOf(Item.getIdFromItem(item)) + ":" + String.valueOf(itemStack.getItemDamage());        
+        
+        if (item instanceof ItemBarrels || item instanceof ItemLargeVessel)
+        {   //Extended key type for barrels and vessels sealed\no date fluid
+            key = ExtendedLogic.getKeyForBarrel(key, itemStack);
+        }
 
         //for correct quantity display of new and used jug and smallvessel
         //used jugs have "blowTime" tag with random value  

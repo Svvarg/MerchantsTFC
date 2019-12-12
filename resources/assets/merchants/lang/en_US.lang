@@ -201,6 +201,7 @@ gui.Stall.Tooltip.NoPaysSpace=No space for pay
 gui.Stall.Tooltip.LimitButton=Click to edit limit
 gui.Stall.Tooltip.SetPayButton=Click to edit pay item
 
+gui.StallSetPayItem.Title=Pay Item Editor
 gui.StallSetPay.Tooltip.ID=PayItem ID
 gui.StallSetPay.Tooltip.Meta=Damage or metaData
 gui.StallSetPay.Tooltip.Count=Count
@@ -227,7 +228,6 @@ gui.StallLimit.Title=Limit for Price Item
 gui.StallLimit.Limit=Limit
 gui.StallLimit.Apply=Apply
 gui.StallLimit.Cancel=Cancel
-gui.StallSetPayItem.Title=Manual setting pay item
 
 gui.Warehouse.Title=Warehouse
 gui.Warehouse.Sign=Sign

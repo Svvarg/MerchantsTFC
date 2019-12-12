@@ -265,7 +265,7 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                     p1 = (payStack.stackTagCompound.getBoolean("Sealed"))?1:0;
                     p2 = payStack.stackTagCompound.getInteger("SealTime");
                     p2 = EditPriceSlot.getYearFromHours(p2);
-                    FluidStack fluidStack = EditPriceSlot.getFluidID(payStack);
+                    FluidStack fluidStack = EditPriceSlot.getFluid(payStack);
                     if (fluidStack != null)
                     {
                         p3 = fluidStack.getFluidID();
@@ -541,7 +541,12 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                 
             case ITBARREL:
                 if (p > 0&& p < barrelt.length)                     
-                    r = barrelt[p];                                
+                    r = barrelt[p];
+                if (p == 3 && this._param3TextField.getText()!=null && !this._param3TextField.getText().isEmpty())
+                {
+                    int p3 = strToInt(this._param3TextField.getText());                    
+                    bonus = EditPriceSlot.getFluidNameByID(p3);//getValidFluidIDList();
+                }
                 break;
                 
             case ITPOTTERYJUG:

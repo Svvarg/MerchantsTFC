@@ -15,6 +15,7 @@ import com.bioxx.tfc.Items.Tools.ItemCustomSword;
 import com.bioxx.tfc.Items.Tools.ItemMiscToolHead;
 import com.bioxx.tfc.Items.Tools.ItemTerraTool;
 import com.bioxx.tfc.Items.Tools.ItemWeapon;
+import com.bioxx.tfc.api.Constant.Global;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.setDamageBuff;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.setDurabilityBuff;
 import com.bioxx.tfc.api.Enums.EnumFoodGroup;
@@ -40,7 +41,9 @@ public class EditPriceSlot {
     public static final int TFCTOOLS = 1;//without damage
     public static final int TFCARMOR = 2;//without damage
     public static final int TFCTOOLSADAMAGE = 3;//without damage
-     static final int TFCWEAPON = 4;//without damage
+    static final int TFCWEAPON = 4;//without damage
+    
+    public static String TFCFluidsList = "";
 
     
     /**
@@ -128,7 +131,8 @@ public class EditPriceSlot {
         //dont work with sandwich
             return 0;
         
-        int maxMeta = 0;        
+        int maxMeta = 0;
+        int minMeta = 0;
         
                
         if (item instanceof ItemTerra  ) //int maxMeta = 15;//Exception UdaryMod! RichLimonite
@@ -141,6 +145,11 @@ public class EditPriceSlot {
                  String[] metaNames = ((ItemTerra) item).metaNames;
                  if ( metaNames != null ) 
                      maxMeta = metaNames.length-1;                     
+                 else if ( item instanceof com.bioxx.tfc.Items.ItemBloom)
+                 {
+                     maxMeta = 840;
+                     minMeta = 100;
+                 }
              }
              catch (Exception e)
              {
@@ -186,6 +195,10 @@ public class EditPriceSlot {
             return 0;        
             
         meta = meta > maxMeta ? meta = 0 : meta;
+        
+        if ( meta < minMeta )
+            meta = minMeta;
+        
         return meta;
     }
     
@@ -499,7 +512,7 @@ public class EditPriceSlot {
                 payStack.stackTagCompound = new NBTTagCompound(); 
             payStack.stackTagCompound.setBoolean("Sealed", sealed);
             payStack.stackTagCompound.setInteger("SealTime", sealTime);
-            //payStack.stackTagCompound.setInteger("barrelType", barrelType); 
+            //payStack.stackTagCompound.setInteger("barrelType", barrelType); ignore at compare
             payStack = setFluidID(payStack, p3, p4);
         }        
         return payStack;
@@ -507,10 +520,16 @@ public class EditPriceSlot {
         
     public static int getYearFromHours(int tHours)
     {
+        return getYearFromHours(tHours, false);
+    }
+    
+    public static int getYearFromHours(int tHours, boolean real)
+    {
         int tDays = tHours / TFC_Time.HOURS_IN_DAY;        
         int tMonths = tDays / TFC_Time.daysInMonth;
         int year = tMonths / 12;
-        return 1000 + year;
+        
+        return real ? year : year + 1000;
     }
     
     public static int getHoursForYear(int year)
@@ -525,7 +544,7 @@ public class EditPriceSlot {
     }
         
     //fluid.getFluidID & fluid.amount 
-    public static FluidStack getFluidID(ItemStack barrel)
+    public static FluidStack getFluid(ItemStack barrel)
     {
         if (barrel==null || !barrel.hasTagCompound())
             return null;//-1?
@@ -541,16 +560,21 @@ public class EditPriceSlot {
     
     public static ItemStack setFluidID(ItemStack barrel, int fluidID, int amount )
     {
-        if (barrel==null || fluidID < 4 || amount<1 )
+        if (barrel==null || fluidID < 0 || amount<1 )
             return null;
         
        amount = (amount >= 10)? 10000: amount*1000;//ItemBarrels.MAX_LIQUID
        
        Fluid fluid = FluidRegistry.getFluid(fluidID);
-       if (fluid == null)
-           return null;
-       
+       // don`t allow to set vanilla water & lava
+       if (fluid == null || fluid == FluidRegistry.WATER || fluid == FluidRegistry.LAVA)
+           return barrel;
+              
        FluidStack fluidStack = new FluidStack(fluid, amount);       
+       
+       if (fluidStack.getFluid() != null && fluidStack.getFluid().getTemperature(fluidStack) > Global.HOT_LIQUID_TEMP)
+           return barrel;
+              
        NBTTagCompound fluidNBT = new NBTTagCompound();
        if( fluidStack != null )
            fluidStack.writeToNBT(fluidNBT);       
@@ -561,6 +585,39 @@ public class EditPriceSlot {
        barrel.stackTagCompound.setTag("fluidNBT", fluidNBT);
        return barrel;
     }
+    
+    public static String getFluidNameByID(int id)
+    {
+        if ( id<0 || id>FluidRegistry.getMaxID())
+            return "";
+        Fluid fluid = FluidRegistry.getFluid(id);
+        return (fluid == null) ? "" : fluid.getName();
+    }
+    
+    public static String getValidFluidIDList()
+    {
+        if (TFCFluidsList==null || TFCFluidsList.isEmpty())
+        {
+            String r = "";
+            int maxID = FluidRegistry.getMaxID();
+            int id = 0;            
+            while (id <= maxID)
+            {
+                Fluid fluid = FluidRegistry.getFluid(id);
+                id++;
+                if (fluid==null)
+                    continue;
+                String name = fluid.getName();
+                if (name==null || name.isEmpty())
+                    continue;
+                r += String.format("%s  %s\n",String.valueOf(id-1), name);                
+            }               
+            TFCFluidsList = r;
+        }
+        return TFCFluidsList;
+    }
+    
+
     
     
 }
