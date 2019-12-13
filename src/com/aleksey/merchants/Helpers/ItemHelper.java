@@ -1,5 +1,6 @@
 package com.aleksey.merchants.Helpers;
 
+import com.aleksey.merchants.Extended.AnimalInCrate;
 import com.aleksey.merchants.Extended.EditPriceSlot;
 import com.aleksey.merchants.Extended.ExtendedLogic;
 import static com.aleksey.merchants.Extended.ExtendedLogic.PERMISSIBLEDECLAY;
@@ -13,6 +14,7 @@ import com.bioxx.tfc.api.Food;
 import com.bioxx.tfc.api.Interfaces.IFood;
 import static com.aleksey.merchants.Extended.ExtendedLogic.isNoSplitFood;
 import static com.aleksey.merchants.Extended.ExtendedLogic.getNoSplitFoodWeight;
+import com.aleksey.merchants.Extended.Integration;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
 import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
 import com.bioxx.tfc.Items.Pottery.ItemPotteryJug;
@@ -63,6 +65,14 @@ public class ItemHelper {
             key =  itemStack.hasTagCompound() ? key+":1" : key;
             return key;
         }
+        
+        if ( item.getClass() == Integration.ItemCrateClass )
+        { 
+            // Added info to key - animal ID
+            key = AnimalInCrate.getItemKeyForAnimalCrate(itemStack, key);
+            return key;
+        }
+            
         
         if (!(item instanceof IFood)) {
             key = ExtendedLogic.getKeyForSmithingItem(itemStack,key);

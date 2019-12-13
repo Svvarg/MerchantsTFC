@@ -2,6 +2,8 @@ package com.aleksey.merchants.Extended;
 
 import static com.aleksey.merchants.Extended.Integration.ItemCrateClass;
 import static com.aleksey.merchants.Extended.Integration.isAnimalCrateModLoaded;
+import com.bioxx.tfc.Core.TFC_Time;
+import com.bioxx.tfc.api.TFCOptions;
 import cpw.mods.fml.common.Loader;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,6 +41,12 @@ public class AnimalInCrate {
     public static boolean allowSetOnlyTFCAnimal = true;
     public static String TFCAnimalsList = "";
     public static final String[] InvalidTFCAnimal = {"skeletonTFC","zombieTFC","spiderTFC","slimeTFC","ghastTFC","caveSpiderTFC","blazeTFC", "endermanTFC","pigZombieTFC","boarTFC","banditTFC","minecartTFC","arrowTFC","standTFC","creeperTFC","irongolemTFC"};
+    
+    public static final int UKNOWN = 0;
+    public static final int ABABY = 1;
+    public static final int AADULT = 2;
+    
+    
     
     //public static final String  = "";
     public int id;
@@ -92,8 +100,10 @@ public class AnimalInCrate {
         if ( nbt.hasKey(SEX) )
                 sex = nbt.getInteger(SEX) + 1; //1 man 2 female   0 - error     
         
-        age = nbt.getInteger(AGE);
-        age = (age <= 0 ) ? 0 : age;
+        age = nbt.getInteger(AGE);//real is birthday
+        age = (age == 0 ) ? 0 :
+                getAnimalAge(name, age);// 0 - UKNOWN 1 - BABY 2 - ADULT
+        
             
         variant = nbt.getInteger(VARIANT);//surface
         familiarity = nbt.getInteger(FAMILIARITY);//35 cap
@@ -125,7 +135,7 @@ public class AnimalInCrate {
      */
     public AnimalInCrate(
             int p1,  //id
-            int p2,  //familiarity * 10 + sex;
+            int p2,  //familiarity * 100 + Age*10 + sex;
             int p3,  //speed + jump  * 1000;
             int p4   //a.variant;
     )
@@ -145,8 +155,8 @@ public class AnimalInCrate {
         }
         this.id = p1;
         this.sex = p2 % 10;
-        //sex = ( sex > 0)? sex - 1: 0;// 1 man 2 female +1 by gamestandart        
-        this.familiarity = (p2 >= 10)? (int) Math.floor( p2 / 10 ):0;
+        this.age =  (p2 >= 10)? (int) Math.floor( p2 / 10 ) : 0;
+        this.familiarity = (p2 >= 100)? (int) Math.floor( p2 / 100 ) : 0;
         
         this.speedX10 = (p3 > 0)? p3 % 1000: 0;
         this.speed = (this.speedX10 > 0) ? (float) this.speedX10 / 430 : 0 ;
@@ -227,24 +237,57 @@ public class AnimalInCrate {
     }
     
     /**
+     * Animal logic Age UKNOWN ADULT BABY
+     */
+    public static int getAnimalAge(String name,int birthday)
+    {
+        if (name == null|| name.isEmpty() )
+            return UKNOWN;
+        int days = getDaysForAdultByAnimalName(name);
+        int totalDays = TFC_Time.getTotalDays();        
+        return (totalDays - birthday >= days )? AADULT : ABABY;        
+    }
+            
+    
+    public static int getDaysForAdultByAnimalName(String name)
+    {
+        if ( name == null || name.isEmpty() )
+            return 0;
+        String[]   names = {"bearTFC", "chickenTFC", "cowTFC", "deerTFC", "horseTFC", "pigTFC", "sheepTFC", "wolfTFC"};
+        float[] dToAdult = {60,        4.14f,        36,        24,       30,          15,      12,         9};
+        
+        if (dToAdult.length != names.length)
+            return 0;
+        
+        for (int i = 0; i < names.length; i++) {
+            String n = names[i];
+            if (name.compareTo(names[i])==0)
+                return (int) Math.floor( TFCOptions.animalTimeMultiplier * TFC_Time.daysInMonth * dToAdult[i] ) ;            
+        }
+        return 0;
+    }
+    
+    
+    /**
      * Suited enimal to trade. True if animal two have better feature 
      * @param a animal two
      * @return 
      */
     public boolean isAnimalEqual(AnimalInCrate a)
-    {
-        //MateVariant:0,Variant:768 внешний вид
+    {        
         if ( a ==null || this.id==0)
             return false;
         
         return ( this.id == a.id 
                 //if the value of sex is not defined(0) allow trade animal with any sex
                 && ( this.sex==0 || this.sex == a.sex  )
+                && (this.age==0 || this.age <= a.age)
+                && (this.familiarity==0 || this.familiarity <= a.familiarity)
                 
                 && (this.speed==0 || this.speed <= a.speed)
                 && (this.jumpStrength==0 || this.jumpStrength <= a.jumpStrength)
-                && (this.age==0 || this.age <= a.age)
-                && (this.familiarity==0 || this.familiarity <= a.familiarity)
+                                
+                && (this.variant==0 || this.variant == a.variant)
                 );        
     }
     
@@ -350,7 +393,17 @@ public class AnimalInCrate {
                 return false;            
         }        
         return true;
-    } 
+    }
+    
+    public static String getItemKeyForAnimalCrate(ItemStack iStack, String key)
+    {
+      if (iStack == null || !iStack.hasTagCompound() || !isValidAnimalCrate(iStack) )
+          return key;
+      
+      AnimalInCrate animal = new AnimalInCrate(iStack.stackTagCompound);
+      
+      return (animal==null || animal.id <= 0 ) ? key : key+":"+animal.id;
+    }
     
     
   

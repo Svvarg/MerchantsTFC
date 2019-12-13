@@ -52,15 +52,13 @@ public class GuiStallSetPayItem extends GuiContainerTFC
     public static final int SlotSize = 18;
     public static final int PriceSlotX = 55;
     public static final int PriceSlotY = 40;    
-//    public static final int GoodSlotX = 102;
+    //public static final int GoodSlotX = 102;
     public static final int WindowWidth = 176;
     public static final int WindowHeight = 137;
     
     private static final int _titleX = 0;
     private static final int _titleY = 4;
     
-    //private static final int _limitLabelX = 6;
-    //private static final int _limitLabelY = 43;
     private static final int _limitLabelWidth = 47;
 
     private static final int _fieldWidth = 48;
@@ -139,10 +137,8 @@ public class GuiStallSetPayItem extends GuiContainerTFC
     private static final int FP4 = 14;
     
     private AnimalInCrate animal; 
+    //private ContainerStallSetPayItem inventory;
     
-    
-    
-    private ContainerStallSetPayItem inventory;
 
     public  GuiStallSetPayItem(InventoryPlayer inventoryplayer, TileEntityStall stall, World world, int x, int y, int z)
     {
@@ -285,7 +281,7 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                     if (this.animal.id > 0 )
                     {
                         p1 = this.animal.id;
-                        p2 = this.animal.sex + this.animal.familiarity * 10; // 351 35-famil 1-sex(invert 1-man 0-female)
+                        p2 = this.animal.sex + this.animal.age*10 + this.animal.familiarity * 100; // 3521 35-famil 2-Adult 1-sex(invert 1-man 0-female)
                         int speed = this.animal.getSpeedX10();
                         int jump = this.animal.getJumpHX10();
                         p3 = speed + jump  * 1000;//45103 jump 4.5m speed 10.3m/s
@@ -566,9 +562,20 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                             sexx = " \u2642";
                         else if (animal.sex == 2)
                             sexx = " \u2640";
+                        
+                        String Age = "";
+                        if (animal.age == 1)
+                            Age = "ABaby";
+                        else if (animal.age == 2)
+                            Age = "AAdult";
+                        else 
+                            Age = "AUknown";
+                                    
                         if (animal.sex > 0 )
-                            bonus = animal.familiarity + " - Familiarity \n" + animal.sex+ sexx;
-                            
+                            bonus = animal.familiarity + " - " + StatCollector.translateToLocal("gui.StallSetPay.Tooltip.Familiarity") +" \n" 
+                                    + animal.age + " - "+StatCollector.translateToLocal("gui.StallSetPay.Tooltip.Age")+
+                                                   " "+ StatCollector.translateToLocal("gui.StallSetPay.Tooltip."+Age)+"\n"
+                                    + animal.sex + sexx;                            
                     }                            
                     else if (p==3 && this.animal != null)
                     {
@@ -577,7 +584,7 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                         float speed = animal.getSpeedX10();     
                         speed = (speed>0)? (float) speed / 10 : 0;
                         if ( jumpH > 0 || speed > 0)
-                            bonus =  String.format("%.1f m \n%.1f m/s", jumpH, speed );
+                            bonus =  String.format("J: %.1f m \nS: %.1f m/s", jumpH, speed );
                     }
                     
                 }

@@ -218,9 +218,14 @@ gui.StallSetPay.Tooltip.BarrelSealTime=Год закрытия
 gui.StallSetPay.Tooltip.BarrelFluidID=ID жидкости
 gui.StallSetPay.Tooltip.BarrelAmount=Кол-во жидкости (литры)
 gui.StallSetPay.Tooltip.ACrateAnimID=ID животного
-gui.StallSetPay.Tooltip.ACrateFamAndSex=Приручение*10 пол(1м, 2ж)
-gui.StallSetPay.Tooltip.ACrateJumpAndSpeed=Высота прыжка*100 скорость м/с 
-gui.StallSetPay.Tooltip.ACrateVariant=Внешний вида
+gui.StallSetPay.Tooltip.ACrateFamAndSex=Приручение*100 Возвраст*10 Пол
+gui.StallSetPay.Tooltip.ACrateJumpAndSpeed=Высота Прыжка*1000 Скорость м/с 
+gui.StallSetPay.Tooltip.ACrateVariant=Внешний вид
+gui.StallSetPay.Tooltip.Age=Возвраст
+gui.StallSetPay.Tooltip.AUknown=Неизвестно
+gui.StallSetPay.Tooltip.ABaby=Ребёнок
+gui.StallSetPay.Tooltip.AAdult=Взрослое
+gui.StallSetPay.Tooltip.Familiarity=Прирученность
 
 
 gui.Stall.NA=-

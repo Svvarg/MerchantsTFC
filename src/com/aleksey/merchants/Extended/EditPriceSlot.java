@@ -25,6 +25,7 @@ import com.bioxx.tfc.api.TFCItems;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -616,7 +617,8 @@ public class EditPriceSlot {
         if ( id<0 || id>FluidRegistry.getMaxID())
             return "";
         Fluid fluid = FluidRegistry.getFluid(id);
-        return (fluid == null) ? "" : fluid.getName();
+        String un = (fluid == null) ? "" : fluid.getUnlocalizedName();
+        return (un==null || un.isEmpty() )? "": StatCollector.translateToLocal(un);
     }
     
     public static String getValidFluidIDList()

@@ -218,12 +218,16 @@ gui.StallSetPay.Tooltip.BarrelSealTime=SealTime (Year)
 gui.StallSetPay.Tooltip.BarrelFluidID=Fluid ID
 gui.StallSetPay.Tooltip.BarrelAmount=Fluid Amount (Liters)
 gui.StallSetPay.Tooltip.ACrateAnimID=Animal ID
-gui.StallSetPay.Tooltip.ACrateFamAndSex= Familiarity*10 sex(1m, 2f)
-gui.StallSetPay.Tooltip.ACrateJumpAndSpeed=JumpHeight*100  Speed м/с 
+gui.StallSetPay.Tooltip.ACrateFamAndSex= Familiarity*100 Age*10 Sex
+gui.StallSetPay.Tooltip.ACrateJumpAndSpeed=JumpHeight*1000  Speed
 gui.StallSetPay.Tooltip.ACrateVariant=Look Variant
+gui.StallSetPay.Tooltip.Age=Age
+gui.StallSetPay.Tooltip.AUknown=Uknown
+gui.StallSetPay.Tooltip.ABaby=Baby
+gui.StallSetPay.Tooltip.AAdult=Adult
+gui.StallSetPay.Tooltip.Familiarity=Familiarity
 
 gui.Stall.NA=-
-
 gui.StallLimit.Title=Limit for Price Item
 gui.StallLimit.Limit=Limit
 gui.StallLimit.Apply=Apply
