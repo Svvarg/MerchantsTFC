@@ -4,12 +4,9 @@ import static com.aleksey.merchants.Extended.Integration.ItemCrateClass;
 import static com.aleksey.merchants.Extended.Integration.isAnimalCrateModLoaded;
 import com.bioxx.tfc.Core.TFC_Time;
 import com.bioxx.tfc.api.TFCOptions;
-import cpw.mods.fml.common.Loader;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.minecraft.entity.EntityList;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -33,7 +30,7 @@ public class AnimalInCrate {
     public static final String MJUMP = "MateJump";
     //public static final String MHEALTH = "MateHealth";? Health
     public static final String VARIANT = "Variant";
-    public static final String FAMILIARITY = "Familiarity";//35 cap
+    public static final String FAMILIARITY = "Familiarity";//35 100
     public static final String ATTRIBUTES = "Attributes";    
     public static final String GMAXHEALTH = "generic.maxHealth";
     public static final String GMOVEMENTSPEED = "generic.movementSpeed";
@@ -46,9 +43,6 @@ public class AnimalInCrate {
     public static final int ABABY = 1;
     public static final int AADULT = 2;
     
-    
-    
-    //public static final String  = "";
     public int id;
     public String name;
     public int sex;//+1
@@ -113,16 +107,22 @@ public class AnimalInCrate {
         
         for (int i = 0; i < anbt.tagCount(); i++) 
         {
-            NBTTagCompound att = anbt.getCompoundTagAt(i);
+            NBTTagCompound att = anbt.getCompoundTagAt(i);            
             String _name = att.getString("Name");            
             
             if (_name != null && _name.contains(GMAXHEALTH) )
-                health = (int) att.getDouble("Base"); 
+                this.health = (int) att.getDouble("Base"); 
             if (_name != null && _name.contains(GMOVEMENTSPEED) )
-                speed = (float) att.getDouble("Base");
+            {
+                this.speed = (float) att.getDouble("Base");
+                if (this.speed>0)
+                    this.speedX10 = (int) Math.floor( this.speed * 430 );
+            }
             else if (_name != null && _name.endsWith(GJUMPSTRENGTH))
             {
-                jumpStrength = (float) att.getDouble("Base");
+                this.jumpStrength = (float) att.getDouble("Base");
+                if (this.jumpStrength > 0)
+                    this.jumpHX10 = (int) Math.floor( getJumpHeight(this.jumpStrength) * 10);
                 if (speed > 0)
                     break;                
             }    
@@ -187,10 +187,10 @@ public class AnimalInCrate {
         if (animal.id > 0 )
         {
             int p1 = animal.id;
-            int p2 = animal.sex + animal.age*10 + animal.familiarity * 100; // 3521 35-famil 2-Adult 1-sex(invert 1-man 0-female)
-            int speed = animal.getSpeedX10();
-            int jump = animal.getJumpHX10();
-            int p3 = speed + jump  * 1000;//45103 jump 4.5m speed 10.3m/s
+            int p2 = animal.sex + animal.age*10 + animal.familiarity * 100; // 3521 35-famil 2-Adult 1-sex(0-man 1-female 2-any)            
+            int speed = animal.speedX10;            
+            int jump = animal.jumpHX10;
+            int p3 = speed + jump  * 1000;//45103 is jump 4.5m speed 10.3m/s
             int p4 = animal.variant;
             return new EditPayParams(p1,p2,p3,p4);
         }
@@ -198,7 +198,7 @@ public class AnimalInCrate {
     }
     
     /**
-     * Parse String Field to Params for toolTip     
+     * Parse String Field to Params for EditPayGUI toolTip     
      */
     public static EditPayParams getAnimalSexAgeFamiliarity(String str)
     {
@@ -227,6 +227,9 @@ public class AnimalInCrate {
       return new EditPayParams(sex,age,familiarity,0);
     }
     
+    /**
+    * Parse String Field to Params for EditPayGUI toolTip     
+    */
     public static EditPayParams getAnimalJumpSpeed(String str)
     {
       if (str == null || str.isEmpty())
@@ -240,7 +243,6 @@ public class AnimalInCrate {
     
     /**
      * For GUI setPayitem
-     * @return 
      */
     public NBTTagCompound writeToNBT()
     {
@@ -262,7 +264,7 @@ public class AnimalInCrate {
         
         if ( this.speed > 0 )//("horseTFC")
         {
-            NBTTagList attrList = new NBTTagList();//nbt.getTagList(ATTRIBUTES, 10);
+            NBTTagList attrList = new NBTTagList();
             
             NBTTagCompound attrSpeed = new NBTTagCompound();            
             attrSpeed.setFloat("Base", this.speed );
@@ -282,32 +284,9 @@ public class AnimalInCrate {
         anim.setTag(ANIMAL, nbt);
         return anim;    
     }
-    
-    /**
-     * game inside value to m/s *10 
-     * @return 121 is 12.1m/s
-     */
-    public int getSpeedX10()
-    {
-       if (this.speedX10==0)
-           this.speedX10 = (int) Math.floor( this.speed * 430 );
-       
-        return  this.speedX10;
-    }
-    /**
-     * game jumpStreght value to Height in m * 10
-     * @return 25 is 2.5 m
-     */        
-    public int getJumpHX10()
-    {
-        if (jumpHX10==0)
-            jumpHX10 = (int) Math.floor( getJumpHeight(this.jumpStrength) * 10);
         
-        return jumpHX10;
-    }
-    
     /**
-     * Animal logic Age UKNOWN ADULT BABY
+     * Animal, logic Age UKNOWN ADULT BABY
      */
     public static int getAnimalAge(String name,int birthday)
     {
@@ -323,6 +302,7 @@ public class AnimalInCrate {
     {
         if ( name == null || name.isEmpty() )
             return 0;
+        //the values from th TFC they have not constants
         String[]   names = {"bearTFC", "chickenTFC", "cowTFC", "deerTFC", "horseTFC", "pigTFC", "sheepTFC", "wolfTFC"};
         float[] dToAdult = {60,        4.14f,        36,        24,       30,          15,      12,         9};
         
@@ -350,8 +330,8 @@ public class AnimalInCrate {
         
         return ( this.id == a.id 
                 //if the value of sex is not defined(0) allow trade animal with any sex
-                && ( this.sex==2 || this.sex == a.sex  )//2 - any for buyinug
-                && (this.age==0 || this.age <= a.age)
+                && ( this.sex==2 || this.sex == a.sex  )//2 - any for buyinug 0 man 1 femal
+                && (this.age==0 || this.age == a.age)
                 && (this.familiarity==0 || this.familiarity <= a.familiarity)
                 
                 && (this.speed==0 || this.speed <= a.speed)
@@ -472,7 +452,13 @@ public class AnimalInCrate {
       
       AnimalInCrate animal = new AnimalInCrate(iStack.stackTagCompound);
       
-      return (animal==null || animal.id <= 0 ) ? key : key+":"+animal.id;
+      return (animal==null || animal.id <= 0 ) ? key : 
+              key+":"+animal.id+":"+
+              Integer.toString(animal.sex)+
+              Integer.toString(animal.age)+
+              Integer.toString(animal.familiarity)+
+              Integer.toString(animal.speedX10)+
+              Integer.toString(animal.variant);
     }
     
     

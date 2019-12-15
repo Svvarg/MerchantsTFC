@@ -330,7 +330,7 @@ public class EditPriceSlot {
         }
         
         boolean r =
-                (   i == TFCItems.flintSteel 
+                (  i == TFCItems.flintSteel 
                 || i == TFCItems.fireStarter
                 || i == TFCItems.bow
                 || i == TFCItems.fishingRod
@@ -512,7 +512,7 @@ public class EditPriceSlot {
     {
         if (param4<=0)
             return false;
-        int brined = param4<10? param4 : param4 % 10;
+        int brined = param4<10 ? param4 : param4 % 10;
         int pickled = (int) Math.floor(  param4 % 100 / 10);
         int smoked =  (int) Math.floor(  param4 % 1000 / 100);
         
@@ -659,7 +659,7 @@ public class EditPriceSlot {
             return null;
         int p1 = iStack.stackTagCompound.getBoolean("Sealed") ? 1 : 0;
         int p2 = iStack.stackTagCompound.getInteger("SealTime");
-        p2 = getYearFromHours(p2);
+        p2 = getYearFromHours(p2);//zeroSealTimeBarrel or year of seal
         int p3 = 0;
         int p4 = 0;
         FluidStack fluidStack = EditPriceSlot.getFluid(iStack);
@@ -703,8 +703,12 @@ public class EditPriceSlot {
         return getYearFromHours(tHours, false);
     }
     
+    //real=true -only for short barrelKey on quantity
     public static int getYearFromHours(int tHours, boolean real)
     {
+        if ( tHours == 0)
+            return 0;
+        
         int tDays = tHours / TFC_Time.HOURS_IN_DAY;        
         int tMonths = tDays / TFC_Time.daysInMonth;
         int year = tMonths / 12;
@@ -714,6 +718,8 @@ public class EditPriceSlot {
     
     public static int getHoursForYear(int year)
     {
+        if ( year == 1000)
+            return 24;
         year = year - 1000;
         if (year<=0)
             return 0;

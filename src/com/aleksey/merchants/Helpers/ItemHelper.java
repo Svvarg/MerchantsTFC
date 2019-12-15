@@ -70,8 +70,7 @@ public class ItemHelper {
             // Added info to key - animal ID
             key = AnimalInCrate.getItemKeyForAnimalCrate(itemStack, key);
             return key;
-        }
-            
+        }            
         
         if (!(item instanceof IFood)) {
             key = ExtendedLogic.getKeyForSmithingItem(itemStack,key);

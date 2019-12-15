@@ -49,23 +49,19 @@ public class ExtendedLogic {
     public static final int SALADWEIGHT = 20;
     private static final int JUGMILKWEIGHT = 80;
     public static final int PERMISSIBLEDECLAY = 2;//for jug, bucket milk and salad. 20 1 - is 5%
-   // public static final int permissibleSealTimeHours = 8760;//24*365ч new way
+   /
     public static final boolean ToNonEmptySlot = true;
     public static final boolean ToEmptySlot = false;
     
     public static final String CRAFTINGTAG = "craftingTag";
     public static final String DURABUFF = "durabuff";
     public static final String DAMAGEBUFF = "damagebuff";
-    //public static final float permissibleSmithingBonus = 0.1f;
-    
+        
     public static final String SEALTIME = "SealTime";
     public static final String SEALED = "Sealed";
     public static final String BARRELTYPE = "barrelType";
     public static final boolean IGNOREBARRELWOODTYPE = true;//allow trade any one barrel wood type
-    
-    
-    
-    
+                
     //for towny private system. dont work with containers on another chunks
     public static boolean seeContainersOnlyWarehouseChunk = true; 
     
@@ -363,8 +359,8 @@ public class ExtendedLogic {
         {
             int sealTime1 = 0;
             int sealTime2 = 0;
-            int barrelType1 = 0;
-            int barrelType2 = 0;
+            int barrelType1 = 0;//need for remove om compare by NBT
+            int barrelType2 = 0;// ignore this values for compare barrels
             
             //from Stall-Face-Slot dont change
             if ( st1.stackTagCompound.hasKey(SEALTIME) )
@@ -390,7 +386,7 @@ public class ExtendedLogic {
                 Therefore set sealTime on this moment (trade)
                 */
                 sealTime2 = (int)TFC_Time.getTotalHours();                
-                barrelType2 = st2.getItemDamage();
+                //barrelType2 = st2.getItemDamage();
             }
             
             //case then sealtime = 0 and have nbt tag with sealTime=0
@@ -405,8 +401,8 @@ public class ExtendedLogic {
               Or if StallFaceSlot have barrel withount SealTime for 
               trade(sealing-buing) anyone barrel sealTime
             */
-            int sealYear1 =  EditPriceSlot.getYearFromHours(sealTime1);
-            int sealYear2 =  EditPriceSlot.getYearFromHours(sealTime2);
+            int sealYear1 = EditPriceSlot.getYearFromHours(sealTime1);
+            int sealYear2 = EditPriceSlot.getYearFromHours(sealTime2);
             
             //if (sealTime1 != 0 && permissibleSealTimeHours < Math.abs( sealTime2 - sealTime1 ) )
             if (sealTime1 != 0 && sealYear1 != sealYear2 )
@@ -822,6 +818,13 @@ public class ExtendedLogic {
         if (itemStack==null || !itemStack.hasTagCompound())
                 return key;            
       
+       if  (itemStack.stackTagCompound.hasKey("Items") ) 
+       {
+           NBTTagList nbttaglist = itemStack.stackTagCompound.getTagList("Items", 10);
+           if ( nbttaglist != null )
+               key += ":"+nbttaglist.tagCount();           
+       }   
+
         FluidStack fluidStack = EditPriceSlot.getFluid(itemStack);
         if (fluidStack != null)
         {
@@ -829,12 +832,12 @@ public class ExtendedLogic {
             int amount = 0;
             if (fluidStack.amount > 0 )
                 amount = (int) Math.floor(fluidStack.amount / 1000);
-            key += ":"+fluidID+":"+amount;                
+            key += ":"+fluidID+":"+amount;
         } 
         //import position at the end of key-name
         int sealTime =  itemStack.stackTagCompound.getInteger(ExtendedLogic.SEALTIME);            
-        int sealYear = (sealTime <= 0)? 0 : EditPriceSlot.getYearFromHours(sealTime,true);
-        key += ":"+sealYear;//date+flag has NBT
+        int sealYear = EditPriceSlot.getYearFromHours(sealTime,true);
+        key += ":"+sealYear;//date+flag has NBT can be 0 for zerotimeBarrel
             
         return key;
     }

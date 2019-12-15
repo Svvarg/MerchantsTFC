@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.aleksey.merchants.GUI;
 
 import com.aleksey.merchants.Extended.AnimalInCrate;
@@ -13,9 +8,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-
 import org.lwjgl.input.Keyboard;
-
 import com.aleksey.merchants.Containers.ContainerStallSetPayItem;
 import static com.aleksey.merchants.Extended.AnimalInCrate.isValidAnimalCrate;
 import com.aleksey.merchants.Extended.EditPayParams;
@@ -29,7 +22,6 @@ import com.bioxx.tfc.GUI.GuiContainerTFC;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
 import com.bioxx.tfc.Items.Pottery.ItemPotteryJug;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
-import static com.bioxx.tfc.api.Crafting.AnvilManager.getDurabilityBuff;
 import com.bioxx.tfc.api.Food;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -37,9 +29,8 @@ import com.bioxx.tfc.api.Interfaces.IFood;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
-import static com.aleksey.merchants.Extended.EditPriceSlot.getParamsForSmallVessel;
+
 
 /**
  *
@@ -139,18 +130,15 @@ public class GuiStallSetPayItem extends GuiContainerTFC
     private static final int FP3 = 13;
     private static final int FP4 = 14;
     
-    //private AnimalInCrate animal; 
-    //private ContainerStallSetPayItem inventory;
-    
+   
 
     public  GuiStallSetPayItem(InventoryPlayer inventoryplayer, TileEntityStall stall, World world, int x, int y, int z)
     {
-        //inventory = new ContainerStallSetPayItem(inventoryplayer, stall, world, x, y, z);
         super( new ContainerStallSetPayItem(inventoryplayer, stall, world, x, y, z), WindowWidth, WindowHeight - 1);
 
         _stall = stall;
         _priceSlotIndex = stall.getActivePriceSlotIndex();
-        //_goodSlotIndex = stall.getActiveGoodSlotIndex();
+        
     }
     
     @Override
@@ -455,7 +443,7 @@ public class GuiStallSetPayItem extends GuiContainerTFC
         this.drawHoveringText(list, mx, my + 15, this.fontRendererObj);
         RenderHelper.disableStandardItemLighting();
         GL11.glDisable(GL11.GL_LIGHTING);
-        //GL11.glDisable(GL11.GL_DEPTH_TEST);
+        
     }    
     
     @Override
@@ -537,8 +525,6 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                     if (p==1)//Animal id
                         bonus = AnimalInCrate.getListOfAnimals();
                     else if (p==2)
-                            //&& this._param2TextField.getText()!=null 
-                            //&& !this._param2TextField.getText().isEmpty())
                     {
                         String sexx ="";
                         String s = this._param2TextField.getText().isEmpty()? "0" : this._param2TextField.getText();
@@ -662,5 +648,5 @@ public class GuiStallSetPayItem extends GuiContainerTFC
         fontRendererObj.drawString(s, x + offset, y, color);
     }
 }
-    
+   е 
 

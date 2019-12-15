@@ -82,7 +82,9 @@ public class WarehouseManager
         confirmTradeGoods(world);
         
         String goodKey = ItemHelper.getItemKey(_goodItemStack);
-        _quantities.put(goodKey, _quantities.get(goodKey) - ItemHelper.getItemStackQuantity(_goodItemStack));        
+        
+        if (_quantities.containsKey(goodKey))//hello zeroSealTime Barrel
+            _quantities.put(goodKey, _quantities.get(goodKey) - ItemHelper.getItemStackQuantity(_goodItemStack));        
         _goodList = null;
         
         confirmTradePays(world);
