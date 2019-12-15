@@ -18,6 +18,7 @@ import org.lwjgl.input.Keyboard;
 
 import com.aleksey.merchants.Containers.ContainerStallSetPayItem;
 import static com.aleksey.merchants.Extended.AnimalInCrate.isValidAnimalCrate;
+import com.aleksey.merchants.Extended.EditPayParams;
 import com.aleksey.merchants.Extended.EditPriceSlot;
 import com.aleksey.merchants.Extended.ExtendedLogic;
 import static com.aleksey.merchants.Extended.ExtendedLogic.strToInt;
@@ -38,6 +39,7 @@ import java.util.List;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
+import static com.aleksey.merchants.Extended.EditPriceSlot.getParamsForSmallVessel;
 
 /**
  *
@@ -118,12 +120,13 @@ public class GuiStallSetPayItem extends GuiContainerTFC
     private static final int ITFOODSANDWICH = 4;
     private static final int ITBARREL = 5;
     private static final int ITPOTTERYJUG = 6;
-    private static final int ITANIMALCRATE = 7;
+    private static final int ITPOTTERYSVESSEL = 7;
+    private static final int ITANIMALCRATE = 8;
     
-    public static final String[] simplefoodt = new String[] {"","FoodCookedLevel","FoodSalted","FoodDired","FoodBrinedPickledSmoked"};                
-    public static final String[] barrelt = new String[] {"","BarrelSealed","BarrelSealTime","BarrelFluidID","BarrelAmount"};
-    public static final String[] animalcrate = new String[] {"","ACrateAnimID","ACrateFamAndSex","ACrateJumpAndSpeed","ACrateVariant"};
-
+    public static final String[] simplefoodtTooltip = new String[] {"","FoodCookedLevel","FoodSalted","FoodDired","FoodBrinedPickledSmoked"};                
+    public static final String[] barreltTooltip = new String[] {"","BarrelSealed","BarrelSealTime","BarrelFluidID","BarrelAmount"};
+    public static final String[] animalcrateTooltip = new String[] {"","ACrateAnimID","ACrateFamAndSex","ACrateJumpAndSpeed","ACrateVariant"};
+    public static final String[] svesselTooltip = new String[] {"","SVesselUsedFlag","NoUsed","MetalID","MetalAmount"};
     
     private static final int FNO = 0;
     private static final int FID = 1;
@@ -136,7 +139,7 @@ public class GuiStallSetPayItem extends GuiContainerTFC
     private static final int FP3 = 13;
     private static final int FP4 = 14;
     
-    private AnimalInCrate animal; 
+    //private AnimalInCrate animal; 
     //private ContainerStallSetPayItem inventory;
     
 
@@ -188,13 +191,33 @@ public class GuiStallSetPayItem extends GuiContainerTFC
         this.buttonList.add(new GuiButton(_buttonId_applyButton, guiLeft + _applyButtonX, guiTop + _buttonY, 50, 20, StatCollector.translateToLocal("gui.StallLimit.Apply")));
         this.buttonList.add(new GuiButton(_buttonId_cancelButton, guiLeft + _cancelButtonX, guiTop + _buttonY, 50, 20, StatCollector.translateToLocal("gui.StallLimit.Cancel")));
     }
+    
+    private boolean fillFieldsByParams(EditPayParams params,int count )
+    {
+        _countTextField.setText(Integer.toString(count));
+        
+        if (params == null)
+            return false;
+        
+        if ( params.p1 > 0 ) 
+            _param1TextField.setText(Integer.toString(params.p1));
+        if ( params.p2 > 0 ) 
+            _param2TextField.setText(Integer.toString(params.p2));
+        if ( params.p3 > 0 ) 
+            _param3TextField.setText(Integer.toString(params.p3));
+        if ( params.p4 > 0 ) 
+             _param4TextField.setText(Integer.toString(params.p4));        
+        return true;
+    }
+    
+    
     /**
      * By PayItemStack from SlallSlot set params to fields
      * and tooltip for this type of payItem
      */
     private void fillPayStackParamToField(){
         this.payItemType = ITNO;
-        this.animal = null;
+        
                 
         if (_priceSlotIndex>-1&& _priceSlotIndex < _stall.getSizeInventory())
         {
@@ -203,127 +226,73 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                 return;
             
             Item item = payStack.getItem();
-            int id = Item.getIdFromItem( item ); //for debug payStack.getItem());
-            
+            int id = Item.getIdFromItem( item );
             int meta = payStack.getItemDamage();
             int count = payStack.stackSize;
             _idTextField.setText(Integer.toString(id));
             _metaTextField.setText(Integer.toString(meta));
             _countTextField.setText(Integer.toString(count));
-            
-            if (payStack.hasTagCompound())
+            EditPayParams params = null;
+
+            if ( item instanceof ItemSalad )
             {
-                int p1 = 0;
-                int p2 = 0;
-                int p3 = 0;
-                int p4 = 0;
-                if ( payStack.stackTagCompound.hasKey("craftingTag") )
+                this.payItemType = ITFOODSALAD;
+                count = ExtendedLogic.SALADWEIGHT ;
+                if ( payStack.stackTagCompound != null )
                 {
-                    this.payItemType = ITFORGED;
-                    int duraBuff = (int) Math.floor( getDurabilityBuff(payStack) * 100 );
-                    if (duraBuff > 0)
-                        p1 = duraBuff;//_param1TextField.setText(Integer.toString(duraBuff));                    
+                    params = EditPriceSlot.getParamsForSalad(payStack);
+                    fillFieldsByParams(params,count);                
                 }
-                else if(payStack.getItem() instanceof IFood)
-                {
-                    float weight = Food.getWeight(payStack);                    
-                    
-                    if ( item instanceof ItemSalad )
-                    {
-                        this.payItemType = ITFOODSALAD;
-                        int maxSaladWeight = 20;
-                        int [] fg = Food.getFoodGroups(payStack);
-                        if ( fg.length == 4){
-                            p1 = fg[0];
-                            p2 = fg[1];
-                            p3 = fg[2];
-                            p4 = fg[3];
-                        }
-                       count = ( weight > 0 && weight < maxSaladWeight ) ? count = 10 * (int)(weight / 10) : maxSaladWeight;                       
-                    }
-                    else //Simple TFC Food
-                    {
-                        this.payItemType = ITSIMPLEFOOD;
-                        count = ( weight > 0 && weight <=160) ? count = 10 * (int)(weight / 10) : 160;
-                        p1 = ExtendedLogic.getCookedLevel(payStack);                       
-                        p2 = Food.isSalted(payStack)? 1 : 0;                   
-                        p3 = Food.isDried(payStack) ? 1 : 0;
-                        //brined pickled smoked at one param
-                        p4 = EditPriceSlot.getTFCFoodParams(payStack);                        
-                    }
-                }
-                //only saled barrels (have nbt)
-                else if ( item instanceof ItemBarrels )
-                {                    
-                    this.payItemType = ITBARREL;
-                    _countTextField.setText(Integer.toString(1));
-                    p1 = (payStack.stackTagCompound.getBoolean("Sealed"))?1:0;
-                    p2 = payStack.stackTagCompound.getInteger("SealTime");
-                    p2 = EditPriceSlot.getYearFromHours(p2);
-                    FluidStack fluidStack = EditPriceSlot.getFluid(payStack);
-                    if (fluidStack != null)
-                    {
-                        p3 = fluidStack.getFluidID();
-                        if (fluidStack.amount > 0 )
-                            p4 = (int) Math.floor(fluidStack.amount / 1000);
-                    }                        
-                }
-                else if ( item instanceof ItemPotteryJug ||
-                        item instanceof ItemPotterySmallVessel)
-                {
-                    this.payItemType = ITPOTTERYJUG;
-                    p1 = 1;//flag about not new potteryJug or smallVessel
-                } 
-                else if (payStack.hasTagCompound() && isValidAnimalCrate(payStack) )
-                {
-                    this.payItemType = ITANIMALCRATE;
-                    this.animal = new AnimalInCrate(payStack.stackTagCompound);
-                    if (this.animal.id > 0 )
-                    {
-                        p1 = this.animal.id;
-                        p2 = this.animal.sex + this.animal.age*10 + this.animal.familiarity * 100; // 3521 35-famil 2-Adult 1-sex(invert 1-man 0-female)
-                        int speed = this.animal.getSpeedX10();
-                        int jump = this.animal.getJumpHX10();
-                        p3 = speed + jump  * 1000;//45103 jump 4.5m speed 10.3m/s
-                        p4 = this.animal.variant;
-                    }
-                }
-                
-                _countTextField.setText(Integer.toString(count));
-                
-                if ( p1 > 0 ) 
-                    _param1TextField.setText(Integer.toString(p1));
-                if ( p2 > 0 ) 
-                    _param2TextField.setText(Integer.toString(p2));
-                if ( p3 > 0 ) 
-                    _param3TextField.setText(Integer.toString(p3));
-                if ( p4 > 0 ) 
-                    _param4TextField.setText(Integer.toString(p4));
-                
-            } //end have nbt---
-            else 
-            {  //without NBT can work without it. For Usability 
-               // determine type of payItem for tooltip;
-               if ( item instanceof ItemSalad )
-                    this.payItemType = ITFOODSALAD;
-               
-               else if ( item instanceof IFood )
-                   this.payItemType = ITSIMPLEFOOD;
-               
-               else if ( item instanceof ItemBarrels )
-                   this.payItemType = ITBARREL;
-               
-               else if ( item instanceof ItemPotteryJug ||
-                        item instanceof ItemPotterySmallVessel)
-                   this.payItemType = ITPOTTERYJUG;
-               
-               else if ( !EditPriceSlot.isNotForgedTFCItems(payStack) && 
-                       EditPriceSlot.getTFCSmithingItemType(payStack) != EditPriceSlot.NOTFC)
-                   this.payItemType = ITFORGED;
-               
-               else if ( isValidAnimalCrate(payStack))
-                   this.payItemType = ITANIMALCRATE;
             }
+            else if(item instanceof IFood)//Simple TFC Food
+            {
+                this.payItemType = ITSIMPLEFOOD;
+                if ( payStack.stackTagCompound != null )
+                {
+                    float weight = Food.getWeight(payStack);
+                    count = ( weight > 0 && weight <=160) ? count = 10 * (int)(weight / 10) : 160;
+                    params = EditPriceSlot.getParamsForTFCSimpleFood(payStack);
+                }                
+            }            
+            else if ( item instanceof ItemPotteryJug)
+            {
+                this.payItemType = ITPOTTERYJUG;
+                if ( payStack.stackTagCompound != null )
+                    params = new EditPayParams(1);//flag about used potteryJug
+            } 
+            else if (item instanceof ItemPotterySmallVessel)
+            {
+                this.payItemType = ITPOTTERYSVESSEL;
+                if ( payStack.stackTagCompound != null )
+                {                    
+                    params = EditPriceSlot.getParamsForSmallVessel(payStack);
+                }    
+            }             
+            else if ( item instanceof ItemBarrels )
+            { 
+                this.payItemType = ITBARREL;
+                if ( payStack.stackTagCompound != null )
+                {
+                    count = 1;
+                    params = EditPriceSlot.getParamsForBarrel(payStack);
+                }    
+            }
+            else if ( (payStack.stackTagCompound!=null && payStack.stackTagCompound.hasKey("craftingTag")) 
+                    || !EditPriceSlot.isNotForgedTFCItems(payStack) && 
+                       EditPriceSlot.getTFCSmithingItemType(payStack) != EditPriceSlot.NOTFC )
+            {
+                this.payItemType = ITFORGED;
+                if ( payStack.stackTagCompound != null )
+                    params = EditPriceSlot.getParamsForSmithingItem(payStack);
+            }
+            else if (isValidAnimalCrate(payStack) )
+            {
+                this.payItemType = ITANIMALCRATE;
+                if ( payStack.stackTagCompound != null )
+                    params = AnimalInCrate.getParamsForAnimalCrate(payStack);
+            }
+            
+            fillFieldsByParams(params,count);
         }                     
     }
     
@@ -526,8 +495,8 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                 break;
                 
             case ITSIMPLEFOOD:
-                if (p > 0 && p < simplefoodt.length)                     
-                    r = simplefoodt[p];                
+                if (p > 0 && p < simplefoodtTooltip.length)                     
+                    r = simplefoodtTooltip[p];                
                 break;
                 
             case ITFOODSALAD:
@@ -535,53 +504,80 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                 break;
                 
             case ITBARREL:
-                if (p > 0&& p < barrelt.length)                     
-                    r = barrelt[p];
+                if (p > 0&& p < barreltTooltip.length)
+                    r = barreltTooltip[p];
                 if (p == 3 && this._param3TextField.getText()!=null && !this._param3TextField.getText().isEmpty())
                 {
-                    int p3 = strToInt(this._param3TextField.getText());                    
+                    int p3 = strToInt(this._param3TextField.getText());
                     bonus = EditPriceSlot.getFluidNameByID(p3);//getValidFluidIDList();
                 }
                 break;
                 
             case ITPOTTERYJUG:
                 r = ( p == 1) ? "PotteryJugUsed" : "NoUsed";
-                bonus = "0 new \n 1 - used";
+                if (p==1)
+                    bonus = "0 new \n1 - used";
+                break;
+                
+            case ITPOTTERYSVESSEL:
+                if (p > 0&& p < svesselTooltip.length)
+                    r = svesselTooltip[p];
+                /*if (p == 3 )// MetalID
+                {
+                    int p3 = strToInt(this._param3TextField.getText());
+                    bonus = "Look NEI";
+                }*/
+                
                 break;
                 
             case ITANIMALCRATE:
-                if (p > 0&& p < animalcrate.length)
+                if (p > 0&& p < animalcrateTooltip.length)
                 {
-                    r = animalcrate[p];
-                    if (p==1)
-                        bonus= AnimalInCrate.getListOfAnimals();
-                    else if (p==2 && this.animal != null)
+                    r = animalcrateTooltip[p];
+                    if (p==1)//Animal id
+                        bonus = AnimalInCrate.getListOfAnimals();
+                    else if (p==2)
+                            //&& this._param2TextField.getText()!=null 
+                            //&& !this._param2TextField.getText().isEmpty())
                     {
-                        String sexx =" ";
-                        if (animal.sex == 1) //man
-                            sexx = " \u2642";
-                        else if (animal.sex == 2)
-                            sexx = " \u2640";
+                        String sexx ="";
+                        String s = this._param2TextField.getText().isEmpty()? "0" : this._param2TextField.getText();
+                        EditPayParams saf = AnimalInCrate.getAnimalSexAgeFamiliarity( s );
+                        if (saf == null)
+                            return "";
+                        
+                        if (saf.p1 == 0) //sex
+                            sexx = " - \u2642";
+                        else if (saf.p1 == 1)
+                            sexx = " - \u2640";
+                        else if (saf.p1 == 2)
+                            sexx = " - " + StatCollector.translateToLocal("gui.StallSetPay.Tooltip.AUknown");
                         
                         String Age = "";
-                        if (animal.age == 1)
+                        if (saf.p2 == 1)
                             Age = "ABaby";
-                        else if (animal.age == 2)
+                        else if (saf.p2 == 2)
                             Age = "AAdult";
                         else 
                             Age = "AUknown";
                                     
-                        if (animal.sex > 0 )
-                            bonus = animal.familiarity + " - " + StatCollector.translateToLocal("gui.StallSetPay.Tooltip.Familiarity") +" \n" 
-                                    + animal.age + " - "+StatCollector.translateToLocal("gui.StallSetPay.Tooltip.Age")+
+                        if (saf.p1 >= 0 && saf.p1<3 ) //2 any sex
+                            bonus = saf.p3/*animal.familiarity*/ + " - " + StatCollector.translateToLocal("gui.StallSetPay.Tooltip.Familiarity") +" \n" 
+                                    + saf.p2/*animal.age*/ + " - "+StatCollector.translateToLocal("gui.StallSetPay.Tooltip.Age")+
                                                    " "+ StatCollector.translateToLocal("gui.StallSetPay.Tooltip."+Age)+"\n"
-                                    + animal.sex + sexx;                            
+                                    + saf.p1/*animal.sex*/ + sexx;                            
                     }                            
-                    else if (p==3 && this.animal != null)
+                    else if (p==3
+                            && this._param3TextField.getText()!=null 
+                            && !this._param3TextField.getText().isEmpty())
+                            
                     {
-                        float jumpH = animal.getJumpHX10();
+                        EditPayParams js = AnimalInCrate.getAnimalJumpSpeed(this._param3TextField.getText());
+                        if (js==null)
+                            return "";
+                        float jumpH = js.p1;//animal.getJumpHX10();
                         jumpH = (jumpH > 0)? (float) jumpH /10 : 0;
-                        float speed = animal.getSpeedX10();     
+                        float speed = js.p2;//animal.getSpeedX10();     
                         speed = (speed>0)? (float) speed / 10 : 0;
                         if ( jumpH > 0 || speed > 0)
                             bonus =  String.format("J: %.1f m \nS: %.1f m/s", jumpH, speed );

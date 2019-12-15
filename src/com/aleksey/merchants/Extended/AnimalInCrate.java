@@ -98,13 +98,12 @@ public class AnimalInCrate {
         name = nbt.getString(ID);//horseTFC
         id = getIdByAnimalName(name);
         if ( nbt.hasKey(SEX) )
-                sex = nbt.getInteger(SEX) + 1; //1 man 2 female   0 - error     
+                sex = nbt.getInteger(SEX); //0 man 1 female 2 - any for buying up
         
-        age = nbt.getInteger(AGE);//real is birthday
-        age = (age == 0 ) ? 0 :
-                getAnimalAge(name, age);// 0 - UKNOWN 1 - BABY 2 - ADULT
-        
-            
+        age = nbt.getInteger(AGE);//real is birthday days left from start
+        if (age != 1 && age != 2) //here age is Age stat: 1 - baby 2 adult, not birthday!
+            age = (age == 0 ) ? 0 : getAnimalAge(name, age);// 0 - UKNOWN 1 - BABY 2 - ADULT
+                    
         variant = nbt.getInteger(VARIANT);//surface
         familiarity = nbt.getInteger(FAMILIARITY);//35 cap
         
@@ -152,21 +151,92 @@ public class AnimalInCrate {
         
         if (p1 <= 0) {
             return;
-        }
+        }        
         this.id = p1;
-        this.sex = p2 % 10;
-        this.age =  (p2 >= 10)? (int) Math.floor( p2 / 10 ) : 0;
-        this.familiarity = (p2 >= 100)? (int) Math.floor( p2 / 100 ) : 0;
         
-        this.speedX10 = (p3 > 0)? p3 % 1000: 0;
-        this.speed = (this.speedX10 > 0) ? (float) this.speedX10 / 430 : 0 ;
+        if (p2 > 0)//0 sex=man
+        {
+            this.sex = p2 < 10 ? p2 : p2 % 10;
+            if (this.sex > 2 || this.sex < 0)
+                sex = 2;
+            this.age =  (p2 >= 10)? (int) Math.floor( p2 / 10 ) % 10 : 0;
+            if (this.age > 2)
+                this.age = 2;
+            this.familiarity = (p2 >= 100)? (int) Math.floor( p2 / 100 ) : 0;
+            if (this.familiarity > 100)
+                this.familiarity = 100;
+        }    
         
-        this.jumpHX10 = (p3 > 1000)? (int) Math.floor(p3 / 1000): 0;
-        this.jumpStrength = (float) getJumpStrength(jumpHX10);
+        if ( p3 > 0)
+        {
+            this.speedX10 = (p3 > 0)? p3 % 1000: 0;
+            this.speed = (this.speedX10 > 0) ? (float) this.speedX10 / 430 : 0 ;
+            this.jumpHX10 = (p3 > 1000)? (int) Math.floor(p3 / 1000): 0;
+            this.jumpStrength = (float) getJumpStrength(jumpHX10);
+        }
         
         this.variant = p4;
     } 
     
+    public static EditPayParams getParamsForAnimalCrate(ItemStack iStack)
+    {
+        if (iStack==null || iStack.stackTagCompound == null)
+            return null;
+        
+        AnimalInCrate animal = new AnimalInCrate(iStack.stackTagCompound);
+        if (animal.id > 0 )
+        {
+            int p1 = animal.id;
+            int p2 = animal.sex + animal.age*10 + animal.familiarity * 100; // 3521 35-famil 2-Adult 1-sex(invert 1-man 0-female)
+            int speed = animal.getSpeedX10();
+            int jump = animal.getJumpHX10();
+            int p3 = speed + jump  * 1000;//45103 jump 4.5m speed 10.3m/s
+            int p4 = animal.variant;
+            return new EditPayParams(p1,p2,p3,p4);
+        }
+        return null;
+    }
+    
+    /**
+     * Parse String Field to Params for toolTip     
+     */
+    public static EditPayParams getAnimalSexAgeFamiliarity(String str)
+    {
+      if (str == null || str.isEmpty())
+          return null;
+      
+      int p2 = ExtendedLogic.strToInt(str);
+      
+      if (p2 < 0)
+          return null;
+      
+      int sex =0;
+      int age = 0;
+      int familiarity = 0;
+      
+      if (p2 > 0) {
+          sex = p2 < 10? p2 : p2 % 10;
+          age =  (p2 >= 10)? (int) Math.floor( p2 / 10  ) % 10 : 0;
+          if (age > 2 )
+              age =2;      
+          familiarity = (p2 >= 100)? (int) Math.floor( p2 / 100 ) : 0;
+          if ( familiarity > 100)
+              familiarity = 100;
+      }
+      
+      return new EditPayParams(sex,age,familiarity,0);
+    }
+    
+    public static EditPayParams getAnimalJumpSpeed(String str)
+    {
+      if (str == null || str.isEmpty())
+          return null;
+      int p3 = ExtendedLogic.strToInt(str);       
+      
+      int speedX10 = (p3 > 0)? p3 % 1000: 0;
+      int jumpHX10 = (p3 > 1000)? (int) Math.floor(p3 / 1000): 0;
+      return new EditPayParams(jumpHX10, speedX10, 0,0);        
+    }
     
     /**
      * For GUI setPayitem
@@ -184,8 +254,8 @@ public class AnimalInCrate {
                 ( allowSetOnlyTFCAnimal && !isValidTFCAnimal(name) ) )
             return null;
             
-        nbt.setString(ID, name);        
-        nbt.setInteger(SEX, (sex > 0) ? sex-1 : 0 );//1 man 2 female
+        nbt.setString(ID, name);                
+        nbt.setInteger(SEX, sex);//0 man 1 female  2 - any for buying up        
         nbt.setInteger(AGE, age);
         nbt.setInteger(VARIANT, variant);
         nbt.setInteger(FAMILIARITY,familiarity);
@@ -280,7 +350,7 @@ public class AnimalInCrate {
         
         return ( this.id == a.id 
                 //if the value of sex is not defined(0) allow trade animal with any sex
-                && ( this.sex==0 || this.sex == a.sex  )
+                && ( this.sex==2 || this.sex == a.sex  )//2 - any for buyinug
                 && (this.age==0 || this.age <= a.age)
                 && (this.familiarity==0 || this.familiarity <= a.familiarity)
                 

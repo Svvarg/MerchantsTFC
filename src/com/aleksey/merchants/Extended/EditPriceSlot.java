@@ -2,6 +2,7 @@ package com.aleksey.merchants.Extended;
 
 import static com.aleksey.merchants.Extended.AnimalInCrate.isValidAnimalCrate;
 import static com.aleksey.merchants.Extended.ExtendedLogic.setCookedLevel;
+import com.bioxx.tfc.Core.Metal.MetalRegistry;
 import com.bioxx.tfc.Core.TFC_Time;
 import com.bioxx.tfc.Food.ItemFoodMeat;
 import com.bioxx.tfc.Food.ItemFoodTFC;
@@ -11,16 +12,20 @@ import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
 import com.bioxx.tfc.Items.ItemBlocks.ItemTerraBlock;
 import com.bioxx.tfc.Items.ItemTFCArmor;
 import com.bioxx.tfc.Items.ItemTerra;
+import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 import com.bioxx.tfc.Items.Tools.ItemCustomSword;
 import com.bioxx.tfc.Items.Tools.ItemMiscToolHead;
 import com.bioxx.tfc.Items.Tools.ItemWeapon;
+import com.bioxx.tfc.api.Armor;
 import com.bioxx.tfc.api.Constant.Global;
+import static com.bioxx.tfc.api.Crafting.AnvilManager.getDurabilityBuff;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.setDamageBuff;
 import static com.bioxx.tfc.api.Crafting.AnvilManager.setDurabilityBuff;
 import com.bioxx.tfc.api.Enums.EnumFoodGroup;
 import com.bioxx.tfc.api.Food;
 import com.bioxx.tfc.api.FoodRegistry;
 import com.bioxx.tfc.api.Interfaces.IFood;
+import com.bioxx.tfc.api.Metal;
 import com.bioxx.tfc.api.TFCItems;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -232,7 +237,13 @@ public class EditPriceSlot {
         meta = getValidMetaForItem(item, meta);
         
         ItemStack payStack = new ItemStack(item,1 ,meta );
-        if (payStack.getItem() instanceof IFood)
+        
+        // meta 0 is unfired vessel cant have nbt
+        if (payStack.getItem() instanceof ItemPotterySmallVessel && meta > 0)
+        {
+            payStack = createSmallVesellNBTByParam(payStack, count, p1, p2, p3, p4);            
+        }
+        else if (payStack.getItem() instanceof IFood)
         {
             //payStack.stackSize = 1;//TFCfood amount at nbttag foodWeight
             
@@ -268,6 +279,18 @@ public class EditPriceSlot {
         return payStack;        
     }
     
+    public static EditPayParams getParamsForSmithingItem(ItemStack iStack)
+    {
+        if ( iStack == null || !iStack.stackTagCompound.hasKey("craftingTag"))
+            return null;
+        
+        int duraBuff = (int) Math.floor( getDurabilityBuff(iStack) * 100 );
+        duraBuff = (duraBuff < 0)? 0 : duraBuff;            
+        
+        return new EditPayParams(duraBuff);
+    }
+    
+    
     public static boolean createSmithingNBTByParam(ItemStack iStack, int p1)
     {
         if ( iStack==null || p1 <= 0 )
@@ -296,6 +319,16 @@ public class EditPriceSlot {
         
         Item i = iStack.getItem();
         
+        if (i instanceof ItemTFCArmor )
+        {
+            Armor armor = ((ItemTFCArmor) i ).armorTypeTFC;
+            if (armor != null)
+            {
+                return ( armor.metaltype != null && !armor.metaltype.isEmpty()
+                        && armor.metaltype.contains("Leather") );
+            }                    
+        }
+        
         boolean r =
                 (   i == TFCItems.flintSteel 
                 || i == TFCItems.fireStarter
@@ -306,7 +339,22 @@ public class EditPriceSlot {
                 || i == TFCItems.stoneHammerHead
                 || i == TFCItems.stoneKnife
                 || i == TFCItems.stoneKnifeHead                
-                || i == TFCItems.arrow
+                || i == TFCItems.arrow                
+                || i == TFCItems.igInAxe
+                || i == TFCItems.igInHoe
+                || i == TFCItems.sedShovel
+                || i == TFCItems.sedAxe
+                || i == TFCItems.sedHoe
+                || i == TFCItems.igExShovel
+                || i == TFCItems.igExAxe
+                || i == TFCItems.igExHoe
+                || i == TFCItems.mMShovel
+                || i == TFCItems.mMAxe
+                || i == TFCItems.mMHoe                
+                || i == TFCItems.igInStoneJavelin
+                || i == TFCItems.sedStoneJavelin
+                || i == TFCItems.igExStoneJavelin
+                || i == TFCItems.mMStoneJavelin                
                 );
         if (!r)
         {
@@ -382,6 +430,20 @@ public class EditPriceSlot {
     }
 
     
+    public static EditPayParams getParamsForTFCSimpleFood(ItemStack iStack)
+    {
+       if (iStack == null || iStack.stackTagCompound==null) 
+           return null;    
+       
+       int p1 = ExtendedLogic.getCookedLevel(iStack);
+       int p2 = Food.isSalted(iStack)? 1 : 0;                   
+       int p3 = Food.isDried(iStack) ? 1 : 0;
+       //brined pickled smoked at one param
+       int p4 = getTFCFoodParams(iStack);                        
+       
+       return new EditPayParams(p1,p2,p3,p4);
+    }
+    
     public static ItemStack createSimpleTFCFoodNBTByParam(ItemStack food, int count, int p1, int p2,int p3, int p4)
     {
       if (food == null || food.getItem() instanceof ItemSandwich )   
@@ -450,7 +512,7 @@ public class EditPriceSlot {
     {
         if (param4<=0)
             return false;
-        int brined = param4 % 10;
+        int brined = param4<10? param4 : param4 % 10;
         int pickled = (int) Math.floor(  param4 % 100 / 10);
         int smoked =  (int) Math.floor(  param4 % 1000 / 100);
         
@@ -491,7 +553,81 @@ public class EditPriceSlot {
         return false;
     }
 
+    
+    public static EditPayParams getParamsForSmallVessel(ItemStack svessel)
+    {
+        if (svessel == null || !(svessel.getItem() instanceof ItemPotterySmallVessel) 
+                || svessel.stackTagCompound == null)
+            return null;
         
+        EditPayParams params = new EditPayParams();
+        
+        if  ( svessel.stackTagCompound.hasKey("Items") ) 
+        {
+            params.p1 = 1;
+        }
+        else if ( svessel.stackTagCompound.hasKey("TempTimer") )
+        {   
+            //TempTimer:5448L,MetalAmount:560,MetalType:"Copper"
+            
+            String metalTypeName = svessel.stackTagCompound.getString("MetalType");
+            if (metalTypeName==null || metalTypeName.isEmpty())
+                return params;
+            Metal metal = MetalRegistry.instance.getMetalFromString(metalTypeName);
+            if (metal ==null)
+                return params;
+            params.p3 = Item.getIdFromItem(metal.ingot);
+            params.p4 = svessel.stackTagCompound.getInteger("MetalAmount");
+       }        
+        return params;
+    }
+    
+    
+    /**
+     *  //TempTimer:5448L,MetalAmount:560,MetalType:"Copper"
+     */
+    public static ItemStack createSmallVesellNBTByParam(ItemStack svessel, int count, int p1, int p2,int p3, int p4)
+    {
+      if (svessel == null || !(svessel.getItem() instanceof ItemPotterySmallVessel) )
+          return null;
+      //p3 - metall type
+      //p4 - metallamount
+      if (p4 > 2240)
+          p4 = 2240;//max;
+      if (p4<1)
+          p4 = 100;
+      
+      if (p3>0 && p4 > 0)
+      {
+          Item ingot = Item.getItemById(p3);
+          if (ingot == null)
+              return svessel;
+          Metal metal = MetalRegistry.instance.getMetalFromItem(ingot);
+          if (metal == null)
+              return svessel;
+          svessel.stackTagCompound = new NBTTagCompound();
+          svessel.stackTagCompound.setLong("TempTimer", 0);
+          svessel.stackTagCompound.setString("MetalType", metal.name);
+          svessel.stackTagCompound.setInteger("MetalAmount",p4);
+          svessel.setItemDamage(2);
+      }
+      return svessel;  
+    }
+        
+    
+    public static EditPayParams getParamsForSalad(ItemStack iStack)
+    {
+       if (iStack == null || !(iStack.getItem() instanceof ItemSalad) 
+               || iStack.stackTagCompound == null) 
+           return null;           
+
+       int [] fg = Food.getFoodGroups(iStack);
+       if ( fg.length == 4){
+           return new EditPayParams(fg[0],fg[1],fg[2],fg[3]);
+       }
+       return null;       
+    }                   
+    
     public static ItemStack createSaladNBTByParam(ItemStack food, int count, int p1, int p2,int p3, int p4)
     {
       if (food==null || ! (food.getItem() instanceof ItemSalad) )
@@ -517,6 +653,24 @@ public class EditPriceSlot {
       return food;             
     }
             
+    public static EditPayParams getParamsForBarrel(ItemStack iStack)
+    {
+        if (iStack==null || iStack.stackTagCompound==null)
+            return null;
+        int p1 = iStack.stackTagCompound.getBoolean("Sealed") ? 1 : 0;
+        int p2 = iStack.stackTagCompound.getInteger("SealTime");
+        p2 = getYearFromHours(p2);
+        int p3 = 0;
+        int p4 = 0;
+        FluidStack fluidStack = EditPriceSlot.getFluid(iStack);
+        if (fluidStack != null)
+        {
+            p3 = fluidStack.getFluidID();
+            if (fluidStack.amount > 0 )
+                p4 = (int) Math.floor(fluidStack.amount / 1000);
+        }
+        return new EditPayParams(p1,p2,p3,p4);
+    }
     
     /**
      * 
@@ -643,5 +797,6 @@ public class EditPriceSlot {
         }
         return TFCFluidsList;
     }
+    
     
 }

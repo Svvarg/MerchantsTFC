@@ -29,8 +29,8 @@ import com.bioxx.tfc.Core.Player.PlayerInventory;
 import com.bioxx.tfc.Food.ItemFoodTFC;
 import com.bioxx.tfc.api.Interfaces.IFood;
 import com.bioxx.tfc.api.Food;
-import static com.aleksey.merchants.Extended.ExtendedLogic.isNoSplitFood;
 import static com.aleksey.merchants.Extended.ExtendedLogic.getNoSplitFoodWeight;
+import static com.aleksey.merchants.Extended.ExtendedLogic.isNoSplitFood;
 
 //slotClick is based on https://github.com/Mr-J/AdvancedBackpackMod/blob/master/unrelated/slotClick%2BComments%2BRename%2BHelpers.java.txt
 
@@ -950,11 +950,14 @@ public class ContainerStall extends ContainerTFC
             
             //ItemStack newItemStack = goodItemStack.copy();
             ItemStack newItemStack = _stall._goodItemFromWarehouseContainer;
-            if ( newItemStack == null )//this shoult not happen but for insurance
+            //this shoult not happen. It for insurance and safety
+            if ( newItemStack == null 
+                    || !ExtendedLogic.areItemEquals(goodItemStack, newItemStack) )
                 newItemStack = goodItemStack.copy();
                         
-            if(newItemStack.getItem() instanceof IFood)                
-                ItemFoodTFC.createTag(newItemStack, Food.getWeight(newItemStack));
+            /* this check occurs when assigning values for _goodItemFromWarehouseContainer;
+             if(newItemStack.getItem() instanceof IFood && !isNoSplitFood(newItemStack) )
+                ItemFoodTFC.createTag(newItemStack, Food.getWeight(newItemStack));*/
 
             inventoryplayer.setItemStack(newItemStack);
             

@@ -1,13 +1,10 @@
 package com.aleksey.merchants.Helpers;
 
 import com.aleksey.merchants.Extended.AnimalInCrate;
-import com.aleksey.merchants.Extended.EditPriceSlot;
 import com.aleksey.merchants.Extended.ExtendedLogic;
-import static com.aleksey.merchants.Extended.ExtendedLogic.PERMISSIBLEDECLAY;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-
 import com.bioxx.tfc.Food.ItemFoodTFC;
 import com.bioxx.tfc.TileEntities.TEIngotPile;
 import com.bioxx.tfc.api.Food;
@@ -19,7 +16,7 @@ import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
 import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
 import com.bioxx.tfc.Items.Pottery.ItemPotteryJug;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
-import net.minecraftforge.fluids.FluidStack;
+
 
 public class ItemHelper {
 
@@ -63,6 +60,8 @@ public class ItemHelper {
         if (item instanceof ItemPotteryJug || item instanceof ItemPotterySmallVessel)
         {
             key =  itemStack.hasTagCompound() ? key+":1" : key;
+            if ( item instanceof ItemPotterySmallVessel)
+                key =  ExtendedLogic.getKeyForSmallVessel(key,itemStack);
             return key;
         }
         
@@ -102,8 +101,8 @@ public class ItemHelper {
             float foodDecay = removeDecay ? Math.max(Food.getDecay(itemStack), 0) : 0;
             
             //for no split tfcfood for possible trade with small-permissible decay value
-            if (foodDecay <= PERMISSIBLEDECLAY && isNoSplitFood(itemStack) ) {
-                foodDecay = 0;                
+            if (foodDecay <= ExtendedLogic.PERMISSIBLEDECLAY && isNoSplitFood(itemStack) ) {
+                foodDecay = 0;  //only for the calculations of quantity
             }
             
             int quantity = (int) (Food.getWeight(itemStack) - foodDecay);
@@ -151,8 +150,9 @@ public class ItemHelper {
                         
             Food.setWeight(itemStack, newQuantity);
             
-            // destroy garbage rotten food scraps 
-            if ( newQuantity < 2 && Food.getDecay(itemStack) > 0.4f )
+            // destroy garbage decay food scraps 
+            if ( newQuantity < 5 &&  newQuantity - Food.getDecay(itemStack) < 2 )    
+            //if ( newQuantity < 2 && Food.getDecay(itemStack) > 0.4f )
                 itemStack.stackSize = 0;
             
         } else {
@@ -162,7 +162,12 @@ public class ItemHelper {
 
     public static final void setStackQuantity(ItemStack itemStack, int quantity) {
         if (itemStack.getItem() instanceof IFood) {
-            ItemFoodTFC.createTag(itemStack, quantity);
+            if (ExtendedLogic.isNoSplitFood(itemStack))
+            {
+                //pass unchanged as is
+            }
+            else
+                ItemFoodTFC.createTag(itemStack, quantity);
         } else {
             itemStack.stackSize = quantity;
         }

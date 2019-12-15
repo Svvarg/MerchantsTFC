@@ -34,6 +34,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.fluids.FluidStack;
 
 /**
@@ -45,9 +46,9 @@ public class ExtendedLogic {
     //private static final String BUCKETMILK = "com.bioxx.tfc.Items.Tools.ItemCustomBucketMilk";
     //private static final String JUGMILK = "ItemCeramicJugMilk";
     private static final int BUCKETMILKWEIGHT = 20;
-    private static final int SALADWEIGHT = 20;
+    public static final int SALADWEIGHT = 20;
     private static final int JUGMILKWEIGHT = 80;
-    public static final int PERMISSIBLEDECLAY = 2;//milk salad!
+    public static final int PERMISSIBLEDECLAY = 2;//for jug, bucket milk and salad. 20 1 - is 5%
    // public static final int permissibleSealTimeHours = 8760;//24*365ч new way
     public static final boolean ToNonEmptySlot = true;
     public static final boolean ToEmptySlot = false;
@@ -114,11 +115,11 @@ public class ExtendedLogic {
             return false;
         }
         
-        // on barrel itemDamage=meta type of wood barrel Can ignore this for payMode
+        // on barrel itemDamage=meta type of wood barrel Can ignore this for payMode        
         if  ( IGNOREBARRELWOODTYPE && 
                 itemStack1.getItem() instanceof ItemBarrels 
                 && itemStack2.getItem() instanceof ItemBarrels 
-                && itemStack1.getItem() == itemStack2.getItem() )        
+                && itemStack1.getItem() == itemStack2.getItem() )
             return areItemStackTagsEqualEx(itemStack1, itemStack2, payMode);
         
         
@@ -133,6 +134,7 @@ public class ExtendedLogic {
                 : ExtendedLogic.areItemStackTagsEqualEx(itemStack1, itemStack2 , payMode*/
         boolean equals = false;
  
+        
         if (itemStack1.getItem() instanceof IFood)
         {
             //equals = Food.areEqual(itemStack1, itemStack2); //old
@@ -248,8 +250,6 @@ public class ExtendedLogic {
         return (c == fg1.length);
     }
     
-    
-    
     /**
      *  For Equal TFC items like burrel with date, tools-armor-weapons with SwimingBonus, (food with temperature not realized)
      *                
@@ -289,8 +289,12 @@ public class ExtendedLogic {
               
               if (  item1 instanceof ItemBarrels || item1 instanceof  ItemLargeVessel )
               {
-                      return areBarrelsEqual(st1, st2);   
-              }                  
+                  return areBarrelsEqual(st1, st2);   
+              }       
+              if (item1 instanceof ItemPotterySmallVessel)
+              {
+                  return areSmallVesselEqual(st1,st2);//metall
+              }    
               
               //compare TFC smithingItem by bonus 
               if ( ( st1.hasTagCompound() && st1.stackTagCompound.hasKey(CRAFTINGTAG) ) 
@@ -306,13 +310,45 @@ public class ExtendedLogic {
     }        
     
     /**
+     * Compare smallVessels by Metall alloy
+     */
+    public static boolean areSmallVesselEqual(ItemStack st1, ItemStack st2) 
+    { 
+        if (st1 == null || st2 == null 
+                || st1.stackTagCompound == null || st2.stackTagCompound == null)
+            return false;
+        
+        //insurance
+        if (st1.stackTagCompound == null && st2.stackTagCompound == null)
+            return true;
+        
+        if (st1.stackTagCompound.hasKey("TempTimer") &&
+                st2.stackTagCompound.hasKey("TempTimer") )
+        {
+            String metalType1 = st1.stackTagCompound.getString("MetalType");
+            int amount1 = st1.stackTagCompound.getInteger("MetalAmount");
+            
+            String metalType2 = st2.stackTagCompound.getString("MetalType");
+            int amount2 = st2.stackTagCompound.getInteger("MetalAmount");
+            return metalType1 !=null && !metalType1.isEmpty() 
+                    && metalType2 !=null && !metalType2.isEmpty() 
+                    && metalType1.compareTo(metalType2)==0
+                    && amount1 == amount2;
+        }
+        
+        return st1.stackTagCompound != null && st2.stackTagCompound != null 
+                && st1.stackTagCompound.equals(st2.stackTagCompound);
+    }
+    
+    /**
      * Compare barrels and LargeVessel by sealTime new Trade Logic
      * ignore burrelType value
      * st1 StallFaceSlot pay or goods
      * st2 onPayMode - Stack from playerInventory 
      *    else Stack from Warehouse Container
      */ 
-    public static boolean areBarrelsEqual(ItemStack st1, ItemStack st2) {                
+    public static boolean areBarrelsEqual(ItemStack st1, ItemStack st2) 
+    {
         if (st1 == null || st2 == null )
             return false;
         
@@ -594,7 +630,12 @@ public class ExtendedLogic {
         //set good quantity from StallFaceSlot
         if (iStack.getItem() instanceof IFood )
         {   //cut decay inside
-            ItemFoodTFC.createTag(iStack, Food.getWeight(goodStack) );
+            if ( isNoSplitFood(iStack) )
+            {                
+               //dacay don`t cut, to give the same. Check for the number of able-bodied was previously
+            }
+            else
+                ItemFoodTFC.createTag(iStack, Food.getWeight(goodStack) );
         }
         else 
         {
@@ -631,8 +672,9 @@ public class ExtendedLogic {
       
       //set pay quantity from StallFaceSlot
       if (payStack.getItem() instanceof IFood )
-        {   //cut decay inside
-            ItemFoodTFC.createTag(payStack, Food.getWeight(payItemStack) );
+        {   //cut decay inside for food. But not for NoSplitFood like jugMilk bucketMilk Salad
+            if (!isNoSplitFood(payItemStack) )
+                ItemFoodTFC.createTag(payStack, Food.getWeight(payItemStack) );
         }
         else 
         {
@@ -839,5 +881,56 @@ public class ExtendedLogic {
         return q;
     }
     
+    
+    
+    /**
+     * Smart key for smallVessel
+     * @param key
+     * @param iStack
+     * @return 
+     */
+    public static String getKeyForSmallVessel(String key, ItemStack vessel)
+    {   
+        if (vessel == null || !(vessel.getItem() instanceof ItemPotterySmallVessel))
+           return key;
+           
+       NBTTagCompound nbt = vessel.stackTagCompound;
+       
+       if  ( nbt.hasKey("Items") ) 
+       {
+           NBTTagList nbttaglist = nbt.getTagList("Items", 10);
+           if ( nbttaglist == null )
+               return key;
+           for(int i = 0; i < nbttaglist.tagCount(); i++)
+           {
+               NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
+               if (nbttagcompound1==null)
+                   continue;
+            
+               byte byte0 = nbttagcompound1.getByte("Slot");
+               if(byte0 >= 0 && byte0 < 4)
+               {
+                   int id = nbttagcompound1.getInteger("id");
+                   
+                   key += ":" + Byte.toString(byte0) + Integer.toString(id);
+               }
+           }
+
+       }// for vessel with metal alloy
+       else if ( nbt.hasKey("TempTimer") )
+       {
+           EditPayParams params = EditPriceSlot.getParamsForSmallVessel(vessel);
+           if (params == null)
+               return key;
+           int id = params.p3;
+           int amount = params.p4;
+          if (id < 0 )
+              return key;
+          key = key + ":"+Integer.toString(id)+":"+Integer.toString(amount);         
+         
+       }
+       
+       return key;        
+    }
 }
                 
