@@ -38,6 +38,10 @@ public class AnimalInCrate {
     public static boolean allowSetOnlyTFCAnimal = true;
     public static String TFCAnimalsList = "";
     public static final String[] InvalidTFCAnimal = {"skeletonTFC","zombieTFC","spiderTFC","slimeTFC","ghastTFC","caveSpiderTFC","blazeTFC", "endermanTFC","pigZombieTFC","boarTFC","banditTFC","minecartTFC","arrowTFC","standTFC","creeperTFC","irongolemTFC"};
+        //the values from th TFC they have not constants
+    public static final String[] ANIMALSNAMES = {"bearTFC", "chickenTFC", "cowTFC", "deerTFC", "horseTFC", "pigTFC", "sheepTFC", "wolfTFC"};
+    public static final float[] ANIMALSTIMETOADULT = {60, 4.14f, 36, 24, 30, 15, 12, 9};
+
     
     public static final int UKNOWN = 0;
     public static final int ABABY = 1;
@@ -302,17 +306,15 @@ public class AnimalInCrate {
     {
         if ( name == null || name.isEmpty() )
             return 0;
-        //the values from th TFC they have not constants
-        String[]   names = {"bearTFC", "chickenTFC", "cowTFC", "deerTFC", "horseTFC", "pigTFC", "sheepTFC", "wolfTFC"};
-        float[] dToAdult = {60,        4.14f,        36,        24,       30,          15,      12,         9};
         
-        if (dToAdult.length != names.length)
+        if (ANIMALSTIMETOADULT.length != ANIMALSNAMES.length)
             return 0;
         
-        for (int i = 0; i < names.length; i++) {
-            String n = names[i];
-            if (name.compareTo(names[i])==0)
-                return (int) Math.floor( TFCOptions.animalTimeMultiplier * TFC_Time.daysInMonth * dToAdult[i] ) ;            
+        for (int i = 0; i < ANIMALSNAMES.length; i++) {
+            String n = ANIMALSNAMES[i];
+            if (name.compareTo(ANIMALSNAMES[i])==0)
+                return (int) Math.floor( TFCOptions.animalTimeMultiplier 
+                        * TFC_Time.daysInMonth * ANIMALSTIMETOADULT[i] ) ;
         }
         return 0;
     }

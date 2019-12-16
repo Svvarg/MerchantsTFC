@@ -49,7 +49,7 @@ public class ExtendedLogic {
     public static final int SALADWEIGHT = 20;
     private static final int JUGMILKWEIGHT = 80;
     public static final int PERMISSIBLEDECLAY = 2;//for jug, bucket milk and salad. 20 1 - is 5%
-   /
+   
     public static final boolean ToNonEmptySlot = true;
     public static final boolean ToEmptySlot = false;
     

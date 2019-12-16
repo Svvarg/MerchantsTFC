@@ -648,5 +648,5 @@ public class GuiStallSetPayItem extends GuiContainerTFC
         fontRendererObj.drawString(s, x + offset, y, color);
     }
 }
-   е 
+   
 
