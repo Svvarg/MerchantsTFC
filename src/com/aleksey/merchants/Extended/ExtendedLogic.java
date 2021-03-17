@@ -815,30 +815,29 @@ public class ExtendedLogic {
      */
     public static String getKeyForBarrel(String key, ItemStack itemStack)
     {
-        if (itemStack==null || !itemStack.hasTagCompound())
-                return key;            
-      
-       if  (itemStack.stackTagCompound.hasKey("Items") ) 
-       {
-           NBTTagList nbttaglist = itemStack.stackTagCompound.getTagList("Items", 10);
-           if ( nbttaglist != null )
-               key += ":"+nbttaglist.tagCount();           
-       }   
+        if (itemStack != null && itemStack.hasTagCompound()) {
+            if  (itemStack.stackTagCompound.hasKey("Items") )
+            {
+                NBTTagList nbttaglist = itemStack.stackTagCompound.getTagList("Items", 10);
+                if ( nbttaglist != null )
+                    key += ":"+nbttaglist.tagCount();
+            }
 
-        FluidStack fluidStack = EditPriceSlot.getFluid(itemStack);
-        if (fluidStack != null)
-        {
-            int fluidID = fluidStack.getFluidID();
-            int amount = 0;
-            if (fluidStack.amount > 0 )
-                amount = (int) Math.floor(fluidStack.amount / 1000);
-            key += ":"+fluidID+":"+amount;
-        } 
-        //import position at the end of key-name
-        int sealTime =  itemStack.stackTagCompound.getInteger(ExtendedLogic.SEALTIME);            
-        int sealYear = EditPriceSlot.getYearFromHours(sealTime,true);
-        key += ":"+sealYear;//date+flag has NBT can be 0 for zerotimeBarrel
-            
+            FluidStack fluidStack = EditPriceSlot.getFluid(itemStack);
+            if (fluidStack != null)
+            {
+                int fluidID = fluidStack.getFluidID();
+                int amount = 0;
+                if (fluidStack.amount > 0 )
+                    amount = (int) Math.floor(fluidStack.amount / 1000);
+                key += ":"+fluidID+":"+amount;
+            }
+            //import position at the end of key-name
+            int sealTime =  itemStack.stackTagCompound.getInteger(ExtendedLogic.SEALTIME);
+            int sealYear = EditPriceSlot.getYearFromHours(sealTime,true);
+            key += ":"+sealYear;//date+flag has NBT can be 0 for zerotimeBarrel
+        }
+
         return key;
     }
     
@@ -889,51 +888,54 @@ public class ExtendedLogic {
     /**
      * Smart key for smallVessel
      * @param key
-     * @param iStack
+     * @param vessel
      * @return 
      */
     public static String getKeyForSmallVessel(String key, ItemStack vessel)
-    {   
-        if (vessel == null || !(vessel.getItem() instanceof ItemPotterySmallVessel))
-           return key;
-           
-       NBTTagCompound nbt = vessel.stackTagCompound;
-       
-       if  ( nbt.hasKey("Items") ) 
-       {
-           NBTTagList nbttaglist = nbt.getTagList("Items", 10);
-           if ( nbttaglist == null )
-               return key;
-           for(int i = 0; i < nbttaglist.tagCount(); i++)
-           {
-               NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-               if (nbttagcompound1==null)
-                   continue;
-            
-               byte byte0 = nbttagcompound1.getByte("Slot");
-               if(byte0 >= 0 && byte0 < 4)
-               {
-                   int id = nbttagcompound1.getInteger("id");
-                   
-                   key += ":" + Byte.toString(byte0) + Integer.toString(id);
-               }
-           }
+    {
+        if (vessel != null && vessel.stackTagCompound != null
+               && vessel.getItem() instanceof ItemPotterySmallVessel) {
 
-       }// for vessel with metal alloy
-       else if ( nbt.hasKey("TempTimer") )
-       {
-           EditPayParams params = EditPriceSlot.getParamsForSmallVessel(vessel);
-           if (params == null)
-               return key;
-           int id = params.p3;
-           int amount = params.p4;
-          if (id < 0 )
-              return key;
-          key = key + ":"+Integer.toString(id)+":"+Integer.toString(amount);         
-         
-       }
-       
-       return key;        
+            //for vessel as container with ItemsStacks
+            if (vessel.stackTagCompound.hasKey("Items"))
+            {
+               NBTTagList nbttaglist = vessel.stackTagCompound.getTagList("Items", 10);
+               if ( nbttaglist != null ) {
+                   final int sz = nbttaglist.tagCount();
+                   if (sz > 0) {
+                       StringBuilder sb = new StringBuilder();
+                       sb.append(key);
+
+                       for(int i = 0; i < sz; i++) {
+                           NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
+                           if (nbttagcompound1 != null) {
+                               byte byte0 = nbttagcompound1.getByte("Slot");
+                               if (byte0 >= 0 && byte0 < 4) {
+                                   int id = nbttagcompound1.getInteger("id");
+                                   //key += ":" + Byte.toString(byte0) + Integer.toString(id);
+                                   sb.append(':').append(byte0).append(id);
+                               }
+                           }
+                       }
+                       key = sb.toString();
+                   }
+               }
+            }
+            // for vessel with metal alloy
+            else if ( vessel.stackTagCompound.hasKey("TempTimer") )
+            {
+                EditPayParams params = EditPriceSlot.getParamsForSmallVessel(vessel);
+                if (params != null) {
+                    int id = params.p3;
+                    int amount = params.p4;
+                    if (id > -1 ) {
+                        key = key + ":"+Integer.toString(id)+":"+Integer.toString(amount);
+                    }
+                }
+            }
+        }
+
+        return key;
     }
 }
                 
