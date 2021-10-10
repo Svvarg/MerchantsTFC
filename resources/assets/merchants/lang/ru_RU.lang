@@ -212,6 +212,7 @@ gui.StallSetPay.Tooltip.PotteryJugUsed=Флаг не нового кувшина
 gui.StallSetPay.Tooltip.SVesselUsedFlag=Флаг не нового сосуда
 gui.StallSetPay.Tooltip.MetalID=ID метала (ID слитка)
 gui.StallSetPay.Tooltip.MetalAmount=Количество единиц
+gui.StallSetPay.Tooltip.ContentType=Тип содержимого(1-металл, 2- слитки)
 gui.StallSetPay.Tooltip.FoodCookedLevel=Термообработка(0 сырая, 5 максимальная)
 gui.StallSetPay.Tooltip.FoodSalted=Флаг солёная
 gui.StallSetPay.Tooltip.FoodDired=Флаг сушёная

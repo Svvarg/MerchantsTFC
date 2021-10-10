@@ -212,6 +212,7 @@ gui.StallSetPay.Tooltip.PotteryJugUsed=Used (not new) Pottery Jug
 gui.StallSetPay.Tooltip.SVesselUsedFlag=Used (not new) Pottery Vessel
 gui.StallSetPay.Tooltip.MetalID=Metal ID (Ingot ID)
 gui.StallSetPay.Tooltip.MetalAmount=Metal amount (Units)
+gui.StallSetPay.Tooltip.ContentType=Content Type (1-MetalAlloy 2-Ingots)
 gui.StallSetPay.Tooltip.FoodCookedLevel=Cooked Level
 gui.StallSetPay.Tooltip.FoodSalted=Salted
 gui.StallSetPay.Tooltip.FoodDired=Dired
