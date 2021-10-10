@@ -20,6 +20,7 @@ import com.bioxx.tfc.Core.Player.PlayerInventory;
 import com.bioxx.tfc.Food.ItemSalad;
 import com.bioxx.tfc.GUI.GuiContainerTFC;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
+import com.bioxx.tfc.Items.ItemBlocks.ItemCrucible;
 import com.bioxx.tfc.Items.Pottery.ItemPotteryJug;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 import com.bioxx.tfc.api.Food;
@@ -113,11 +114,13 @@ public class GuiStallSetPayItem extends GuiContainerTFC
     private static final int ITPOTTERYJUG = 6;
     private static final int ITPOTTERYSVESSEL = 7;
     private static final int ITANIMALCRATE = 8;
+    private static final int ITCRUCIBLE = 9;
     
     public static final String[] simplefoodtTooltip = new String[] {"","FoodCookedLevel","FoodSalted","FoodDired","FoodBrinedPickledSmoked"};                
     public static final String[] barreltTooltip = new String[] {"","BarrelSealed","BarrelSealTime","BarrelFluidID","BarrelAmount"};
     public static final String[] animalcrateTooltip = new String[] {"","ACrateAnimID","ACrateFamAndSex","ACrateJumpAndSpeed","ACrateVariant"};
     public static final String[] svesselTooltip = new String[] {"","SVesselUsedFlag","NoUsed","MetalID","MetalAmount"};
+    public static final String[] crucibleTooltip = new String[]{"", "ContentType", "NoUsed", "MetalID", "MetalAmount"};
     
     private static final int FNO = 0;
     private static final int FID = 1;
@@ -255,7 +258,16 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                 {                    
                     params = EditPriceSlot.getParamsForSmallVessel(payStack);
                 }    
-            }             
+            }
+            else if ( item instanceof ItemCrucible )
+            {
+                this.payItemType = ITCRUCIBLE;
+                if ( payStack.stackTagCompound != null )
+                {
+                    count = 1;
+                    params = EditPriceSlot.getParamsForCrucible(payStack);
+                }
+            }
             else if ( item instanceof ItemBarrels )
             { 
                 this.payItemType = ITBARREL;
@@ -516,6 +528,11 @@ public class GuiStallSetPayItem extends GuiContainerTFC
                     bonus = "Look NEI";
                 }*/
                 
+                break;
+
+            case ITCRUCIBLE:
+                if (p > 0 && p < crucibleTooltip.length)
+                    r = crucibleTooltip[p];
                 break;
                 
             case ITANIMALCRATE:

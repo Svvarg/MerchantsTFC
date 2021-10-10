@@ -1,7 +1,5 @@
 package com.aleksey.merchants.Extended;
 
-import static com.aleksey.merchants.Extended.AnimalInCrate.isValidAnimalCrate;
-import static com.aleksey.merchants.Extended.ExtendedLogic.setCookedLevel;
 import com.bioxx.tfc.Core.Metal.MetalRegistry;
 import com.bioxx.tfc.Core.TFC_Time;
 import com.bioxx.tfc.Food.ItemFoodMeat;
@@ -18,9 +16,6 @@ import com.bioxx.tfc.Items.Tools.ItemMiscToolHead;
 import com.bioxx.tfc.Items.Tools.ItemWeapon;
 import com.bioxx.tfc.api.Armor;
 import com.bioxx.tfc.api.Constant.Global;
-import static com.bioxx.tfc.api.Crafting.AnvilManager.getDurabilityBuff;
-import static com.bioxx.tfc.api.Crafting.AnvilManager.setDamageBuff;
-import static com.bioxx.tfc.api.Crafting.AnvilManager.setDurabilityBuff;
 import com.bioxx.tfc.api.Enums.EnumFoodGroup;
 import com.bioxx.tfc.api.Food;
 import com.bioxx.tfc.api.FoodRegistry;
@@ -34,6 +29,13 @@ import net.minecraft.util.StatCollector;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import static com.bioxx.tfc.api.Crafting.AnvilManager.getDurabilityBuff;
+import static com.bioxx.tfc.api.Crafting.AnvilManager.setDamageBuff;
+import static com.bioxx.tfc.api.Crafting.AnvilManager.setDurabilityBuff;
+import static com.aleksey.merchants.Extended.AnimalInCrate.isValidAnimalCrate;
+import static com.aleksey.merchants.Extended.ExtendedLogic.setCookedLevel;
+import com.bioxx.tfc.Items.ItemBlocks.ItemCrucible;
+import net.minecraft.nbt.NBTTagList;
 
 /**
  *
@@ -242,6 +244,10 @@ public class EditPriceSlot {
         if (payStack.getItem() instanceof ItemPotterySmallVessel && meta > 0)
         {
             payStack = createSmallVesellNBTByParam(payStack, count, p1, p2, p3, p4);            
+        }
+        else if (payStack.getItem() instanceof ItemCrucible)
+        {
+            payStack = createCrucibleNBTByParam(payStack, count, p1, p2, p3, p4);
         }
         else if (payStack.getItem() instanceof IFood)
         {
@@ -613,7 +619,105 @@ public class EditPriceSlot {
       }
       return svessel;  
     }
-        
+
+    /**
+     * p1 - type of content 1-Metall  2-Items(ingots)
+     * @param crucible
+     * @return
+     */
+    public static EditPayParams getParamsForCrucible(ItemStack crucible) {
+        if (crucible != null && crucible.stackTagCompound != null) {
+
+            NBTTagCompound nbt = crucible.stackTagCompound;
+            if (nbt != null && nbt.hasKey("Metals")) {
+                NBTTagList nbttaglist = nbt.getTagList("Metals", 10);
+                final int sz = nbttaglist.tagCount();
+                
+                //Work only with simple mettal not alloy! 
+                if (sz == 1) {
+                    EditPayParams params = new EditPayParams();
+                    params.p1 = 1;// type of crucible content or metallally or bag
+
+                    NBTTagCompound nbtMetall = nbttaglist.getCompoundTagAt(0);
+                    params.p3 = /*id*/ nbtMetall.getInteger("ID");
+                    params.p4 = /*amount*/ (int) nbtMetall.getFloat("AmountF");//"Amount"
+                    return params;
+                } else {
+                    int p1 = 3;//multi-alloy not Support!
+                    //return null
+                }
+            }
+
+            if  (nbt.hasKey("Items") ) {
+                NBTTagList items = crucible.getTagCompound().getTagList("Items", 10/*COMPOUND*/);
+                if (items != null && items.tagCount() > 0) {
+                    EditPayParams params = new EditPayParams();
+                    NBTTagCompound el = items.getCompoundTagAt(0);
+                    if (el != null) {
+                        ItemStack item = ItemStack.loadItemStackFromNBT(el);
+                        if (item != null) {
+                            params.p1 = 2;//ContentType item inside cruicible
+                            //params.p2 = /*meta*/item.getItemDamage();// no id on ingot
+                            params.p3 = /*id*/Item.getIdFromItem(item.getItem());
+                            params.p4 = /*count*/item.stackSize;
+                            return params;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    /**
+     * From params to ItemStack nbt
+     * @param crucible
+     * @param count
+     * @param p1 type of content  1-metall, 2-Items
+     * @param p2 t1-mettalId                t2 itemId(Ingot)
+     * @param p3 t1-mettalAmount            t2 itemMeta
+     * @param p4                            t3 count
+     * @return
+     */
+    public static ItemStack createCrucibleNBTByParam(ItemStack crucible, int count, int p1, int p2,int p3, int p4) {
+        if (crucible != null && crucible.getItem() instanceof ItemCrucible) {
+            if (p1 == 1 && p3 > 0 && p4 > 0) {//Metalls
+                crucible.stackTagCompound = new NBTTagCompound();
+                crucible.stackTagCompound.setInteger("temp", 0);//for pass nbtcheck by stall
+                NBTTagList nbtMetalls = new NBTTagList();
+                crucible.stackTagCompound.setTag("Metals", nbtMetalls);
+                NBTTagCompound nbtMetall = new NBTTagCompound();
+                nbtMetall.setInteger("ID", p3);
+                nbtMetall.setFloat("AmountF", Math.min(3000,p4));
+                nbtMetalls.appendTag(nbtMetall);
+                //for pass nbtcheck via stall
+                crucible.stackTagCompound.setInteger("temp", 0);
+                crucible.stackTagCompound.setTag("Items", new NBTTagList());
+            } 
+            else if (p1 == 2) {//Items
+                Item item = Item.getItemById(p3);
+                if (item != null) {
+                    ItemStack is = new ItemStack(item);
+                    //is.setItemDamage(p3); Not Used 
+                    int max = is.getMaxStackSize();
+                    is.stackSize = Math.min(max, p4);
+
+                    crucible.stackTagCompound = new NBTTagCompound();
+                    NBTTagList nbttaglist = new NBTTagList();
+                    NBTTagCompound nbtItem = new NBTTagCompound();
+                    nbtItem.setByte("Slot", (byte)0);
+                    is.writeToNBT(nbtItem);
+                    nbttaglist.appendTag(nbtItem);
+                    crucible.stackTagCompound.setTag("Items", nbttaglist);
+                    //for pass nbtcheck via stall
+                    crucible.stackTagCompound.setInteger("temp", 0);
+                    crucible.stackTagCompound.setTag("Metals", new NBTTagList());
+                }
+            }
+            return crucible;
+        }
+        return null;
+    }
+
     
     public static EditPayParams getParamsForSalad(ItemStack iStack)
     {
@@ -652,7 +756,7 @@ public class EditPriceSlot {
       Food.setFoodGroups(food, foodGroups);          
       return food;             
     }
-            
+
     public static EditPayParams getParamsForBarrel(ItemStack iStack)
     {
         if (iStack==null || iStack.stackTagCompound==null)
@@ -803,6 +907,6 @@ public class EditPriceSlot {
         }
         return TFCFluidsList;
     }
-    
+
     
 }
