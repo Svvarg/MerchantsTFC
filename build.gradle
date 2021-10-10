@@ -37,10 +37,10 @@ allprojects {
 	archivesBaseName = config.archive_name
 
 repositories {
-    maven { // The repo from which to get waila
-        name "Mobius Repo"
-        url "http://mobiusstrip.eu/maven"
-    }
+//    maven { // The repo from which to get waila
+//        name "Mobius Repo"
+//        url "http://mobiusstrip.eu/maven"
+//    }
     maven { // the repo from which to get NEI and stuff
         name 'CB Repo'
         url "https://modmaven.k-4u.nl/"
@@ -77,14 +77,14 @@ sourceSets {
  }
 
 
-task copyJar(type: Copy) {
-     from('build/libs') {
-		include '**/*.jar'
-	 }
-     into 'C:/Users/Aleksey/AppData/Roaming/.minecraft_tfc/mods'
- }
+//task copyJar(type: Copy) {
+//     from('build/libs') {
+//		include '**/*.jar'
+//	 }
+//     into 'C:/Users/Aleksey/AppData/Roaming/.minecraft_tfc/mods'
+// }
 
-tasks.build.dependsOn('copyJar')
+//tasks.build.dependsOn('copyJar')
 
 dependencies {
     // Copy "[1.7.10]TerraFirmaCraft-0.79.21.741.jar" file
