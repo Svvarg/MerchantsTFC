@@ -9,6 +9,7 @@ import com.bioxx.tfc.Food.ItemFoodTFC;
 import com.bioxx.tfc.Food.ItemSalad;
 import com.bioxx.tfc.Food.ItemSandwich;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
+import com.bioxx.tfc.Items.ItemBlocks.ItemCrucible;
 import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
 import com.bioxx.tfc.Items.Tools.ItemCustomBucketMilk;
@@ -291,6 +292,10 @@ public class ExtendedLogic {
               {
                   return areSmallVesselEqual(st1,st2);//metall
               }    
+              if (item1 instanceof ItemCrucible)
+              {
+                  return areCruciblesEqual(st1, st2);//metall & items for ignore other tags(temperature)
+              }
               
               //compare TFC smithingItem by bonus 
               if ( ( st1.hasTagCompound() && st1.stackTagCompound.hasKey(CRAFTINGTAG) ) 
@@ -438,6 +443,52 @@ public class ExtendedLogic {
         }
         
         return st1.stackTagCompound.equals(st2.stackTagCompound);
+    }
+
+    private static boolean areCruciblesEqual(ItemStack st1, ItemStack st2) {
+        if (st1 == null || st2 == null ) {
+            return false;
+        }
+        final NBTTagCompound nbt1 = st1.stackTagCompound;
+        final NBTTagCompound nbt2 = st2.stackTagCompound;
+
+        //case: no nbt and empty crucible
+        boolean empty1 = isCrucibleEmptyOrWithoutNBT(nbt1);
+        boolean empty2 = isCrucibleEmptyOrWithoutNBT(nbt2);
+        if ( empty1 && empty2) {
+            return true;
+        }
+
+        if (!empty1 && !empty2) {
+            //ignore Temperature and other tags! Be careful!
+
+            NBTTagList metals1 = nbt1.hasKey("Metals") ? nbt1.getTagList("Metals", 10): null;
+            NBTTagList metals2 = nbt2.hasKey("Metals") ? nbt2.getTagList("Metals", 10): null;
+
+            if (metals1 == null && metals2 == null
+                    || metals1 != null && metals2 != null && metals1.tagCount() == metals2.tagCount()) {
+                if ( metals1 != null && metals1.equals(metals2)) {
+                    NBTTagList items1 = nbt1.hasKey("Items") ? nbt1.getTagList("Items", 10): null;
+                    NBTTagList items2 = nbt2.hasKey("Items") ? nbt2.getTagList("Items", 10): null;
+
+                    if (items1 == null && items2 == null
+                            || items1 != null && items2 != null && items1.tagCount() == items2.tagCount()) {
+                        return items1 != null && items1.equals(items2);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isCrucibleEmptyOrWithoutNBT(NBTTagCompound nbt) {
+        if (nbt == null) {
+            return true;
+        }
+        //ignore temperature
+        NBTTagList metals = nbt.hasKey("Metals") ? nbt.getTagList("Metals", 10): null;
+        NBTTagList items = nbt.hasKey("Items") ? nbt.getTagList("Items", 10): null;
+        return (metals == null || metals.tagCount() == 0) && (items == null || items.tagCount() == 0);
     }
 
     
