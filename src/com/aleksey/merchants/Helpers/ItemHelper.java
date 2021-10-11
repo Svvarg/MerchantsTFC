@@ -13,6 +13,7 @@ import static com.aleksey.merchants.Extended.ExtendedLogic.isNoSplitFood;
 import static com.aleksey.merchants.Extended.ExtendedLogic.getNoSplitFoodWeight;
 import com.aleksey.merchants.Extended.Integration;
 import com.bioxx.tfc.Items.ItemBlocks.ItemBarrels;
+import com.bioxx.tfc.Items.ItemBlocks.ItemCrucible;
 import com.bioxx.tfc.Items.ItemBlocks.ItemLargeVessel;
 import com.bioxx.tfc.Items.Pottery.ItemPotteryJug;
 import com.bioxx.tfc.Items.Pottery.ItemPotterySmallVessel;
@@ -53,6 +54,12 @@ public class ItemHelper {
         {   //Extended key type for barrels and vessels sealed\no date fluid
             key = ExtendedLogic.getKeyForBarrel(key, itemStack);
         }
+
+        else if (item instanceof ItemCrucible)
+        {   //Extended key type for crucible: empty, with metalls/Items(ingots)
+            key = ExtendedLogic.getKeyForCrucible(key, itemStack);
+        }
+        else
 
         //for correct quantity display of new and used jug and smallvessel
         //used jugs have "blowTime" tag with random value  
