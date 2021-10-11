@@ -690,8 +690,8 @@ public class EditPriceSlot {
                 nbtMetall.setFloat("AmountF", Math.min(3000,p4));
                 nbtMetalls.appendTag(nbtMetall);
                 //for pass nbtcheck via stall
-                crucible.stackTagCompound.setInteger("temp", 0);
-                crucible.stackTagCompound.setTag("Items", new NBTTagList());
+                //crucible.stackTagCompound.setInteger("temp", 0);
+                //crucible.stackTagCompound.setTag("Items", new NBTTagList());
             } 
             else if (p1 == 2) {//Items
                 Item item = Item.getItemById(p3);
@@ -709,8 +709,8 @@ public class EditPriceSlot {
                     nbttaglist.appendTag(nbtItem);
                     crucible.stackTagCompound.setTag("Items", nbttaglist);
                     //for pass nbtcheck via stall
-                    crucible.stackTagCompound.setInteger("temp", 0);
-                    crucible.stackTagCompound.setTag("Metals", new NBTTagList());
+                    //crucible.stackTagCompound.setInteger("temp", 0);
+                    //crucible.stackTagCompound.setTag("Metals", new NBTTagList());
                 }
             }
             return crucible;
