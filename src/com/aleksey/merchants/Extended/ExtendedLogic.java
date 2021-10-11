@@ -464,18 +464,19 @@ public class ExtendedLogic {
 
             NBTTagList metals1 = nbt1.hasKey("Metals") ? nbt1.getTagList("Metals", 10): null;
             NBTTagList metals2 = nbt2.hasKey("Metals") ? nbt2.getTagList("Metals", 10): null;
+            int metals1Count = metals1 == null ? 0 : metals1.tagCount();
+            int metals2Count = metals2 == null ? 0 : metals2.tagCount();
 
-            if (metals1 == null && metals2 == null
-                    || metals1 != null && metals2 != null && metals1.tagCount() == metals2.tagCount()) {
-                if ( metals1 != null && metals1.equals(metals2)) {
+
+            if (metals1Count == 0 && metals1Count == 0
+                    || metals1Count > 0 && metals1Count == metals2Count && metals1.equals(metals2)) {
                     NBTTagList items1 = nbt1.hasKey("Items") ? nbt1.getTagList("Items", 10): null;
                     NBTTagList items2 = nbt2.hasKey("Items") ? nbt2.getTagList("Items", 10): null;
+                    int items1Count = items1 == null ? 0 : items1.tagCount();
+                    int items2Count = items2 == null ? 0 : items2.tagCount();
 
-                    if (items1 == null && items2 == null
-                            || items1 != null && items2 != null && items1.tagCount() == items2.tagCount()) {
-                        return items1 != null && items1.equals(items2);
-                    }
-                }
+                    return (items1Count == 0 && items2Count == 0
+                            || items1Count > 0 && items1Count == items2Count && items1.equals(items2));
             }
         }
         return false;
@@ -889,6 +890,16 @@ public class ExtendedLogic {
             key += ":"+sealYear;//date+flag has NBT can be 0 for zerotimeBarrel
         }
 
+        return key;
+    }
+
+    public static String getKeyForCrucible(String key, ItemStack itemStack) {
+        if (itemStack != null && itemStack.hasTagCompound()) {
+            EditPayParams params = EditPriceSlot.getParamsForCrucible(itemStack);
+            if (params != null) {
+                key += ":" + /*type1|2*/ params.p1 + "_" + /*ID*/params.p3 + "_" +/*COUNT*/ params.p4;
+            }
+        }
         return key;
     }
     
