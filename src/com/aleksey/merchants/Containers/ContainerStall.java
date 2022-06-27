@@ -189,7 +189,7 @@ public class ContainerStall extends ContainerTFC
         
         if(!preparePayAndTrade(goodSlotIndex, goodItemStack, payItemStack, entityplayer))
             return null;
-        
+
         ArrayList<Integer> slotIndexes = new ArrayList<Integer>();
         
         if(!prepareTransferGoods(goodItemStack, inventoryPlayer, slotIndexes))
@@ -198,7 +198,7 @@ public class ContainerStall extends ContainerTFC
         confirmPay(payItemStack, inventoryPlayer);
          
          _stall.confirmTrade();
-         
+
          confirmTransferGoods(goodItemStack, inventoryPlayer, slotIndexes);
 
          entityplayer.worldObj.markBlockForUpdate(_stall.xCoord, _stall.yCoord, _stall.zCoord);
@@ -947,7 +947,7 @@ public class ContainerStall extends ContainerTFC
             confirmPay(payItemStack, inventoryplayer);
             
             _stall.confirmTrade();
-            
+
             //ItemStack newItemStack = goodItemStack.copy();
             ItemStack newItemStack = _stall._goodItemFromWarehouseContainer;
             //this shoult not happen. It for insurance and safety
@@ -991,6 +991,8 @@ public class ContainerStall extends ContainerTFC
         confirmPay(payItemStack, inventoryplayer);
 
         _stall.confirmTrade();
+
+        org.swarg.mcf.event.TradeEvent.fireTradeEvent(player, _stall.getOwnerUserName(), _stall._goodItemFromWarehouseContainer, _stall._payItemFromPlayerInventory);
         
         ItemHelper.increaseStackQuantity(playerItemStack, goodQuantity);
         
@@ -1018,8 +1020,10 @@ public class ContainerStall extends ContainerTFC
         PrepareTradeResult result = 
                 _stall.prepareTrade(goodSlotIndex, goodItemStack, _stall._payItemFromPlayerInventory);
         
-        if(result == PrepareTradeResult.Success)
-            return true;
+        if (result == PrepareTradeResult.Success) {
+            final boolean cancelled = _stall.fireTradeEvent(player);//true - если событие не отменено при запрете на обмен вывод сообщения на обработчике данного события!
+            return !cancelled;//return true;
+        }
         
         if(result == PrepareTradeResult.NoGoods)        
             player.addChatComponentMessage(new ChatComponentTranslation("gui.Stall.Message.NoGoods", new Object[0]));

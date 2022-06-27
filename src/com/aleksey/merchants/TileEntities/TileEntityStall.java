@@ -531,7 +531,7 @@ public class TileEntityStall extends NetworkTileEntity implements ISidedInventor
         
         this.broadcastPacketInRange(this.createDataPacket(nbt));
 
-        this.worldObj.func_147479_m(xCoord, yCoord, zCoord);
+        this.worldObj.func_147479_m(xCoord, yCoord, zCoord);//markBlockForRenderUpdate
     }
     
     private void actionHandlerBuy(NBTTagCompound nbt)
@@ -716,6 +716,21 @@ public class TileEntityStall extends NetworkTileEntity implements ISidedInventor
 
     
 
-    
-    
+    /**
+     * Кинуть в шину форжа событие торгового-обмена
+     * @param buyer игрок пытающийся купить-обменять товар в данной лавке
+     * @return true - обмен заблокирован для данной сделки!
+     */
+    public boolean fireTradeEvent(EntityPlayer buyer) {
+        if (buyer != null && !buyer.worldObj.isRemote) {
+            if (org.swarg.mcf.event.TradeEvent.fireTradeEvent(buyer, getOwnerUserName(), _goodItemFromWarehouseContainer, _payItemFromPlayerInventory)) {
+                //если обмен заблокирован неким специальным условием. Например игрок-покупатель в черном списке или враг нации, Вывод сообения о причине блокировке на коде обрабатывающем данное событие!
+                //?? насколько нужна эта очистка?
+                this._goodItemFromWarehouseContainer = null;
+                this._payItemFromPlayerInventory = null;
+                return true;//cancelled
+            }
+        }
+        return false;
+    }
 }
