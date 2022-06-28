@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -965,7 +966,9 @@ public class ContainerStall extends ContainerTFC
             
             player.onUpdate();
 
-            _stall.actionBuy(inventoryplayer.getItemStack());
+            //_stall.actionBuy(inventoryplayer.getItemStack());
+
+            _stall.updateHeldItem(player);
 
             return;
         }
@@ -1000,7 +1003,9 @@ public class ContainerStall extends ContainerTFC
         
         player.onUpdate();
 
-        _stall.actionBuy(inventoryplayer.getItemStack());
+        //_stall.actionBuy(inventoryplayer.getItemStack());
+        
+        _stall.updateHeldItem(player);
     }
     
     private boolean preparePayAndTrade(int goodSlotIndex, ItemStack goodItemStack, ItemStack payItemStack, EntityPlayer player)

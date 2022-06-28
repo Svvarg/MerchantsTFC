@@ -5,6 +5,7 @@ import com.aleksey.merchants.Extended.ExtendedLogic;
 import java.util.UUID;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -516,12 +517,23 @@ public class TileEntityStall extends NetworkTileEntity implements ISidedInventor
         this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     }    
     
-    //Send action to client
+    /**
+     * Send action to client
+     * Похоже автор этим методом хотел обновлять на клиенте содержимое курсора
+     * помещая туда купленный товар. Но данный метод не работает как надо
+     * из-за getClientPlayer() - Здесь нужно было передавать инстанс конкретного
+     * игрока + Этота пара методов с actionHandlerBuy избыточны. Задачу обновления
+     * предмета в курсоре легко можно решить через стандартный метод
+     * ((EntityPlayerMP)p).updateHeldItem(); // sendPacket(new S2FPacketSetSlot...
+     * @param itemStack
+     * @deprecated
+     */
+    @Deprecated
     public void actionBuy(ItemStack itemStack)
     {
         NBTTagCompound nbt = new NBTTagCompound();
         nbt.setByte("Action", _actionId_Buy);
-        
+        //здесь у автора ошибка! из-за которой у других игроков отображается купленный товар другого игрока!
         nbt.setString("playerID", PlayerManagerTFC.getInstance().getClientPlayer().playerUUID.toString());
         
         NBTTagCompound itemTag = new NBTTagCompound();
@@ -533,7 +545,15 @@ public class TileEntityStall extends NetworkTileEntity implements ISidedInventor
 
         this.worldObj.func_147479_m(xCoord, yCoord, zCoord);//markBlockForRenderUpdate
     }
-    
+
+    /**
+     * Заменено на _stall.updateHeldItem(player);
+     * В оригинале по задумке автора этот хэндл должен обновлять содержимое
+     * курсора игрока после покупки 
+     * @param nbt
+     * @deprecated
+     */
+    @Deprecated
     private void actionHandlerBuy(NBTTagCompound nbt)
     {
     	UUID actionPlayerID = UUID.fromString(nbt.getString("playerID"));
@@ -548,7 +568,7 @@ public class TileEntityStall extends NetworkTileEntity implements ISidedInventor
         this.entityplayer.inventory.setItemStack(itemStack);
     }
     
-    //Send action to client
+    //Send action from client to server?
     public void actionSelectLimit(int goodSlotIndex)
     {
         _activeGoodSlotIndex = goodSlotIndex;
@@ -575,7 +595,7 @@ public class TileEntityStall extends NetworkTileEntity implements ISidedInventor
         player.openGui(MerchantsMod.instance, GuiHandler.GuiOwnerStallLimit, worldObj, xCoord, yCoord, zCoord);        
     }
     
-    //Send action to client
+    //Send action from client to server?
     public void actionSetLimit(int goodSlotIndex, Integer limit)
     {
         NBTTagCompound nbt = new NBTTagCompound();
@@ -678,7 +698,6 @@ public class TileEntityStall extends NetworkTileEntity implements ISidedInventor
     
     //sw
     private void actionHandlerSelectSetPayItem (NBTTagCompound nbt)
-    
     {
         _activeGoodSlotIndex = nbt.getInteger("GoodSlotIndex");
         
@@ -732,5 +751,16 @@ public class TileEntityStall extends NetworkTileEntity implements ISidedInventor
             }
         }
         return false;
+    }
+
+    /**
+     * [ServerSide] отослать пакет обновления предмета в курсоре контейнера
+     * конкретному игроку. (Замена избыточной пары методов actionBuy и actionHandlerBuy)
+     * @param player
+     */
+    public void updateHeldItem(EntityPlayer player) {
+        if (player instanceof EntityPlayerMP && ((EntityPlayerMP)player).playerNetServerHandler != null) {
+            ((EntityPlayerMP) player).updateHeldItem();//sendPacket(new S2FPacketSetSlot(-1, -1, inventoryplayer.getItemStack()));
+        }
     }
 }
