@@ -58,7 +58,7 @@ public class TradeEvent extends Event {
     }
 
     public static boolean fireTradeEvent(EntityPlayer buyer, String seller, ItemStack good, ItemStack pay, ItemStack pay2, boolean isNpc) {
-        if (buyer != null && pay != null && good != null) {
+        if (buyer != null && !buyer.worldObj.isRemote && pay != null && good != null) {
             TradeEvent event = new TradeEvent(buyer, seller, good, pay, pay2, isNpc);
             final boolean cancelled = net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
             return cancelled;

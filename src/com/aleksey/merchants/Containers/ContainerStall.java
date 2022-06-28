@@ -995,8 +995,6 @@ public class ContainerStall extends ContainerTFC
 
         _stall.confirmTrade();
 
-        org.swarg.mcf.event.TradeEvent.fireTradeEvent(player, _stall.getOwnerUserName(), _stall._goodItemFromWarehouseContainer, _stall._payItemFromPlayerInventory);
-        
         ItemHelper.increaseStackQuantity(playerItemStack, goodQuantity);
         
         player.worldObj.markBlockForUpdate(_stall.xCoord, _stall.yCoord, _stall.zCoord);
