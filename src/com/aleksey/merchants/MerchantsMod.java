@@ -26,7 +26,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid="MerchantsTFC", name="Merchants", version="1.1.8", dependencies="after:TerraFirmaCraft")
+@Mod(modid="MerchantsTFC", name="Merchants", version="1.2.0", dependencies="after:TerraFirmaCraft")
 public class MerchantsMod
 {
     @Instance("MerchantsTFC")
@@ -49,6 +49,7 @@ public class MerchantsMod
         ItemList.Setup();
 
         MerchantsTabs.MainTab.setTabIconItemStack(new ItemStack(BlockList.Stalls[0]));
+        MerchantsTabs.MainTab.setTabIconItemStack(new ItemStack(BlockList.BigStalls[0]));
 
         proxy.registerGuiHandler();
     }

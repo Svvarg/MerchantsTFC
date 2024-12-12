@@ -7,6 +7,8 @@ import com.aleksey.merchants.TileEntities.TileEntityStall;
 import com.aleksey.merchants.TileEntities.TileEntityStorageRack;
 import com.aleksey.merchants.TileEntities.TileEntityWarehouse;
 
+import org.swarg.merchants.tileentities.TileEntityBigStall;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -32,6 +34,7 @@ public class CommonProxy
     protected void registerServerTileEntities()
     {
         GameRegistry.registerTileEntity(TileEntityStall.class, "TileEntityStall");
+        GameRegistry.registerTileEntity(TileEntityBigStall.class, "TileEntityBigStall");
         GameRegistry.registerTileEntity(TileEntityStorageRack.class, "TileEntityStorageRack");
     }
 

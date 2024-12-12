@@ -19,13 +19,23 @@ import com.aleksey.merchants.GUI.GuiStorageRack;
 import com.aleksey.merchants.GUI.GuiTrussel;
 import com.aleksey.merchants.GUI.GuiTrusselCreate;
 import com.aleksey.merchants.GUI.GuiWarehouse;
-import static com.aleksey.merchants.Handlers.GuiHandler.GuiStallSetPayItem;
 import com.aleksey.merchants.TileEntities.TileEntityAnvilDie;
 import com.aleksey.merchants.TileEntities.TileEntityStall;
 import com.aleksey.merchants.TileEntities.TileEntityStorageRack;
 import com.aleksey.merchants.TileEntities.TileEntityWarehouse;
 
+import org.swarg.merchants.gui.GuiBigStall;
+import org.swarg.merchants.gui.GuiBigStallLimit;
+import org.swarg.merchants.gui.GuiBigStallSetPayItem;
+import org.swarg.merchants.tileentities.TileEntityBigStall;
+import org.swarg.merchants.containers.ContainerBigStall;
+import org.swarg.merchants.containers.ContainerBigStallLimit;
+import org.swarg.merchants.containers.ContainerBigStallSetPayItem;
+
 import cpw.mods.fml.common.network.IGuiHandler;
+
+import static com.aleksey.merchants.Handlers.GuiHandler.GuiStallSetPayItem;
+
 
 public class GuiHandler implements IGuiHandler
 {
@@ -38,6 +48,11 @@ public class GuiHandler implements IGuiHandler
     public static final int GuiAnvilDie = 6;
     public static final int GuiStorageRack = 7;
     public static final int GuiStallSetPayItem = 8;
+
+    public static final int GuiOwnerBigStall = 10;
+    public static final int GuiBuyerBigStall = 11;
+    public static final int GuiOwnerBigStallLimit = 12;
+    public static final int GuiBigStallSetPayItem = 13;
 
 
     @Override
@@ -67,6 +82,16 @@ public class GuiHandler implements IGuiHandler
             case GuiStallSetPayItem:
                 return new ContainerStallSetPayItem(player.inventory, (TileEntityStall)te, world, x, y, z);
 
+            // Big Stall
+            case GuiOwnerBigStall:
+                return new ContainerBigStall(player.inventory, (TileEntityBigStall)te, true, world, x, y, z);
+            case GuiBuyerBigStall:
+                return new ContainerBigStall(player.inventory, (TileEntityBigStall)te, false, world, x, y, z);
+            case GuiOwnerBigStallLimit:
+                return new ContainerBigStallLimit(player.inventory, (TileEntityBigStall)te, world, x, y, z);
+            case GuiBigStallSetPayItem:
+                return new ContainerBigStallSetPayItem(player.inventory, (TileEntityBigStall)te, world, x, y, z);
+
             default:
                 return null;
         }
@@ -92,6 +117,7 @@ public class GuiHandler implements IGuiHandler
                 return new GuiStall(player.inventory, (TileEntityStall)te, true, world, x, y, z);
             case GuiBuyerStall:
                 return new GuiStall(player.inventory, (TileEntityStall)te, false, world, x, y, z);
+
             case GuiOwnerStallLimit:
                 return new GuiStallLimit(player.inventory, (TileEntityStall)te, world, x, y, z);
             case GuiWarehouse:
@@ -107,6 +133,16 @@ public class GuiHandler implements IGuiHandler
 
             case GuiStallSetPayItem:
                 return new GuiStallSetPayItem(player.inventory, (TileEntityStall)te, world, x, y, z);
+
+            // Big Stall
+            case GuiOwnerBigStall:
+                return new GuiBigStall(player.inventory, (TileEntityBigStall)te, true, world, x, y, z);
+            case GuiBuyerBigStall:
+                return new GuiBigStall(player.inventory, (TileEntityBigStall)te, false, world, x, y, z);
+            case GuiOwnerBigStallLimit:
+                return new GuiBigStallLimit(player.inventory, (TileEntityBigStall)te, world, x, y, z);
+            case GuiBigStallSetPayItem:
+                return new GuiBigStallSetPayItem(player.inventory, (TileEntityBigStall)te, world, x, y, z);
 
             default:
                 return null;

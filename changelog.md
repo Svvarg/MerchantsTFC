@@ -1,3 +1,6 @@
+## 1.2.0
+- start working for Big Stall
+
 ## 1.1.8
 - added support for `org.swarg.mcf.event.TradeEvent` -
   be able to keep statistics on players trading through stalls

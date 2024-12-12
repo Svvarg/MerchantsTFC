@@ -28,6 +28,7 @@ public class Recipes
     {
         registerWarehouseRecipes();
         registerStallRecipes();
+        registerBigStallRecipes();
         registerStorageRackRecipes();
     }
 
@@ -57,7 +58,26 @@ public class Recipes
             ItemStack stall = new ItemStack(BlockList.Stalls[i], 1);
             ItemStack lumber = new ItemStack(TFCItems.singlePlank, 1, i);
 
-            GameRegistry.addRecipe(new ShapedOreRecipe(stall, new Object[] { "pcp", "pbp", "ppp", Character.valueOf('p'), lumber, Character.valueOf('c'), "materialCloth", Character.valueOf('b'), Items.writable_book }));
+            GameRegistry.addRecipe(new ShapedOreRecipe(stall, new Object[] {
+                "pcp", "pbp", "ppp",
+                Character.valueOf('p'), lumber,
+                Character.valueOf('c'), "materialCloth",
+                Character.valueOf('b'), Items.writable_book }));
+        }
+    }
+
+    private static void registerBigStallRecipes()
+    {
+        for(int i = 0; i < BlockList.BigStalls.length; i++)
+        {
+            ItemStack stall = new ItemStack(BlockList.Stalls[i], 1);
+            ItemStack bigStall = new ItemStack(BlockList.BigStalls[i], 1);
+
+            GameRegistry.addRecipe(new ShapedOreRecipe(bigStall, new Object[] {
+                "   ", "scs", "sss",
+                Character.valueOf('c'), "materialCloth", // todo replace with gold x2 ingot
+                Character.valueOf('s'), stall
+            }));
         }
     }
 

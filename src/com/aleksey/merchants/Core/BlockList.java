@@ -10,6 +10,10 @@ import com.aleksey.merchants.Blocks.Devices.BlockWarehouse;
 import com.aleksey.merchants.ItemBlocks.ItemStall;
 import com.aleksey.merchants.ItemBlocks.ItemStorageRack;
 import com.aleksey.merchants.ItemBlocks.ItemWarehouse;
+
+import org.swarg.merchants.blocks.devices.BlockBigStall;
+import org.swarg.merchants.itemblocks.ItemBigStall;
+
 import com.bioxx.tfc.api.Constant.Global;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -17,11 +21,13 @@ import cpw.mods.fml.common.registry.GameRegistry;
 public class BlockList
 {
     public static int StallRenderId;
+    public static int BigStallRenderId;
     public static int WarehouseRenderId;
     public static int AnvilDieRenderId;
     public static int StorageRackRenderId;
 
     public static Block[] Stalls;
+    public static Block[] BigStalls;
     public static Block Warehouse;
     public static Block Warehouse2;
     public static Block StorageRack;
@@ -30,8 +36,10 @@ public class BlockList
 
     public static void registerBlocks()
     {
-        for(int i = 0; i < Global.WOOD_ALL.length; i++)
+        for(int i = 0; i < Global.WOOD_ALL.length; i++) {
             GameRegistry.registerBlock(Stalls[i], ItemStall.class, Stalls[i].getUnlocalizedName().substring(5));
+            GameRegistry.registerBlock(BigStalls[i], ItemBigStall.class, BigStalls[i].getUnlocalizedName().substring(5));
+        }
 
         GameRegistry.registerBlock(Warehouse, ItemWarehouse.class, Warehouse.getUnlocalizedName().substring(5));
         GameRegistry.registerBlock(Warehouse2, ItemWarehouse.class, Warehouse2.getUnlocalizedName().substring(5));
@@ -45,15 +53,20 @@ public class BlockList
     public static void loadBlocks()
     {
         Stalls = new Block[Global.WOOD_ALL.length];
+        BigStalls = new Block[Global.WOOD_ALL.length];
 
         for(int i = 0; i < Global.WOOD_ALL.length; i++)
         {
             String name = "Stall";
+            String name2 = "BigStall";
 
-            if(i > 0)
+            if(i > 0) {
                 name += "." + Global.WOOD_ALL[i];
+                name2 += "." + Global.WOOD_ALL[i];
+            }
 
             Stalls[i] = new BlockStall(i).setBlockName(name).setHardness(2);
+            BigStalls[i] = new BlockBigStall(i).setBlockName(name2).setHardness(2);
         }
 
         Warehouse = new BlockWarehouse(0).setBlockName("Warehouse").setHardness(2);

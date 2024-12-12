@@ -37,6 +37,24 @@ tile.Stall.Willow.name=Willow Stall
 tile.Stall.Kapok.name=Kapok Stall
 tile.Stall.Acacia.name=Acacia Stall
 
+tile.BigStall.name=Oak Big Stall
+tile.BigStall.Aspen.name=Aspen Big Stall
+tile.BigStall.Birch.name=Birch Big Stall
+tile.BigStall.Chestnut.name=Chestnut Big Stall
+tile.BigStall.Douglas Fir.name=Douglas Fir Big Stall
+tile.BigStall.Hickory.name=Hickory Big Stall
+tile.BigStall.Maple.name=Maple Big Stall
+tile.BigStall.Ash.name=Ash Big Stall
+tile.BigStall.Pine.name=Pine Big Stall
+tile.BigStall.Sequoia.name=Sequoia Big Stall
+tile.BigStall.Spruce.name=Spruce Big Stall
+tile.BigStall.Sycamore.name=Sycamore Big Stall
+tile.BigStall.White Cedar.name=White Cedar Big Stall
+tile.BigStall.White Elm.name=White Elm Big Stall
+tile.BigStall.Willow.name=Willow Big Stall
+tile.BigStall.Kapok.name=Kapok Big Stall
+tile.BigStall.Acacia.name=Acacia Big Stall
+
 tile.Warehouse.name=Oak Warehouse
 tile.Warehouse.Aspen.name=Aspen Warehouse
 tile.Warehouse.Birch.name=Birch Warehouse
@@ -183,6 +201,8 @@ item.AnvilDie.Steel.name=Steel Anvil Die
 item.AnvilDie.BlackSteel.name=Black Steel Anvil Die
 item.AnvilDie.BlueSteel.name=Blue Steel Anvil Die
 item.AnvilDie.RedSteel.name=Red Steel Anvil Die
+
+gui.BigStall.Title=Big Stall
 
 gui.Stall.Prices=Prices
 gui.Stall.Goods=Goods

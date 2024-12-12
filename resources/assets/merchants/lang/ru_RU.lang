@@ -19,6 +19,7 @@ metal.WroughtIron=Кованное Железо
 metal.Nickel=Никель
 metal.Steel=Сталь
 metal.BlackSteel=Чёрная Сталь
+
 tile.Stall.name=Лавка из Дуба
 tile.Stall.Aspen.name=Лавка из Осины
 tile.Stall.Birch.name=Лавка из Берёзы
@@ -36,6 +37,24 @@ tile.Stall.White Elm.name=Лавка из Белого Вяза
 tile.Stall.Willow.name=Лавка из Ивы
 tile.Stall.Kapok.name=Лавка из Сейбы
 tile.Stall.Acacia.name=Лавка из Акации
+
+tile.BigStall.name=Экстра Лавка из Дуба
+tile.BigStall.Aspen.name=Экстра Лавка из Осины
+tile.BigStall.Birch.name=Экстра Лавка из Берёзы
+tile.BigStall.Chestnut.name=Экстра Лавка из Каштана
+tile.BigStall.Douglas Fir.name=Экстра Лавка из Пихты
+tile.BigStall.Hickory.name=Экстра Лавка из Ореха
+tile.BigStall.Maple.name=Экстра Лавка из Клёна
+tile.BigStall.Ash.name=Экстра Лавка из Ясеня
+tile.BigStall.Pine.name=Экстра Лавка из Сосны
+tile.BigStall.Sequoia.name=Экстра Лавка из Секвойи
+tile.BigStall.Spruce.name=Экстра Лавка из Ели
+tile.BigStall.Sycamore.name=Экстра Лавка из Платана
+tile.BigStall.White Cedar.name=Экстра Лавка из Белого Кедра
+tile.BigStall.White Elm.name=Экстра Лавка из Белого Вяза
+tile.BigStall.Willow.name=Экстра Лавка из Ивы
+tile.BigStall.Kapok.name=Экстра Лавка из Сейбы
+tile.BigStall.Acacia.name=Экстра Лавка из Акации
 
 tile.Warehouse.name=Склад из Дуба
 tile.Warehouse.Aspen.name=Склад из Осины
@@ -184,6 +203,8 @@ item.AnvilDie.BlackSteel.name=Основание из Чёрной Стали
 item.AnvilDie.BlueSteel.name=Основание из Синей Стали
 item.AnvilDie.RedSteel.name=Основание из Красной Стали
 
+gui.BigStall.Title=Большая Лавка
+
 gui.Stall.Prices=Цена
 gui.Stall.Goods=Товар
 gui.Stall.Clear=Очистить
@@ -223,7 +244,7 @@ gui.StallSetPay.Tooltip.BarrelFluidID=ID жидкости
 gui.StallSetPay.Tooltip.BarrelAmount=Кол-во жидкости (литры)
 gui.StallSetPay.Tooltip.ACrateAnimID=ID животного
 gui.StallSetPay.Tooltip.ACrateFamAndSex=Приручение*100 Возвраст*10 Пол
-gui.StallSetPay.Tooltip.ACrateJumpAndSpeed=Высота Прыжка*1000 Скорость м/с 
+gui.StallSetPay.Tooltip.ACrateJumpAndSpeed=Высота Прыжка*1000 Скорость м/с
 gui.StallSetPay.Tooltip.ACrateVariant=Внешний вид
 gui.StallSetPay.Tooltip.Age=Возвраст
 gui.StallSetPay.Tooltip.AUknown=Неизвестно

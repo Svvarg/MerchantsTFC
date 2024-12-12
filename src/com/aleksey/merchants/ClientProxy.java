@@ -14,6 +14,10 @@ import com.aleksey.merchants.TESR.TESRStorageRack;
 import com.aleksey.merchants.TileEntities.TileEntityStall;
 import com.aleksey.merchants.TileEntities.TileEntityStorageRack;
 
+import org.swarg.merchants.tesr.TESRBigStall;
+import org.swarg.merchants.render.blocks.RenderBigStall;
+import org.swarg.merchants.tileentities.TileEntityBigStall;
+
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.Loader;
@@ -30,6 +34,7 @@ public class ClientProxy extends CommonProxy
     public void registerRenderInformation()
     {
         RenderingRegistry.registerBlockHandler(BlockList.StallRenderId = RenderingRegistry.getNextAvailableRenderId(), new RenderStall());
+        RenderingRegistry.registerBlockHandler(BlockList.BigStallRenderId = RenderingRegistry.getNextAvailableRenderId(), new RenderBigStall());
         RenderingRegistry.registerBlockHandler(BlockList.WarehouseRenderId = RenderingRegistry.getNextAvailableRenderId(), new RenderWarehouse());
         RenderingRegistry.registerBlockHandler(BlockList.AnvilDieRenderId = RenderingRegistry.getNextAvailableRenderId(), new RenderAnvilDie());
         RenderingRegistry.registerBlockHandler(BlockList.StorageRackRenderId = RenderingRegistry.getNextAvailableRenderId(), new RenderStorageRack());
@@ -41,6 +46,7 @@ public class ClientProxy extends CommonProxy
         registerCommonTileEntities();
 
         ClientRegistry.registerTileEntity(TileEntityStall.class, "TileEntityStall", new TESRStall());
+        ClientRegistry.registerTileEntity(TileEntityBigStall.class, "TileEntityBigStall", new TESRBigStall());
         ClientRegistry.registerTileEntity(TileEntityStorageRack.class, "TileEntityStorageRack", new TESRStorageRack());
     }
 
