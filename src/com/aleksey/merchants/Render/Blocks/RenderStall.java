@@ -16,7 +16,7 @@ import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 public class RenderStall implements ISimpleBlockRenderingHandler
 {
     public static final double VoxelSizeScaled = 0.0625;// 1/16
-    
+
     private static final Bound[] _caseBounds = new Bound[] {
         new Bound(0, 0, 0, 1, VoxelSizeScaled, 1),//bottom
         new Bound(0, VoxelSizeScaled, VoxelSizeScaled, VoxelSizeScaled, 10 * VoxelSizeScaled, 1 - VoxelSizeScaled),//left
@@ -24,65 +24,65 @@ public class RenderStall implements ISimpleBlockRenderingHandler
         new Bound(1 - VoxelSizeScaled, VoxelSizeScaled, VoxelSizeScaled, 1, 10 * VoxelSizeScaled, 1 - VoxelSizeScaled),//right
         new Bound(0, VoxelSizeScaled, 1 - VoxelSizeScaled, 1, 10 * VoxelSizeScaled, 1),//forward
     };
-    
+
     private static final Bound _topBound = new Bound(VoxelSizeScaled, 6 * VoxelSizeScaled, VoxelSizeScaled, 1 - VoxelSizeScaled, 7 * VoxelSizeScaled, 1 - VoxelSizeScaled);
-    
+
     @Override
     public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer)
     {
         renderer.overrideBlockTexture = getWoodTexture(block);
-        
+
         for(int i = 0; i < _caseBounds.length; i++)
         {
             setBound(_caseBounds[i], renderer);
-            
+
             renderInvBlock(block, metadata, renderer);
         }
-        
+
         renderer.clearOverrideBlockTexture();
-        
+
         setBound(_topBound, renderer);
-        
+
         renderInvBlock(block, 0, renderer);
     }
-    
+
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer)
     {
         renderer.overrideBlockTexture = getWoodTexture(block);
-        
+
         for(int i = 0; i < _caseBounds.length; i++)
         {
             setBound(_caseBounds[i], renderer);
-            
+
             renderer.renderStandardBlock(block, x, y, z);
         }
-        
+
         renderer.clearOverrideBlockTexture();
 
         setBound(_topBound, renderer);
-        
+
         renderer.renderStandardBlock(block, x, y, z);
 
         return true;
     }
-    
+
     @Override
     public boolean shouldRender3DInInventory(int modelId)
     {
         return true;
     }
-    
+
     @Override
     public int getRenderId()
     {
         return 0;
     }
-    
+
     private static void renderInvBlock(Block block, int m, RenderBlocks renderer)
     {
         Tessellator var14 = Tessellator.instance;
-        
+
         GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
         var14.startDrawingQuads();
         var14.setNormal(0.0F, -1.0F, 0.0F);
@@ -110,17 +110,17 @@ public class RenderStall implements ISimpleBlockRenderingHandler
         var14.draw();
         GL11.glTranslatef(0.5F, 0.5F, 0.5F);
     }
-    
+
     private static void setBound(Bound bound, RenderBlocks renderer)
     {
         renderer.setRenderBounds(bound.MinX, bound.MinY, bound.MinZ, bound.MaxX, bound.MaxY, bound.MaxZ);
     }
-    
+
     private static IIcon getWoodTexture(Block block)
     {
         BlockStall stall = (BlockStall)block;
         int woodIndex = stall.getWoodIndex();
-        
+
         return woodIndex < 16
                 ? TFCBlocks.planks.getIcon(0, woodIndex)
                 : TFCBlocks.planks2.getIcon(0, woodIndex - 16);

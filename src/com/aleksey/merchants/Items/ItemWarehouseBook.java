@@ -20,17 +20,17 @@ public class ItemWarehouseBook extends ItemTerra
     public ItemWarehouseBook()
     {
         super();
-        
+
         setMaxDamage(0);
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister registerer)
     {
         this.itemIcon = registerer.registerIcon("merchants:WarehouseBook");
     }
-    
+
     @Override
     public EnumSize getSize(ItemStack is)
     {
@@ -42,20 +42,20 @@ public class ItemWarehouseBook extends ItemTerra
     {
         return EnumWeight.LIGHT;
     }
-    
+
     @Override
     public boolean canStack()
     {
       return false;
     }
-    
+
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List arraylist, boolean flag)
     {
         super.addInformation(is, player, arraylist, flag);
-        
+
         WarehouseBookInfo info = WarehouseBookInfo.readFromNBT(is.getTagCompound());
-        
+
         if(info != null)
         {
             arraylist.add(EnumChatFormatting.GOLD + "X: " + String.valueOf(info.X));

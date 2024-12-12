@@ -17,7 +17,7 @@ public class ItemList
     public static Item Coin;
     public static Item Trussel;
     public static Item AnvilDie;
-    
+
     public static void Setup()
     {
         WarehouseBook = new ItemWarehouseBook().setUnlocalizedName("WarehouseBook");

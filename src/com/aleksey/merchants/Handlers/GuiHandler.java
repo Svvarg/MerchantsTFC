@@ -38,10 +38,10 @@ public class GuiHandler implements IGuiHandler
     public static final int GuiAnvilDie = 6;
     public static final int GuiStorageRack = 7;
     public static final int GuiStallSetPayItem = 8;
-    
-    
+
+
     @Override
-    public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) 
+    public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
     {
         TileEntity te = world.getTileEntity(x, y, z);
 
@@ -63,10 +63,10 @@ public class GuiHandler implements IGuiHandler
                 return new ContainerAnvilDie(player.inventory, (TileEntityAnvilDie)te, world, x, y, z);
             case GuiStorageRack:
                 return new ContainerStorageRack(player.inventory, (TileEntityStorageRack)te, world, x, y, z);
-                
+
             case GuiStallSetPayItem:
                 return new ContainerStallSetPayItem(player.inventory, (TileEntityStall)te, world, x, y, z);
-                                
+
             default:
                 return null;
         }
@@ -76,7 +76,7 @@ public class GuiHandler implements IGuiHandler
     public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
     {
         TileEntity te;
-        
+
         try
         {
             te = world.getTileEntity(x, y, z);
@@ -104,10 +104,10 @@ public class GuiHandler implements IGuiHandler
                 return new GuiAnvilDie(player.inventory, (TileEntityAnvilDie)te, world, x, y, z);
             case GuiStorageRack:
                 return new GuiStorageRack(player.inventory, (TileEntityStorageRack)te, world, x, y, z);
-                
+
             case GuiStallSetPayItem:
                 return new GuiStallSetPayItem(player.inventory, (TileEntityStall)te, world, x, y, z);
-                
+
             default:
                 return null;
         }

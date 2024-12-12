@@ -34,43 +34,43 @@ public class MerchantsMod
 
     @SidedProxy(clientSide = "com.aleksey.merchants.ClientProxy", serverSide = "com.aleksey.merchants.CommonProxy")
     public static CommonProxy proxy;
-    
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         //LanternConfig.loadConfig(event);
-        
+
         BlockList.loadBlocks();
         BlockList.registerBlocks();
 
         proxy.registerTickHandler();
         proxy.registerTileEntities();
-                
+
         ItemList.Setup();
-        
+
         MerchantsTabs.MainTab.setTabIconItemStack(new ItemStack(BlockList.Stalls[0]));
-        
+
         proxy.registerGuiHandler();
     }
-  
+
     @EventHandler
     public void initialize(FMLInitializationEvent event)
     {
         TerraFirmaCraft.PACKET_PIPELINE.registerPacket(InitClientWorldPacket.class);
         TerraFirmaCraft.PACKET_PIPELINE.registerPacket(DieCopyPacket.class);
-        
+
         FMLCommonHandler.instance().bus().register(new PlayerTracker());
-        
+
         // Register the Chunk Load/Save Handler
         MinecraftForge.EVENT_BUS.register(new ChunkEventHandler());
-        
+
         proxy.registerRenderInformation();
-        
+
         OreDictionary.registerOre("materialCloth", new ItemStack(TFCItems.burlapCloth));
         Recipes.registerRecipes();
-        
+
         WarehouseManager.init();
-        
+
 		//WAILA stuff
 		proxy.registerWailaClasses();
 		proxy.hideNEIItems();

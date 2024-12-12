@@ -23,7 +23,7 @@ public class IngotPileContainer extends Container
     {
         return tileEntity.getClass() == TEIngotPile.class;
     }
-    
+
     @Override
     public int searchFreeSpace(
             World world,
@@ -36,42 +36,42 @@ public class IngotPileContainer extends Container
     {
         if(!isItemValid(tileEntity, itemStack))
             return 0;
-        
+
         int quantity = requiredQuantity;
-        
+
         IInventory inventory = (IInventory)tileEntity;
         ItemStack invItemStack = inventory.getStackInSlot(0);
-        
+
         if(invItemStack != null && !ItemHelper.areItemEquals(itemStack, invItemStack))
             return 0;
-        
+
         ItemTileEntity itemTileEntity = resultList.size() > 0 ? resultList.get(resultList.size() - 1): null;
-        
+
         if(itemTileEntity != null && itemTileEntity.TileEntity != tileEntity)
             itemTileEntity = null;
-        
+
         int maxStackQuantity = ItemHelper.getItemStackMaxQuantity(itemStack, inventory);
         int invQuantity = invItemStack != null ? ItemHelper.getItemStackQuantity(invItemStack): 0;
-        
+
         int addQuantity = quantity + invQuantity <= maxStackQuantity
                     || tileEntity.yCoord < maxY
                         && world.isAirBlock(tileEntity.xCoord, tileEntity.yCoord + 1, tileEntity.zCoord)
                 ? quantity
                 : maxStackQuantity - invQuantity;
-        
+
         if(addQuantity > 0)
         {
             if(itemTileEntity == null)
                 resultList.add(itemTileEntity = new ItemTileEntity(this, tileEntity));
-            
+
             itemTileEntity.Items.add(new ItemSlot(0, addQuantity));
-            
+
             quantity -= addQuantity;
         }
-        
+
         return requiredQuantity - quantity;
     }
-    
+
     @Override
     public void confirmTradeGoods(
             World world,
@@ -81,15 +81,15 @@ public class IngotPileContainer extends Container
     {
         TEIngotPile ingotPile = (TEIngotPile)goodTileEntity.TileEntity;
         IInventory inventory = (IInventory)ingotPile;
-        int quantity = ItemHelper.getItemStackQuantity(goodItemStack);        
-        
+        int quantity = ItemHelper.getItemStackQuantity(goodItemStack);
+
         //ItemStack stackOnPile = inventory.getStackInSlot(0);
         //int quantityOnPile = stackOnPile==null ? 0 : stackOnPile.stackSize;
-                
-        if (inventory.getStackInSlot(0).stackSize < quantity)        
+
+        if (inventory.getStackInSlot(0).stackSize < quantity)
         //if ( quantityOnPile < quantity)
             return;
-        
+
         ingotPile.injectContents(0, -quantity);
 
         world.notifyBlockOfNeighborChange(ingotPile.xCoord, ingotPile.yCoord + 1, ingotPile.zCoord, TFCBlocks.ingotPile);
@@ -97,7 +97,7 @@ public class IngotPileContainer extends Container
         if (inventory.getStackInSlot(0).stackSize < 1)
             world.setBlockToAir(ingotPile.xCoord, ingotPile.yCoord, ingotPile.zCoord);
     }
-    
+
     @Override
     public void confirmTradePays(
             World world,
@@ -110,56 +110,56 @@ public class IngotPileContainer extends Container
         IInventory inventory = (IInventory)ingotPile;
         ItemStack ingotPileStack = inventory.getStackInSlot(0);
         int totalQuantity = payTileEntity.Items.get(0).Quantity;
-        
+
         int currentQuantity = ingotPileStack.stackSize + totalQuantity > inventory.getInventoryStackLimit()
             ? inventory.getInventoryStackLimit() - ingotPileStack.stackSize
             : totalQuantity;
-            
+
         if(currentQuantity > 0)
         {
             ingotPile.injectContents(0, currentQuantity);
             ingotPile.validate();
-    
+
             world.addBlockEvent(ingotPile.xCoord, ingotPile.yCoord, ingotPile.zCoord, TFCBlocks.ingotPile, 0, 0);
-            
+
             totalQuantity -= currentQuantity;
         }
-        
+
         if (totalQuantity > 0)
         {
             world.setBlock(ingotPile.xCoord, ingotPile.yCoord + 1, ingotPile.zCoord, TFCBlocks.ingotPile, 0, 0x2);
-            
+
             Item item = payItemStack.getItem();
-            
+
             ingotPile = (TEIngotPile)world.getTileEntity(ingotPile.xCoord, ingotPile.yCoord + 1, ingotPile.zCoord);
-            
+
             ((IInventory)ingotPile).setInventorySlotContents(0, new ItemStack(item, totalQuantity, 0));
-            
+
             ingotPile.setType(MetalRegistry.instance.getMetalFromItem(item).name);
-            
+
             world.markBlockForUpdate(ingotPile.xCoord, ingotPile.yCoord, ingotPile.zCoord);
-            
+
             newContainers.add(new Point(ingotPile.xCoord, ingotPile.yCoord, ingotPile.zCoord));
         }
     }
-    
+
     //Helper methods
-    
+
     private static boolean isItemValid(TileEntity tileEntity, ItemStack itemStack)
     {
         Class<?> cls = tileEntity.getClass();
-        
+
         if(cls != TEIngotPile.class)
             return false;
-        
+
         Item item = itemStack.getItem();
-        
+
         for(int i = 0; i < TEIngotPile.INGOTS.length; i++)
         {
             if(item == TEIngotPile.INGOTS[i])
                 return true;
         }
-        
+
         return false;
     }
 }

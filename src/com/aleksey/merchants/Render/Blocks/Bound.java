@@ -11,7 +11,7 @@ public class Bound
     public int ShiftX;
     public int ShiftY;
     public int ShiftZ;
-    
+
     public Bound(double minX, double minY, double minZ, double maxX, double maxY, double maxZ)
     {
         MinX = minX;
@@ -37,7 +37,7 @@ public class Bound
         ShiftY = shiftY;
         ShiftZ = shiftZ;
     }
-    
+
     public Bound copy()
     {
         return new Bound(MinX, MinY, MinZ, MaxX, MaxY, MaxZ, ShiftX, ShiftY, ShiftZ);

@@ -8,7 +8,7 @@ public class CoinInfo
     public int DieColor;
     public String MetalName;
     public int Level;
-    
+
     public CoinInfo(String coinName, int dieColor, String metalName, int level)
     {
         CoinName = coinName;

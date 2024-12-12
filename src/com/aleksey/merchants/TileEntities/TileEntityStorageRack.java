@@ -17,12 +17,12 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class TileEntityStorageRack extends NetworkTileEntity implements IInventory
 {
     private ItemStack[] _storage;
-    
+
     public TileEntityStorageRack()
     {
         _storage = new ItemStack[1];
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox()
@@ -47,12 +47,12 @@ public class TileEntityStorageRack extends NetworkTileEntity implements IInvento
                 _storage[i] = null;
                 return is;
             }
-            
+
             ItemStack isSplit = _storage[i].splitStack(j);
-            
+
             if (_storage[i].stackSize == 0)
                 _storage[i] = null;
-            
+
             return isSplit;
         }
         else
@@ -131,10 +131,10 @@ public class TileEntityStorageRack extends NetworkTileEntity implements IInvento
         for (int i = 0; i < _storage.length; i++)
         {
             ItemStack itemStack = _storage[i];
-            
+
             if(itemStack == null)
                 itemStack = new ItemStack(ItemList.Flan, 0, 0);//Workaround for synchronization bug
-            
+
             if (itemStack != null)
             {
                 NBTTagCompound itemTag = new NBTTagCompound();
@@ -148,7 +148,7 @@ public class TileEntityStorageRack extends NetworkTileEntity implements IInvento
 
         nbt.setTag("Items", itemList);
     }
-    
+
     @Override
     public void readFromNBT(NBTTagCompound nbt)
     {
@@ -164,10 +164,10 @@ public class TileEntityStorageRack extends NetworkTileEntity implements IInvento
             if (byte0 >= 0 && byte0 < _storage.length)
             {
                 ItemStack itemStack = ItemStack.loadItemStackFromNBT(itemTag);
-                
+
                 if(itemStack.stackSize == 0)
                     itemStack = null;
-                
+
                 setInventorySlotContents(byte0, itemStack);
             }
         }

@@ -19,17 +19,17 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class TileEntityWarehouse extends NetworkTileEntity implements IInventory
 {
     private static final Random _rnd = new Random();
-    
+
     private static final byte _actionId_Sign = 0;
-    
+
     private ItemStack[] _storage;
     private int _key;
-    
+
     public void initKey()
     {
         _key = _rnd.nextInt();
     }
-    
+
     public int getKey()
     {
         return _key;
@@ -39,7 +39,7 @@ public class TileEntityWarehouse extends NetworkTileEntity implements IInventory
     {
         _storage = new ItemStack[1];
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox()
@@ -64,12 +64,12 @@ public class TileEntityWarehouse extends NetworkTileEntity implements IInventory
                 _storage[i] = null;
                 return is;
             }
-            
+
             ItemStack isSplit = _storage[i].splitStack(j);
-            
+
             if (_storage[i].stackSize == 0)
                 _storage[i] = null;
-            
+
             return isSplit;
         }
         else
@@ -144,7 +144,7 @@ public class TileEntityWarehouse extends NetworkTileEntity implements IInventory
     public void writeToNBT(NBTTagCompound nbt)
     {
         super.writeToNBT(nbt);
-        
+
         nbt.setInteger("WarehouseKey", _key);
 
         NBTTagList itemList = new NBTTagList();
@@ -169,7 +169,7 @@ public class TileEntityWarehouse extends NetworkTileEntity implements IInventory
     public void readFromNBT(NBTTagCompound nbt)
     {
         super.readFromNBT(nbt);
-        
+
         _key = nbt.getInteger("WarehouseKey");
 
         NBTTagList itemList = nbt.getTagList("Items", 10);
@@ -188,7 +188,7 @@ public class TileEntityWarehouse extends NetworkTileEntity implements IInventory
     public void handleInitPacket(NBTTagCompound nbt)
     {
         _key = nbt.hasKey("WarehouseKey") ? nbt.getInteger("WarehouseKey"): 0;
-        
+
         this.worldObj.func_147479_m(xCoord, yCoord, zCoord);
     }
 
@@ -233,19 +233,19 @@ public class TileEntityWarehouse extends NetworkTileEntity implements IInventory
     {
         if(_storage[0] == null)
             return;
-        
+
         WarehouseBookInfo info = new WarehouseBookInfo();
         info.X = this.xCoord;
         info.Y = this.yCoord;
         info.Z = this.zCoord;
         info.Key = _key;
-        
+
         NBTTagCompound nbt = new NBTTagCompound();
         info.writeToNBT(nbt);
 
         ItemStack warehouseBook = new ItemStack(ItemList.WarehouseBook, 1, 0);
         warehouseBook.setTagCompound(nbt);
-        
+
         _storage[0] = warehouseBook;
 
         this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);

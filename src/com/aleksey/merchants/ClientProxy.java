@@ -34,26 +34,26 @@ public class ClientProxy extends CommonProxy
         RenderingRegistry.registerBlockHandler(BlockList.AnvilDieRenderId = RenderingRegistry.getNextAvailableRenderId(), new RenderAnvilDie());
         RenderingRegistry.registerBlockHandler(BlockList.StorageRackRenderId = RenderingRegistry.getNextAvailableRenderId(), new RenderStorageRack());
     }
-    
+
     @Override
     public void registerTileEntities()
     {
         registerCommonTileEntities();
-        
+
         ClientRegistry.registerTileEntity(TileEntityStall.class, "TileEntityStall", new TESRStall());
         ClientRegistry.registerTileEntity(TileEntityStorageRack.class, "TileEntityStorageRack", new TESRStorageRack());
     }
-    
+
 	@Override
 	public void hideNEIItems()
 	{
 		String mod = "NotEnoughItems";
-		
+
 		if (Loader.isModLoaded(mod))
 		{
 			codechicken.nei.api.API.hideItem(new ItemStack(ItemList.Coin, 1, OreDictionary.WILDCARD_VALUE));
 			codechicken.nei.api.API.hideItem(new ItemStack(ItemList.WarehouseBook));
-			
+
 			for(int i = 0; i < BlockList.AnvilDies.length; i++)
 				codechicken.nei.api.API.hideItem(new ItemStack(BlockList.AnvilDies[i], 1, OreDictionary.WILDCARD_VALUE));
 		}

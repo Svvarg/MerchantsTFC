@@ -10,14 +10,14 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class MerchantsTabs extends CreativeTabs
 {
     public static MerchantsTabs MainTab = new MerchantsTabs("Merchants");
-    
+
     private ItemStack _itemStack;
 
     public MerchantsTabs(String par2Str)
     {
         super(par2Str);
     }
-    
+
     public MerchantsTabs(String par2Str, int icon)
     {
         super(par2Str);

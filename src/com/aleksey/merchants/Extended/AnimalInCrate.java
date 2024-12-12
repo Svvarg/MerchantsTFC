@@ -17,21 +17,21 @@ import net.minecraft.item.ItemStack;
 /**
  *
  * @author Swarg
- * for Compare Crate with animal 
+ * for Compare Crate with animal
  * "taeog.animalcrate.item.ItemCrate"
  */
-public class AnimalInCrate {    
-    
+public class AnimalInCrate {
+
     public static final String ANIMAL = "Animal";
     public static final String ID = "id";
     public static final String SEX = "Sex";
-    public static final String AGE = "Age";        
+    public static final String AGE = "Age";
     public static final String MSPEED = "MateSpeed";
     public static final String MJUMP = "MateJump";
     //public static final String MHEALTH = "MateHealth";? Health
     public static final String VARIANT = "Variant";
     public static final String FAMILIARITY = "Familiarity";//35 100
-    public static final String ATTRIBUTES = "Attributes";    
+    public static final String ATTRIBUTES = "Attributes";
     public static final String GMAXHEALTH = "generic.maxHealth";
     public static final String GMOVEMENTSPEED = "generic.movementSpeed";
     public static final String GJUMPSTRENGTH = "horse.jumpStrength";
@@ -42,11 +42,11 @@ public class AnimalInCrate {
     public static final String[] ANIMALSNAMES = {"bearTFC", "chickenTFC", "cowTFC", "deerTFC", "horseTFC", "pigTFC", "sheepTFC", "wolfTFC"};
     public static final float[] ANIMALSTIMETOADULT = {60, 4.14f, 36, 24, 30, 15, 12, 9};
 
-    
+
     public static final int UKNOWN = 0;
     public static final int ABABY = 1;
     public static final int AADULT = 2;
-    
+
     public int id;
     public String name;
     public int sex;//+1
@@ -58,64 +58,64 @@ public class AnimalInCrate {
     public int health;
     public int familiarity;
     public int variant;
-    
-    
-   
+
+
+
     public static boolean isValidAnimalCrate(ItemStack stack)
     {
       //return (stack!=null && isAnimalCrateModLoaded() && stack.getItem() instanceof taeog.animalcrate.item.ItemCrate);
-      return ( stack!=null && isAnimalCrateModLoaded() && 
+      return ( stack!=null && isAnimalCrateModLoaded() &&
               ItemCrateClass != null && stack.getItem().getClass() == ItemCrateClass
               //stack.getItem().getClass().toString().contains("taeog.animalcrate.item.ItemCrate")
               );
     }
-    
-    
+
+
     /**
      * Create by AnimalCrateItemStack NBT
-     */ 
+     */
     public AnimalInCrate(NBTTagCompound nbt)
     {
         this.id = 0;
         this.sex = 0;
         this.age = 0;
         this.speed = 0;
-        this.jumpStrength = 0;        
+        this.jumpStrength = 0;
         this.speedX10 = 0;
-        this.jumpHX10 = 0;        
+        this.jumpHX10 = 0;
         this.familiarity = 0;
-        this.variant = 0;        
-        
+        this.variant = 0;
+
         if (nbt == null)
             return;
-        
+
         nbt = nbt.getCompoundTag(ANIMAL);
         if (nbt == null)
             return;
-        
+
         name = nbt.getString(ID);//horseTFC
         id = getIdByAnimalName(name);
         if ( nbt.hasKey(SEX) )
                 sex = nbt.getInteger(SEX); //0 man 1 female 2 - any for buying up
-        
+
         age = nbt.getInteger(AGE);//real is birthday days left from start
         if (age != 1 && age != 2) //here age is Age stat: 1 - baby 2 adult, not birthday!
             age = (age == 0 ) ? 0 : getAnimalAge(name, age);// 0 - UKNOWN 1 - BABY 2 - ADULT
-                    
+
         variant = nbt.getInteger(VARIANT);//surface
         familiarity = nbt.getInteger(FAMILIARITY);//35 cap
-        
+
         NBTTagList anbt = nbt.getTagList(ATTRIBUTES, 10);
         if( anbt == null || anbt.tagCount() < 1)
             return;
-        
-        for (int i = 0; i < anbt.tagCount(); i++) 
+
+        for (int i = 0; i < anbt.tagCount(); i++)
         {
-            NBTTagCompound att = anbt.getCompoundTagAt(i);            
-            String _name = att.getString("Name");            
-            
+            NBTTagCompound att = anbt.getCompoundTagAt(i);
+            String _name = att.getString("Name");
+
             if (_name != null && _name.contains(GMAXHEALTH) )
-                this.health = (int) att.getDouble("Base"); 
+                this.health = (int) att.getDouble("Base");
             if (_name != null && _name.contains(GMOVEMENTSPEED) )
             {
                 this.speed = (float) att.getDouble("Base");
@@ -128,11 +128,11 @@ public class AnimalInCrate {
                 if (this.jumpStrength > 0)
                     this.jumpHX10 = (int) Math.floor( getJumpHeight(this.jumpStrength) * 10);
                 if (speed > 0)
-                    break;                
-            }    
-        }   
+                    break;
+            }
+        }
     }
-    
+
     /**
      * Create AnimCrate to compare on payMode by GUI params
      */
@@ -147,17 +147,17 @@ public class AnimalInCrate {
         this.sex = 0;
         this.age = 0;
         this.speed = 0;
-        this.jumpStrength = 0;        
+        this.jumpStrength = 0;
         this.speedX10 = 0;
-        this.jumpHX10 = 0;        
+        this.jumpHX10 = 0;
         this.familiarity = 0;
-        this.variant = 0;        
-        
+        this.variant = 0;
+
         if (p1 <= 0) {
             return;
-        }        
+        }
         this.id = p1;
-        
+
         if (p2 > 0)//0 sex=man
         {
             this.sex = p2 < 10 ? p2 : p2 % 10;
@@ -169,8 +169,8 @@ public class AnimalInCrate {
             this.familiarity = (p2 >= 100)? (int) Math.floor( p2 / 100 ) : 0;
             if (this.familiarity > 100)
                 this.familiarity = 100;
-        }    
-        
+        }
+
         if ( p3 > 0)
         {
             this.speedX10 = (p3 > 0)? p3 % 1000: 0;
@@ -178,21 +178,21 @@ public class AnimalInCrate {
             this.jumpHX10 = (p3 > 1000)? (int) Math.floor(p3 / 1000): 0;
             this.jumpStrength = (float) getJumpStrength(jumpHX10);
         }
-        
+
         this.variant = p4;
-    } 
-    
+    }
+
     public static EditPayParams getParamsForAnimalCrate(ItemStack iStack)
     {
         if (iStack==null || iStack.stackTagCompound == null)
             return null;
-        
+
         AnimalInCrate animal = new AnimalInCrate(iStack.stackTagCompound);
         if (animal.id > 0 )
         {
             int p1 = animal.id;
-            int p2 = animal.sex + animal.age*10 + animal.familiarity * 100; // 3521 35-famil 2-Adult 1-sex(0-man 1-female 2-any)            
-            int speed = animal.speedX10;            
+            int p2 = animal.sex + animal.age*10 + animal.familiarity * 100; // 3521 35-famil 2-Adult 1-sex(0-man 1-female 2-any)
+            int speed = animal.speedX10;
             int jump = animal.jumpHX10;
             int p3 = speed + jump  * 1000;//45103 is jump 4.5m speed 10.3m/s
             int p4 = animal.variant;
@@ -200,51 +200,51 @@ public class AnimalInCrate {
         }
         return null;
     }
-    
+
     /**
-     * Parse String Field to Params for EditPayGUI toolTip     
+     * Parse String Field to Params for EditPayGUI toolTip
      */
     public static EditPayParams getAnimalSexAgeFamiliarity(String str)
     {
       if (str == null || str.isEmpty())
           return null;
-      
+
       int p2 = ExtendedLogic.strToInt(str);
-      
+
       if (p2 < 0)
           return null;
-      
+
       int sex =0;
       int age = 0;
       int familiarity = 0;
-      
+
       if (p2 > 0) {
           sex = p2 < 10? p2 : p2 % 10;
           age =  (p2 >= 10)? (int) Math.floor( p2 / 10  ) % 10 : 0;
           if (age > 2 )
-              age =2;      
+              age =2;
           familiarity = (p2 >= 100)? (int) Math.floor( p2 / 100 ) : 0;
           if ( familiarity > 100)
               familiarity = 100;
       }
-      
+
       return new EditPayParams(sex,age,familiarity,0);
     }
-    
+
     /**
-    * Parse String Field to Params for EditPayGUI toolTip     
+    * Parse String Field to Params for EditPayGUI toolTip
     */
     public static EditPayParams getAnimalJumpSpeed(String str)
     {
       if (str == null || str.isEmpty())
           return null;
-      int p3 = ExtendedLogic.strToInt(str);       
-      
+      int p3 = ExtendedLogic.strToInt(str);
+
       int speedX10 = (p3 > 0)? p3 % 1000: 0;
       int jumpHX10 = (p3 > 1000)? (int) Math.floor(p3 / 1000): 0;
-      return new EditPayParams(jumpHX10, speedX10, 0,0);        
+      return new EditPayParams(jumpHX10, speedX10, 0,0);
     }
-    
+
     /**
      * For GUI setPayitem
      */
@@ -252,43 +252,43 @@ public class AnimalInCrate {
     {
         if ( this.id <= 0 )
             return null;
-        
+
         NBTTagCompound nbt = new NBTTagCompound();
-        String name = getAnimalNameByID(id);        
-        if ( name == null || name.isEmpty() || 
+        String name = getAnimalNameByID(id);
+        if ( name == null || name.isEmpty() ||
                 //can set only valid tfc animal
                 ( allowSetOnlyTFCAnimal && !isValidTFCAnimal(name) ) )
             return null;
-            
-        nbt.setString(ID, name);                
-        nbt.setInteger(SEX, sex);//0 man 1 female  2 - any for buying up        
+
+        nbt.setString(ID, name);
+        nbt.setInteger(SEX, sex);//0 man 1 female  2 - any for buying up
         nbt.setInteger(AGE, age);
         nbt.setInteger(VARIANT, variant);
         nbt.setInteger(FAMILIARITY,familiarity);
-        
+
         if ( this.speed > 0 )//("horseTFC")
         {
             NBTTagList attrList = new NBTTagList();
-            
-            NBTTagCompound attrSpeed = new NBTTagCompound();            
+
+            NBTTagCompound attrSpeed = new NBTTagCompound();
             attrSpeed.setFloat("Base", this.speed );
-            attrSpeed.setString("Name",GMOVEMENTSPEED);        
+            attrSpeed.setString("Name",GMOVEMENTSPEED);
             attrList.appendTag(attrSpeed);
-            
-            NBTTagCompound attrJump = new NBTTagCompound();            
+
+            NBTTagCompound attrJump = new NBTTagCompound();
             if ( this.jumpStrength > 0 )
             {
                 attrJump.setFloat("Base", this.jumpStrength );
                 attrJump.setString("Name",GJUMPSTRENGTH);
-                attrList.appendTag(attrJump);                
+                attrList.appendTag(attrJump);
             }
             nbt.setTag(ATTRIBUTES, attrList);
         }
         NBTTagCompound anim = new NBTTagCompound();
         anim.setTag(ANIMAL, nbt);
-        return anim;    
+        return anim;
     }
-        
+
     /**
      * Animal, logic Age UKNOWN ADULT BABY
      */
@@ -297,53 +297,53 @@ public class AnimalInCrate {
         if (name == null|| name.isEmpty() )
             return UKNOWN;
         int days = getDaysForAdultByAnimalName(name);
-        int totalDays = TFC_Time.getTotalDays();        
-        return (totalDays - birthday >= days )? AADULT : ABABY;        
+        int totalDays = TFC_Time.getTotalDays();
+        return (totalDays - birthday >= days )? AADULT : ABABY;
     }
-            
-    
+
+
     public static int getDaysForAdultByAnimalName(String name)
     {
         if ( name == null || name.isEmpty() )
             return 0;
-        
+
         if (ANIMALSTIMETOADULT.length != ANIMALSNAMES.length)
             return 0;
-        
+
         for (int i = 0; i < ANIMALSNAMES.length; i++) {
             String n = ANIMALSNAMES[i];
             if (name.compareTo(ANIMALSNAMES[i])==0)
-                return (int) Math.floor( TFCOptions.animalTimeMultiplier 
+                return (int) Math.floor( TFCOptions.animalTimeMultiplier
                         * TFC_Time.daysInMonth * ANIMALSTIMETOADULT[i] ) ;
         }
         return 0;
     }
-    
-    
+
+
     /**
-     * Suited enimal to trade. True if animal two have better feature 
+     * Suited enimal to trade. True if animal two have better feature
      * @param a animal two
-     * @return 
+     * @return
      */
     public boolean isAnimalEqual(AnimalInCrate a)
-    {        
+    {
         if ( a ==null || this.id==0)
             return false;
-        
-        return ( this.id == a.id 
+
+        return ( this.id == a.id
                 //if the value of sex is not defined(0) allow trade animal with any sex
                 && ( this.sex==2 || this.sex == a.sex  )//2 - any for buyinug 0 man 1 femal
                 && (this.age==0 || this.age == a.age)
                 && (this.familiarity==0 || this.familiarity <= a.familiarity)
-                
+
                 && (this.speed==0 || this.speed <= a.speed)
                 && (this.jumpStrength==0 || this.jumpStrength <= a.jumpStrength)
-                                
+
                 && (this.variant==0 || this.variant == a.variant)
-                );        
+                );
     }
-    
-    
+
+
     public static int getIdByAnimalName(String name)
     {
         if (name == null || name.isEmpty()  )
@@ -355,14 +355,14 @@ public class AnimalInCrate {
         Set set = EntityList.IDtoClassMapping.entrySet();
         Iterator iterator = set.iterator();
         while(iterator.hasNext()) {
-            Map.Entry mentry = (Map.Entry)iterator.next();                  
+            Map.Entry mentry = (Map.Entry)iterator.next();
             if (mentry.getValue()==oclass) {
-                return (Integer) mentry.getKey();                    
-            }    
-        }            
+                return (Integer) mentry.getKey();
+            }
+        }
         return 0;
     }
-    
+
     public static String getAnimalNameByID(int id)
     {
         if (id<=0)
@@ -372,9 +372,9 @@ public class AnimalInCrate {
         //Class oclass = (Class)stringToClassMapping.get(name);
         if (oclass == null)
             return "";
-        return (String) EntityList.classToStringMapping.get(oclass);        
+        return (String) EntityList.classToStringMapping.get(oclass);
     }
-    
+
     //from https://github.com/fubira/HorseInfoReloaded/blob/master/src/main/java/net/ironingot/horseinfo/HorseInfoUtil.java
     public static double getJumpHeight(double jumpStrength) {
         double yVelocity = jumpStrength;
@@ -396,9 +396,9 @@ public class AnimalInCrate {
     {
         if (jumpHeightX10 == 0)
             return 0;
-        
-        float[] strength = new float[] { 
-            0.0f,    // 0  0 
+
+        float[] strength = new float[] {
+            0.0f,    // 0  0
             0.2490f, // 1  0.5  05
             0.3690f, // 2  1.0  10
             0.4640f, // 3  1.5  15
@@ -413,11 +413,11 @@ public class AnimalInCrate {
             1.0080f // 12  6.0
         };
         int d = jumpHeightX10 / 5;
-        return (d < 1 || d >= strength.length)? 0: strength[d];        
+        return (d < 1 || d >= strength.length)? 0: strength[d];
     }
-    
+
     public static String getListOfAnimals()
-    {        
+    {
         if ( TFCAnimalsList==null || TFCAnimalsList.isEmpty() )
         {
             int h = EntityList.IDtoClassMapping.size();
@@ -426,35 +426,35 @@ public class AnimalInCrate {
                 String name = getAnimalNameByID(i);
                 if ( isValidTFCAnimal(name) )
                       r += String.format("%s  %s\n", Integer.toString(i), name);
-                
+
             }
-            TFCAnimalsList = r; 
+            TFCAnimalsList = r;
         }
         return TFCAnimalsList;
     }
-    
+
     public static boolean isValidTFCAnimal(String name)
     {
         if (name==null || name.isEmpty() || ! name.contains("TFC"))
             return false;
-        
-        for (int i = 0; i < InvalidTFCAnimal.length; i++) 
+
+        for (int i = 0; i < InvalidTFCAnimal.length; i++)
         {
             String badName = InvalidTFCAnimal[i];
             if (name.contains(badName))
-                return false;            
-        }        
+                return false;
+        }
         return true;
     }
-    
+
     public static String getItemKeyForAnimalCrate(ItemStack iStack, String key)
     {
       if (iStack == null || !iStack.hasTagCompound() || !isValidAnimalCrate(iStack) )
           return key;
-      
+
       AnimalInCrate animal = new AnimalInCrate(iStack.stackTagCompound);
-      
-      return (animal==null || animal.id <= 0 ) ? key : 
+
+      return (animal==null || animal.id <= 0 ) ? key :
               key+":"+animal.id+":"+
               Integer.toString(animal.sex)+
               Integer.toString(animal.age)+
@@ -462,7 +462,7 @@ public class AnimalInCrate {
               Integer.toString(animal.speedX10)+
               Integer.toString(animal.variant);
     }
-    
-    
-  
+
+
+
 }

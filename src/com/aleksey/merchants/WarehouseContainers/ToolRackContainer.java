@@ -23,19 +23,19 @@ public class ToolRackContainer extends ChestContainer
     {
         return tileEntity.getClass() == TEToolRack.class;
     }
-    
+
     //Helper methods
-    
+
     @Override
     protected boolean isItemValid(TileEntity tileEntity, ItemStack itemStack)
     {
         Class<?> cls = tileEntity.getClass();
-        
+
         if(cls != TEToolRack.class)
             return false;
-        
+
         Item item = itemStack.getItem();
-        
+
         return item instanceof ItemTool ||
             item instanceof ItemWeapon ||
             item instanceof ItemHoe ||

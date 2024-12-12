@@ -29,7 +29,7 @@ public class GuiTrusselCreate extends GuiScreen
 
     public static final int WindowWidth = 176;
     public static final int WindowHeight = 127;
-    
+
     private static final int _titleX = 0;
     private static final int _titleY = 4;
     private static final int _nameLabelX = 6;
@@ -43,21 +43,21 @@ public class GuiTrusselCreate extends GuiScreen
     private static final int _createButtonY = 101;
     private static final int _cancelButtonX = 87;
     private static final int _cancelButtonY = 101;
-    
+
     private static final int _dieTextureY = 0;
     private static final int _dieNotSetTextureX = 178;
     private static final int _dieSetTextureX = 183;
     private static final int _diePixelSize = 5;
-    
+
     private static final int _topLeftDiePixelX = 35;
     private static final int _topLeftDiePixelY = 38;
-    
+
     private static final int _weightBtnTextureY = 7;
     private static final int _weightBtnFalseTextureX = 178;
     private static final int _weightBtnTrueTextureX = 186;
     private static final int _weightBtnSize = 7;
     private static final int _weightBtnWidth = 66;
-    
+
     private static final int _weightLabelX = 98;
     private static final int _weightLabelY = 38;
     private static final int _weightIndent = 3;
@@ -68,7 +68,7 @@ public class GuiTrusselCreate extends GuiScreen
     private static final int _buttonId_cancelButton = 1;
     private static final int _buttonId_weightButton = 2;
     private static final int _buttonId_dieButton = _buttonId_weightButton + _weights.length;
-    
+
     private static final int _colorDefaultText = 0x555555;
 
     private EntityPlayer _player;
@@ -101,75 +101,75 @@ public class GuiTrusselCreate extends GuiScreen
     public void initGui()
     {
         super.initGui();
-        
+
         int w = (this.width - WindowWidth) / 2;
         int h = (this.height - WindowHeight) / 2;
 
         _nameTextField = new GuiTextField(fontRendererObj, w + _nameTextFieldX, h + _nameTextFieldY, _nameTextFieldWidth, 20);
         _nameTextField.setFocused(true);
-        
+
         Keyboard.enableRepeatEvents(true);
-        
+
         _createButton = new GuiButton(_buttonId_createButton, w + _createButtonX, h + _createButtonY, 50, 20, StatCollector.translateToLocal("gui.TrusselCreate.Create"));
         buttonList.add(_createButton);
-        
+
         _cancelButton = new GuiButton(_buttonId_cancelButton, w + _cancelButtonX, h + _cancelButtonY, 50, 20, StatCollector.translateToLocal("gui.TrusselCreate.Cancel"));
         buttonList.add(_cancelButton);
-        
+
         initDieMatrix(w, h);
         initWeightButtons(w, h);
     }
-    
+
     private void initDieMatrix(int w, int h)
     {
         int index = 0;
         int y = h + _topLeftDiePixelY;
-        
+
         _dieButtons = new GuiCheckButton[CoinHelper.DieStride * CoinHelper.DieStride];
-                
+
         for(int row = 0; row < CoinHelper.DieStride; row++)
         {
             int x = w + _topLeftDiePixelX;
-            
+
             for(int col = 0; col < CoinHelper.DieStride; col++)
             {
                 GuiCheckButton dieButton = new GuiCheckButton(_buttonId_dieButton + index, x, y, _diePixelSize, _diePixelSize, "", _diePixelSize, _dieTextureY, _dieNotSetTextureX, _dieSetTextureX, _texture);
-                
+
                 _dieButtons[index] = dieButton;
-                
+
                 buttonList.add(dieButton);
-                
+
                 index++;
-                
+
                 x += _diePixelSize;
             }
-            
+
             y += _diePixelSize;
         }
     }
-    
+
     private void initWeightButtons(int w, int h)
     {
         int x = w + _weightLabelX;
         int y = h + _weightLabelY + this.fontRendererObj.FONT_HEIGHT + _weightIndent;
         int index = _buttonId_weightButton;
-        
+
         _weightButtons = new GuiCheckButton[_weights.length];
-        
+
         for(int i = 0; i < _weightButtons.length; i++)
         {
             String text = StatCollector.translateToLocal("gui.TrusselCreate.WeightChoice" + String.valueOf(i + 1));
             GuiCheckButton button = new GuiCheckButton(index, x, y, _weightBtnWidth, _weightBtnSize, text, _weightBtnSize, _weightBtnTextureY, _weightBtnFalseTextureX, _weightBtnTrueTextureX, _texture);
-            
+
             _weightButtons[i] = button;
-            
+
             buttonList.add(button);
-            
+
             y += _weightBtnSize + _weightIndent;
-            
+
             index++;
         }
-        
+
         selectWeight(_weightButtons[_weightButtons.length - 1]);
     }
 
@@ -177,7 +177,7 @@ public class GuiTrusselCreate extends GuiScreen
     protected void mouseClicked(int par1, int par2, int par3)
     {
         super.mouseClicked(par1, par2, par3);
-        
+
         _nameTextField.mouseClicked(par1, par2, par3);
     }
 
@@ -205,7 +205,7 @@ public class GuiTrusselCreate extends GuiScreen
         else
             ((GuiCheckButton)guibutton).negateChecked();
     }
-    
+
     private void createDie()
     {
         NBTTagCompound tag = new NBTTagCompound();
@@ -224,20 +224,20 @@ public class GuiTrusselCreate extends GuiScreen
 
         Minecraft.getMinecraft().displayGuiScreen(null);
     }
-    
+
     private void selectWeight(GuiCheckButton btn)
     {
         int buttonIndex = btn.id - _buttonId_weightButton;
-        
+
         for(int i = 0; i < _weightButtons.length; i++)
             _weightButtons[i].setChecked(buttonIndex == i);
     }
-    
+
     private String createKey()
     {
         return UUID.randomUUID().toString();
     }
-    
+
     private int getSelectedWeight()
     {
         for(int i = 0; i < _weightButtons.length; i++)
@@ -245,17 +245,17 @@ public class GuiTrusselCreate extends GuiScreen
             if(_weightButtons[i].getChecked())
                 return _weights[i];
         }
-        
+
         return 0;
     }
-    
+
     private byte[] getDieData()
     {
         boolean[] bits = new boolean[_dieButtons.length];
-        
+
         for(int i = 0; i < _dieButtons.length; i++)
             bits[i] = _dieButtons[i].getChecked();
-        
+
         return CoinHelper.packDie(bits);
     }
 
@@ -269,25 +269,25 @@ public class GuiTrusselCreate extends GuiScreen
         int h = (this.height - WindowHeight) / 2;
 
         drawTexturedModalRect(w, h, 0, 0, WindowWidth, WindowHeight);
-        
+
         int nameLabelY = _nameLabelY + (20 - this.fontRendererObj.FONT_HEIGHT) / 2;
-        
+
         drawCenteredString(StatCollector.translateToLocal("gui.TrusselCreate.Title"), w + _titleX, h + _titleY, WindowWidth, _colorDefaultText);
         this.fontRendererObj.drawString(StatCollector.translateToLocal("gui.TrusselCreate.Name") + ":", w + _nameLabelX, h + nameLabelY, _colorDefaultText);
         this.fontRendererObj.drawString(StatCollector.translateToLocal("gui.TrusselCreate.Die") + ":", w + _dieLabelX, h + _dieLabelY, _colorDefaultText);
         this.fontRendererObj.drawString(StatCollector.translateToLocal("gui.TrusselCreate.Weight") + ":", w + _weightLabelX, h + _weightLabelY, _colorDefaultText);
 
         _nameTextField.drawTextBox();
-        
+
         _createButton.enabled = _nameTextField.getText().length() > 0;
-        
+
         super.drawScreen(par1, par2, par3);
     }
-    
+
     private void drawCenteredString(String s, int x, int y, int columnWidth, int color)
     {
         int offset = (columnWidth - this.fontRendererObj.getStringWidth(s)) / 2;
-        
+
         this.fontRendererObj.drawString(s, x + offset, y, color);
     }
 }

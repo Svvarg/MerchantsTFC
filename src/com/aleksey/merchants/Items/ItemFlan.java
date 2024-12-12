@@ -18,17 +18,17 @@ public class ItemFlan extends ItemTerra
     public ItemFlan()
     {
         super();
-        
+
         setMaxDamage(0);
         setCreativeTab(MerchantsTabs.MainTab);
         setHasSubtypes(true);
-        
+
         metaNames = new String[Constants.Coins.length];
-        
+
         for(int i = 0; i < Constants.Coins.length; i++)
             metaNames[i] = Constants.Coins[i].CoinName;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister registerer)
@@ -37,10 +37,10 @@ public class ItemFlan extends ItemTerra
 
         for(int i = 0; i < metaNames.length; i++)
             metaIcons[i] = registerer.registerIcon("merchants:flans/Flan" + metaNames[i]);
-        
+
         this.itemIcon = metaIcons[0];
     }
-    
+
     @Override
     public EnumSize getSize(ItemStack is)
     {
@@ -52,7 +52,7 @@ public class ItemFlan extends ItemTerra
     {
         return EnumWeight.MEDIUM;
     }
-    
+
     @Override
     public boolean canStack()
     {

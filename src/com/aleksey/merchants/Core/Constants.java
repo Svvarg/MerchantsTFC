@@ -6,7 +6,7 @@ public class Constants
 {
     private static final int _whiteColor = 0xffffff;
     private static final int _blackColor = 0;
-    
+
     public static final CoinInfo[] Coins = new CoinInfo[] {
         new CoinInfo("Bismuth", _whiteColor, "item.Bismuth Ingot", 0),
         new CoinInfo("Tin", _blackColor, "item.Tin Ingot", 0),
@@ -27,7 +27,7 @@ public class Constants
         new CoinInfo("Steel", _whiteColor, "item.Steel Ingot", 4),
         new CoinInfo("BlackSteel", _whiteColor, "item.Black Steel Ingot", 5),
     };
-    
+
     public static final DieInfo[] Dies = new DieInfo[] {
         new DieInfo("Copper", "item.Copper Ingot", "item.Copper Double Ingot", 1),
         new DieInfo("Bronze", "item.Bronze Ingot", "item.Bronze Double Ingot", 2),

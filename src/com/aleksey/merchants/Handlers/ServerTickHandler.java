@@ -14,7 +14,7 @@ public class ServerTickHandler
     public void onServerWorldTick(WorldTickEvent event)
     {
         World world = event.world;
-        
+
         if(event.phase == Phase.START)
         {
             if(world.provider.dimensionId == 0 && !Recipes.areAnvilRecipesRegistered())

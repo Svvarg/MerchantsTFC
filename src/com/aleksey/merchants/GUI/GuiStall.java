@@ -27,13 +27,13 @@ public class GuiStall extends GuiContainerTFC
         public int Color;
         public String ToolTip;
     }
-    
+
     private static final ResourceLocation _texture = new ResourceLocation("merchants", "textures/gui/gui_stall.png");
 
     public static final int SlotSize = 18;
     public static final int WindowWidth = 176;
     public static final int WindowHeight = 127;
-    
+
     public static final int TopSlotY = 32;
     public static final int PricesSlotX = 18;
     public static final int GoodsSlotX = 62;
@@ -56,13 +56,13 @@ public class GuiStall extends GuiContainerTFC
     private static final int _clearButtonY = 102;
     private static final int _quantityX = 81;
     private static final int _setPayItemX = 9;
-    
-    
+
+
     private static final int _buttonId_clearButton = 0;
     private static final int _buttonId_firstLimitButton = 1;
     private static final int _buttonId_setPayItemButton = 100;
-    
-    
+
+
     private static final int _colorDefaultText = 0x555555;
     private static final int _colorSuccessText = 0x00AA00;
     private static final int _colorFailedText = 0xAA0000;
@@ -87,26 +87,26 @@ public class GuiStall extends GuiContainerTFC
     public void initGui()
     {
         super.initGui();
-        
+
         if(!_isOwnerMode)
             return;
-        
+
         buttonList.add(new GuiButton(_buttonId_clearButton, guiLeft + _clearButtonX, guiTop + _clearButtonY, 50, 20, StatCollector.translateToLocal("gui.Stall.Clear")));
-        
+
         int y = guiTop + TopSlotY;
-        
+
         _limitButtons = new GuiLimitButton[_stall.GoodsSlotIndexes.length];
         _setPayButtons = new GuiSetPayButton[_stall.GoodsSlotIndexes.length];
-        
+
         for(int i = 0; i < _limitButtons.length; i++)
         {
             buttonList.add(_limitButtons[i] = new GuiLimitButton(_buttonId_firstLimitButton + i, guiLeft + _quantityX, y));
-            
+
             buttonList.add( _setPayButtons[i] = new GuiSetPayButton(_buttonId_setPayItemButton + i,guiLeft + _setPayItemX, y ));
             //_pricesTitleX
             y += SlotSize;
         }
-        
+
         //sw
         //buttonList.add(new GuiButton(_buttonId_setPayItemButton, guiLeft + _pricesTitleY - 10, guiTop + TopSlotY, 7, 16, "i"));
     }
@@ -124,102 +124,102 @@ public class GuiStall extends GuiContainerTFC
         }
         else if (guibutton.id >= _buttonId_setPayItemButton)
         {
-            //call SetPayItem        
+            //call SetPayItem
             int index = guibutton.id - _buttonId_setPayItemButton;
             if (index>-1 && index < _stall.GoodsSlotIndexes.length)
                 _stall.actionSelectSetPayItem( _stall.GoodsSlotIndexes[index] );
         }
     }
-    
+
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         QuantityInfo info = getQuantityInfo(mouseX, mouseY);
-        
+
         if(info != null)
             drawTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, info.ToolTip);
         else
         {
             String limitTooltip = getLimitTooltip(mouseX, mouseY);
-            
+
             if(limitTooltip != null)
                 drawTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, limitTooltip);
-            
+
             String setPayTooltip = getSetPayItemTooltip(mouseX, mouseY);
-            
+
             if(setPayTooltip != null)
                 drawTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, setPayTooltip);
-            
+
         }
     }
-    
+
     private QuantityInfo getQuantityInfo(int mouseX, int mouseY)
     {
         if(!getQuantities())
             return null;
-        
+
         int w = (width - xSize) / 2;
         int h = (height - ySize) / 2;
-        
+
         if(mouseX < w + _quantityX)
             return null;
-        
+
         int y = h + TopSlotY + SlotSize - this.fontRendererObj.FONT_HEIGHT;
-        
+
         for(int i = 0; i < _quantities.length; i++)
         {
             if(mouseY < y)
                 return null;
-            
+
             if(mouseY < y + 7)
             {
                 QuantityInfo info = _quantities[i];
-                
+
                 if(info == null)
                     return null;
-                
+
                 int textWidth = this.fontRendererObj.getStringWidth(String.valueOf(info.Quantity));
-                
+
                 return mouseX < w + _quantityX + textWidth ? info: null;
             }
-            
+
             y += SlotSize;
         }
-        
+
         return null;
     }
-    
+
     private String getLimitTooltip(int mouseX, int mouseY)
     {
         if(!_isOwnerMode)
             return null;
-        
+
         int w = (width - xSize) / 2;
         int h = (height - ySize) / 2;
-        
+
         if(mouseX < w + _quantityX)
             return null;
-        
+
         int y = h + TopSlotY;
-        
+
         for(int i = 0; i < _limitButtons.length; i++)
         {
             if(mouseY < y)
                 return null;
-            
+
             if(mouseY < y + 7)
             {
                 int limit = _stall.getLimitByGoodSlotIndex(_stall.GoodsSlotIndexes[i]);
                 String limitText = limit > 0 ? String.valueOf(limit): StatCollector.translateToLocal("gui.Stall.NA");
-                
+
                 int textWidth = this.fontRendererObj.getStringWidth(limitText);
-                
+
                 return mouseX < w + _quantityX + textWidth ? StatCollector.translateToLocal("gui.Stall.Tooltip.LimitButton"): null;
             }
-            
+
             y += SlotSize;
         }
-        
+
         return null;
     }
 
@@ -227,115 +227,115 @@ public class GuiStall extends GuiContainerTFC
     {
         if(!_isOwnerMode)
             return null;
-        
+
         int w = (width - xSize) / 2;
         int h = (height - ySize) / 2;
-        
+
         if(mouseX < w + _setPayItemX || mouseX > w + _setPayItemX + GuiSetPayButton._setPayItemWeight)
             return null;
-        
+
         int y = h + TopSlotY;
-        
+
         for(int i = 0; i < _setPayButtons.length; i++)
         {
             if(mouseY < y)
                 return null;
-            
+
             if(mouseY < y + 7)
             {
                 //int limit = _stall.getLimitByGoodSlotIndex(_stall.GoodsSlotIndexes[i]);
                 //String limitText = limit > 0 ? String.valueOf(limit): StatCollector.translateToLocal("gui.Stall.NA");
                 String toolTip = StatCollector.translateToLocal("gui.Stall.Tooltip.SetPayButton");
                 int textWidth = this.fontRendererObj.getStringWidth(toolTip);
-                
+
                 return mouseX < w + _setPayItemX + textWidth ? StatCollector.translateToLocal("gui.Stall.Tooltip.SetPayButton"): null;
             }
-            
+
             y += SlotSize;
         }
-        
+
         return null;
     }
 
-    
+
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int mouseX, int mouseY)
     {
         resetQuantities();
-        
+
         bindTexture(_texture);
-        
+
         int w = (width - xSize) / 2;
         int h = (height - ySize) / 2;
         int v = _isOwnerMode ? 0: WindowHeight;
 
         drawTexturedModalRect(w, h, 0, v, xSize, ySize);
-        
+
         String inventoryName = StatCollector.translateToLocal(_stall.getInventoryName());
         String title = !_stall.getIsOwnerSpecified() ? inventoryName: inventoryName + " (" + _stall.getOwnerUserName() + ")";
 
         drawCenteredString(title, w + _titleX, h + _titleY, WindowWidth, _colorDefaultText);
         drawCenteredString(StatCollector.translateToLocal("gui.Stall.Prices"), w + _pricesTitleX, h + _pricesTitleY, _columnTitleWidth, _colorDefaultText);
         drawCenteredString(StatCollector.translateToLocal("gui.Stall.Goods"), w + _goodsTitleX, h + _goodsTitleY, _columnTitleWidth, _colorDefaultText);
-        
+
         drawWarehouseText(w, h);
         drawQuantities(w, h);
-        
+
         if(_isOwnerMode)
         {
             for(int i = 0; i < _stall.GoodsSlotIndexes.length; i++)
             {
                 int limit = _stall.getLimitByGoodSlotIndex(_stall.GoodsSlotIndexes[i]);
                 String limitText = limit > 0 ? String.valueOf(limit): StatCollector.translateToLocal("gui.Stall.NA");
-                
+
                 _limitButtons[i].setText(limitText, this.fontRendererObj);
             }
         }
 
         PlayerInventory.drawInventory(this, width, height, ySize - PlayerInventory.invYSize);
     }
-    
+
     private void drawWarehouseText(int w, int h)
     {
         if(!_isOwnerMode)
             return;
-        
+
         drawCenteredString(StatCollector.translateToLocal("gui.Stall.Warehouse"), w + _warehouseTitleX, h + _warehouseTitleY, _columnWarehouseWidth, _colorDefaultText);
-        
+
         if(!_stall.getIsOwnerSpecified())
             return;
 
         WarehouseBookInfo info = _stall.getBookInfo();
-        
+
         if(info != null)
         {
             String coordXText = String.valueOf(info.X);
             String coordYText = String.valueOf(info.Y);
             String coordZText = String.valueOf(info.Z);
-            
+
             int coordXTextWidth = this.fontRendererObj.getStringWidth("X: " + coordXText);
             int coordYTextWidth = this.fontRendererObj.getStringWidth("Y: " + coordYText);
             int coordZTextWidth = this.fontRendererObj.getStringWidth("Z: " + coordZText);
             int coordTextWidth = coordXTextWidth;
-            
+
             if(coordTextWidth < coordYTextWidth)
                 coordTextWidth = coordYTextWidth;
-            
+
             if(coordTextWidth < coordZTextWidth)
                 coordTextWidth = coordZTextWidth;
-            
+
             int x = w + _warehouseCoordsX + (_columnWarehouseWidth - coordTextWidth) / 2;
             int y1 = h + _warehouseCoordsY;
             int y2 = y1 + this.fontRendererObj.FONT_HEIGHT;
             int y3 = y2 + this.fontRendererObj.FONT_HEIGHT;
-            
+
             fontRendererObj.drawString("X: ", x, y1, _colorDefaultText);
             drawRightAlignedString(coordXText, x, y1, coordTextWidth, _colorDefaultText);
             fontRendererObj.drawString("Y: ", x, y2, _colorDefaultText);
             drawRightAlignedString(coordYText, x, y2, coordTextWidth, _colorDefaultText);
             fontRendererObj.drawString("Z: ", x, y3, _colorDefaultText);
             drawRightAlignedString(coordZText, x, y3, coordTextWidth, _colorDefaultText);
-            
+
             //fontRendererObj.drawString("C: " + String.valueOf(_stall.getContainersInWarehouse()), x, y3 + this.fontRendererObj.FONT_HEIGHT, _colorDefaultText);
         }
         else
@@ -343,44 +343,44 @@ public class GuiStall extends GuiContainerTFC
             drawCenteredString(StatCollector.translateToLocal("gui.Stall.NoWarehouse"), w + _warehouseCoordsX, h + _warehouseCoordsY, _columnWarehouseWidth, _colorFailedText);
         }
     }
-    
+
     private void drawQuantities(int w, int h)
     {
         if(!getQuantities())
             return;
-        
+
         int y = TopSlotY + SlotSize - this.fontRendererObj.FONT_HEIGHT;
-        
+
         for(int i = 0; i < _quantities.length; i++)
         {
             QuantityInfo info = _quantities[i];
-            
+
             if(info != null)
                 fontRendererObj.drawString(String.valueOf(info.Quantity), w + _quantityX, h + y, info.Color);
-            
+
             y += SlotSize;
         }
     }
-    
+
     private void drawCenteredString(String s, int x, int y, int columnWidth, int color)
     {
         int offset = (columnWidth - this.fontRendererObj.getStringWidth(s)) / 2;
-        
+
         fontRendererObj.drawString(s, x + offset, y, color);
     }
-    
+
     private void drawRightAlignedString(String s, int x, int y, int columnWidth, int color)
     {
         int offset = columnWidth - this.fontRendererObj.getStringWidth(s);
-        
+
         fontRendererObj.drawString(s, x + offset, y, color);
     }
-    
+
     private void resetQuantities()
     {
         _quantities = null;
     }
-    
+
     private boolean getQuantities()
     {
         if(_stall.getBookInfo() == null)
@@ -388,27 +388,27 @@ public class GuiStall extends GuiContainerTFC
             _quantities = null;
             return false;
         }
-        
+
         if(_quantities != null)
             return true;
 
         _quantities = new QuantityInfo[TileEntityStall.GoodsSlotIndexes.length];
-        
+
         for(int i = 0; i < TileEntityStall.GoodsSlotIndexes.length; i++)
         {
             int goodSlotIndex = TileEntityStall.GoodsSlotIndexes[i];
             ItemStack goodItemStack = _stall.getStackInSlot(goodSlotIndex);
-            
+
             if(goodItemStack == null)
                 continue;
 
             int priceSlotIndex = TileEntityStall.PricesSlotIndexes[i];
             ItemStack priceItemStack = _stall.getStackInSlot(priceSlotIndex);
             int limit = _stall.getLimitByGoodSlotIndex(goodSlotIndex);
-            
-            QuantityInfo info = new QuantityInfo();                
+
+            QuantityInfo info = new QuantityInfo();
             info.Quantity = _stall.getQuantityInWarehouse(goodItemStack);
-            
+
             if(info.Quantity < ItemHelper.getItemStackQuantity(goodItemStack))
             {
                 info.Color = _colorFailedText;
@@ -427,10 +427,10 @@ public class GuiStall extends GuiContainerTFC
                 info.Color = _colorSuccessText;
                 info.ToolTip = StatCollector.translateToLocal("gui.Stall.Tooltip.CanBuy");
             }
-            
+
             _quantities[i] = info;
         }
-        
+
         return true;
     }
 }

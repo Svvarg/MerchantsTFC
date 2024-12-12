@@ -23,7 +23,7 @@ public class GuiTrussel extends GuiContainerTFC
     public static final int SlotSize = 18;
     public static final int WindowWidth = 176;
     public static final int WindowHeight = 127;
-    
+
     public static final int SlotY = 73;
     public static final int SrcSlotX = 58;
     public static final int DstSlotX = 102;
@@ -44,14 +44,14 @@ public class GuiTrussel extends GuiContainerTFC
     private static final int _dieY = 41;
     private static final int _copyButtonX = 63;
     private static final int _copyButtonY = 96;
-    
+
     private static final int _dieTextureY = 128;
     private static final int _dieNotSetTextureX = 178;
     private static final int _dieSetTextureX = 181;
     private static final int _diePixelSize = 2;
-    
+
     private static final int _buttonId_copyButton = 0;
-    
+
     private static final int _colorDefaultText = 0x555555;
 
     private EntityPlayer _player;
@@ -71,13 +71,13 @@ public class GuiTrussel extends GuiContainerTFC
     public void initGui()
     {
         super.initGui();
-        
+
         buttonList.add(_copyButton = new GuiButton(_buttonId_copyButton, guiLeft + _copyButtonX, guiTop + _copyButtonY, 50, 20, StatCollector.translateToLocal("gui.Trussel.Copy")));
-        
+
         ItemStack itemStack = _player.inventory.getCurrentItem();
-        
+
         int weightIndex = CoinHelper.getCoinWeight(itemStack);
-        
+
         _name = CoinHelper.getCoinName(itemStack);
         _weight = CoinHelper.getWeightText(weightIndex);
         _die = CoinHelper.unpackDie(CoinHelper.getCoinDie(itemStack));
@@ -93,17 +93,17 @@ public class GuiTrussel extends GuiContainerTFC
                 break;
         }
     }
-    
+
     private void copyTrussel()
     {
         if(!((ContainerTrussel)this.inventorySlots).copyTrussel())
             return;
-        
+
         DieCopyPacket packet = new DieCopyPacket();
 
         TerraFirmaCraft.PACKET_PIPELINE.sendToServer(packet);
     }
-    
+
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
@@ -113,13 +113,13 @@ public class GuiTrussel extends GuiContainerTFC
     protected void drawGuiContainerBackgroundLayer(float f, int mouseX, int mouseY)
     {
         bindTexture(_texture);
-        
+
         int w = (width - xSize) / 2;
         int h = (height - ySize) / 2;
         int v = WindowHeight;
 
         drawTexturedModalRect(w, h, 0, v, xSize, ySize);
-        
+
         drawDie(w, h);
 
         drawCenteredString(StatCollector.translateToLocal("gui.Trussel.Title"), w + _titleX, h + _titleY, WindowWidth, _colorDefaultText);
@@ -130,38 +130,38 @@ public class GuiTrussel extends GuiContainerTFC
         this.fontRendererObj.drawString(StatCollector.translateToLocal("gui.Trussel.Die") + ":",  w + _dieLabelX, h + _dieLabelY, _colorDefaultText);
 
         PlayerInventory.drawInventory(this, width, height, ySize - PlayerInventory.invYSize);
-        
+
         _copyButton.enabled = this.inventorySlots.getSlot(0).getStack() != null;
     }
-    
+
     private void drawDie(int w, int h)
     {
         int index = 0;
         int y = h + _dieY;
-        
+
         for(int row = 0; row < CoinHelper.DieStride; row++)
         {
             int x = w + _dieX;
-            
+
             for(int col = 0; col < CoinHelper.DieStride; col++)
             {
                 int textureX = _die[index] ? _dieSetTextureX: _dieNotSetTextureX;
-                
+
                 drawTexturedModalRect(x, y, textureX, _dieTextureY, _diePixelSize, _diePixelSize);
-                
+
                 index++;
-                
+
                 x += _diePixelSize;
             }
-            
+
             y += _diePixelSize;
         }
     }
-    
+
     private void drawCenteredString(String s, int x, int y, int columnWidth, int color)
     {
         int offset = (columnWidth - this.fontRendererObj.getStringWidth(s)) / 2;
-        
+
         fontRendererObj.drawString(s, x + offset, y, color);
     }
 }

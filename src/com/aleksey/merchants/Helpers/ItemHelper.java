@@ -32,11 +32,11 @@ public class ItemHelper {
 
         return itemStack1.getItem() instanceof IFood
                 //? Food.areEqual(itemStack1, itemStack2)
-                
+
                 // consider CookedLevel ignore CookedProFile & FuelProFile
-                ? ExtendedLogic.areFoodEqual(itemStack1, itemStack2) 
-                
-                : ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);                
+                ? ExtendedLogic.areFoodEqual(itemStack1, itemStack2)
+
+                : ItemStack.areItemStackTagsEqual(itemStack1, itemStack2);
     }
 
     public static final String getItemKey(ItemStack itemStack) {
@@ -45,11 +45,11 @@ public class ItemHelper {
         if (ExtendedLogic.IGNOREBARRELWOODTYPE && item instanceof ItemBarrels)
         {
             //ignore wood material(metadata) of burrels
-            key = String.valueOf(Item.getIdFromItem(item)); 
+            key = String.valueOf(Item.getIdFromItem(item));
         }
         else
-            key = String.valueOf(Item.getIdFromItem(item)) + ":" + String.valueOf(itemStack.getItemDamage());        
-        
+            key = String.valueOf(Item.getIdFromItem(item)) + ":" + String.valueOf(itemStack.getItemDamage());
+
         if (item instanceof ItemBarrels || item instanceof ItemLargeVessel)
         {   //Extended key type for barrels and vessels sealed\no date fluid
             key = ExtendedLogic.getKeyForBarrel(key, itemStack);
@@ -62,7 +62,7 @@ public class ItemHelper {
         else
 
         //for correct quantity display of new and used jug and smallvessel
-        //used jugs have "blowTime" tag with random value  
+        //used jugs have "blowTime" tag with random value
         //used vessels have empty "Items" tag
         if (item instanceof ItemPotteryJug || item instanceof ItemPotterySmallVessel)
         {
@@ -71,20 +71,20 @@ public class ItemHelper {
                 key =  ExtendedLogic.getKeyForSmallVessel(key,itemStack);
             return key;
         }
-        
+
         if ( item.getClass() == Integration.ItemCrateClass )
-        { 
+        {
             // Added info to key - animal ID
             key = AnimalInCrate.getItemKeyForAnimalCrate(itemStack, key);
             return key;
-        }            
-        
+        }
+
         if (!(item instanceof IFood)) {
             key = ExtendedLogic.getKeyForSmithingItem(itemStack,key);
             return key;
         }
-        
-       
+
+
         key += ":"
                 + (Food.isBrined(itemStack) ? "1" : "0")
                 + (Food.isPickled(itemStack) ? "1" : "0")
@@ -93,7 +93,7 @@ public class ItemHelper {
                 + (Food.isDried(itemStack) ? "1" : "0")
                 + (Food.isSmoked(itemStack) ? "1" : "0")
                 + (Food.isSalted(itemStack) ? "1" : "0");
-        
+
         return key;
     }
 
@@ -105,14 +105,14 @@ public class ItemHelper {
         if (itemStack.getItem() instanceof IFood) {
             IFood food = (IFood) itemStack.getItem();
             float foodDecay = removeDecay ? Math.max(Food.getDecay(itemStack), 0) : 0;
-            
+
             //for no split tfcfood for possible trade with small-permissible decay value
             if (foodDecay <= ExtendedLogic.PERMISSIBLEDECLAY && isNoSplitFood(itemStack) ) {
                 foodDecay = 0;  //only for the calculations of quantity
             }
-            
+
             int quantity = (int) (Food.getWeight(itemStack) - foodDecay);
-            
+
 
             return quantity > 0 ? quantity : 0;
         }
@@ -124,7 +124,7 @@ public class ItemHelper {
         Item item = itemStack.getItem();
 
         if (item instanceof IFood) {
-            
+
             int nsFoodWeight = getNoSplitFoodWeight(itemStack);
             if ( nsFoodWeight > 0 ) {
                 return nsFoodWeight;
@@ -153,14 +153,14 @@ public class ItemHelper {
         if (itemStack.getItem() instanceof IFood) {
             IFood food = (IFood) itemStack.getItem();
             float newQuantity = Food.getWeight(itemStack) + quantity;
-                        
+
             Food.setWeight(itemStack, newQuantity);
-            
-            // destroy garbage decay food scraps 
-            if ( newQuantity < 5 &&  newQuantity - Food.getDecay(itemStack) < 2 )    
+
+            // destroy garbage decay food scraps
+            if ( newQuantity < 5 &&  newQuantity - Food.getDecay(itemStack) < 2 )
             //if ( newQuantity < 2 && Food.getDecay(itemStack) > 0.4f )
                 itemStack.stackSize = 0;
-            
+
         } else {
             itemStack.stackSize += quantity;
         }

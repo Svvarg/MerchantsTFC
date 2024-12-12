@@ -23,14 +23,14 @@ public class ItemStall extends ItemBlock implements ISize
     {
         super(block);
     }
-    
+
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List arraylist, boolean flag)
     {
         ItemTerra.addSizeInformation(is, arraylist);
         readFromItemNBT(is.getTagCompound(), arraylist);
     }
-    
+
     private void readFromItemNBT(NBTTagCompound nbt, List arraylist)
     {
         if(nbt == null)
@@ -40,28 +40,28 @@ public class ItemStall extends ItemBlock implements ISize
             return;
 
         NBTTagList itemList = nbt.getTagList("Items", 10);
-        
+
         if(itemList == null)
             return;
-        
+
         int itemCount = itemList.tagCount();
-        
+
         if(itemCount > 0)
             arraylist.add(EnumChatFormatting.GOLD + StatCollector.translateToLocal("gui.Stall.HasPrices"));
     }
-    
+
     @Override
     public int getItemStackLimit(ItemStack is)
     {
         return this.getSize(null).stackSize * getWeight(null).multiplier;
     }
-    
+
     @Override
     public boolean canStack()
     {
         return true;
     }
-    
+
     @Override
     public EnumSize getSize(ItemStack is)
     {
@@ -73,7 +73,7 @@ public class ItemStall extends ItemBlock implements ISize
     {
         return EnumWeight.HEAVY;
     }
-    
+
     @Override
     public EnumItemReach getReach(ItemStack is)
     {

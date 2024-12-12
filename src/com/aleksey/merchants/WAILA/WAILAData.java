@@ -22,13 +22,13 @@ public class WAILAData implements IWailaDataProvider
 		reg.registerBodyProvider(new WAILAData(), TileEntityStall.class);
 		reg.registerNBTProvider(new WAILAData(), TileEntityStall.class);
 	}
-	
+
 	@Override
 	public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
 	{
@@ -39,13 +39,13 @@ public class WAILAData implements IWailaDataProvider
 
 		return currenttip;
 	}
-	
+
 	@Override
 	public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
 	{
 		return currenttip;
 	}
-	
+
 	@Override
 	public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
 	{
@@ -60,9 +60,9 @@ public class WAILAData implements IWailaDataProvider
 
 		return tag;
 	}
-	
+
 	// Heads
-	
+
 	private List<String> stallHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
 	{
 		String head = currenttip.get(0);
@@ -74,7 +74,7 @@ public class WAILAData implements IWailaDataProvider
 			head += " (" + ownerUserName + ")";
 			currenttip.set(0, head);
 		}
-		
+
 		return currenttip;
 	}
 }

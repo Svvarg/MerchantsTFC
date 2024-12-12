@@ -7,12 +7,12 @@ import net.minecraft.item.ItemStack;
 public class TrusselInventory implements IInventory
 {
     private ItemStack[] _storage;
-    
+
     public TrusselInventory()
     {
         _storage = new ItemStack[2];
     }
-    
+
     public int getSizeInventory()
     {
         return _storage.length;
@@ -33,12 +33,12 @@ public class TrusselInventory implements IInventory
                 _storage[i] = null;
                 return is;
             }
-            
+
             ItemStack isSplit = _storage[i].splitStack(j);
-            
+
             if (_storage[i].stackSize == 0)
                 _storage[i] = null;
-            
+
             return isSplit;
         }
         else
@@ -77,7 +77,7 @@ public class TrusselInventory implements IInventory
 
     public void markDirty()
     {
-        
+
     }
 
     public boolean isUseableByPlayer(EntityPlayer player)
@@ -87,12 +87,12 @@ public class TrusselInventory implements IInventory
 
     public void openInventory()
     {
-        
+
     }
 
     public void closeInventory()
     {
-        
+
     }
 
     public boolean isItemValidForSlot(int i, ItemStack is)

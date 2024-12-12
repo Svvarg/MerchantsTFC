@@ -15,10 +15,10 @@ public class RenderStorageRack implements ISimpleBlockRenderingHandler
 {
     private static final double VoxelSizeScaled = 0.0625;// 1/16
     private static final double Thickness = 2 * VoxelSizeScaled;
-    
+
     private static final BoundTransform[] _caseBounds = new BoundTransform[] {
         new BoundTransform(new Bound(0, 0, 0, 1, Thickness, 1), null),
-                
+
         new BoundTransform(new Bound(0, Thickness, 0, Thickness, 1, Thickness),
                 new PointF[] {
                     new PointF(0, 0, 1 - Thickness),
@@ -37,7 +37,7 @@ public class RenderStorageRack implements ISimpleBlockRenderingHandler
                 }
             )
     };
-    
+
     @Override
     public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer)
     {
@@ -45,30 +45,30 @@ public class RenderStorageRack implements ISimpleBlockRenderingHandler
         {
             BoundTransform boundTransform = _caseBounds[i];
             Bound bound = boundTransform.Bound.copy();
-            
+
             setBound(bound, renderer);
             renderInvBlock(block, metadata, renderer);
 
             if(boundTransform.Transforms == null)
                 continue;
-            
+
             for(int j = 0; j < boundTransform.Transforms.length; j++)
             {
                 PointF p = boundTransform.Transforms[j];
-                
+
                 bound.MinX += p.X;
                 bound.MinY += p.Y;
                 bound.MinZ += p.Z;
                 bound.MaxX += p.X;
                 bound.MaxY += p.Y;
                 bound.MaxZ += p.Z;
-                
+
                 setBound(bound, renderer);
                 renderInvBlock(block, metadata, renderer);
             }
         }
     }
-    
+
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer)
     {
@@ -76,24 +76,24 @@ public class RenderStorageRack implements ISimpleBlockRenderingHandler
         {
             BoundTransform boundTransform = _caseBounds[i];
             Bound bound = boundTransform.Bound.copy();
-            
+
             setBound(bound, renderer);
             renderer.renderStandardBlock(block, x, y, z);
 
             if(boundTransform.Transforms == null)
                 continue;
-            
+
             for(int j = 0; j < boundTransform.Transforms.length; j++)
             {
                 PointF p = boundTransform.Transforms[j];
-                
+
                 bound.MinX += p.X;
                 bound.MinY += p.Y;
                 bound.MinZ += p.Z;
                 bound.MaxX += p.X;
                 bound.MaxY += p.Y;
                 bound.MaxZ += p.Z;
-                
+
                 setBound(bound, renderer);
                 renderer.renderStandardBlock(block, x, y, z);;
             }
@@ -101,23 +101,23 @@ public class RenderStorageRack implements ISimpleBlockRenderingHandler
 
         return true;
     }
-    
+
     @Override
     public boolean shouldRender3DInInventory(int modelId)
     {
         return true;
     }
-    
+
     @Override
     public int getRenderId()
     {
         return 0;
     }
-    
+
     private static void renderInvBlock(Block block, int m, RenderBlocks renderer)
     {
         Tessellator var14 = Tessellator.instance;
-        
+
         GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
         var14.startDrawingQuads();
         var14.setNormal(0.0F, -1.0F, 0.0F);
@@ -145,7 +145,7 @@ public class RenderStorageRack implements ISimpleBlockRenderingHandler
         var14.draw();
         GL11.glTranslatef(0.5F, 0.5F, 0.5F);
     }
-    
+
     private static void setBound(Bound bound, RenderBlocks renderer)
     {
         renderer.setRenderBounds(bound.MinX, bound.MinY, bound.MinZ, bound.MaxX, bound.MaxY, bound.MaxZ);

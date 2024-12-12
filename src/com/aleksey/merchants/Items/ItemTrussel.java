@@ -26,21 +26,21 @@ public class ItemTrussel extends ItemTerra
 {
     private IIcon[] _trusselIcons;
     private IIcon[] _trusselWithDieIcons;
-    
+
     public ItemTrussel()
     {
         super();
-        
+
         setMaxDamage(0);
         setCreativeTab(MerchantsTabs.MainTab);
         setHasSubtypes(true);
-        
+
         metaNames = new String[Constants.Dies.length];
-        
+
         for(int i = 0; i < Constants.Dies.length; i++)
             metaNames[i] = Constants.Dies[i].DieName;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister registerer)
@@ -53,10 +53,10 @@ public class ItemTrussel extends ItemTerra
             _trusselIcons[i] = registerer.registerIcon("merchants:trussels/Trussel" + metaNames[i]);
             _trusselWithDieIcons[i] = registerer.registerIcon("merchants:trussels/TrusselWithDie" + metaNames[i]);
         }
-        
-        this.itemIcon = _trusselIcons[0];        
+
+        this.itemIcon = _trusselIcons[0];
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public IIcon getIconIndex(ItemStack itemStack)
@@ -65,7 +65,7 @@ public class ItemTrussel extends ItemTerra
                 ? _trusselWithDieIcons[itemStack.getItemDamage()]
                 : _trusselIcons[itemStack.getItemDamage()];
     }
-    
+
     @Override
     public IIcon getIconFromDamage(int i)
     {
@@ -77,7 +77,7 @@ public class ItemTrussel extends ItemTerra
     {
         if(!stack.hasTagCompound())
             stack.setTagCompound(new NBTTagCompound());
-        
+
         if(stack.getTagCompound().hasKey(CoinHelper.TagName_Key))
             player.openGui(MerchantsMod.instance, GuiHandler.GuiTrussel, player.worldObj, 0, 0, 0);
         else
@@ -85,7 +85,7 @@ public class ItemTrussel extends ItemTerra
 
         return stack;
     }
-    
+
     @Override
     public EnumSize getSize(ItemStack is)
     {
@@ -97,25 +97,25 @@ public class ItemTrussel extends ItemTerra
     {
         return EnumWeight.MEDIUM;
     }
-    
+
     @Override
     public boolean canStack()
     {
       return false;
     }
-    
+
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List arraylist, boolean flag)
     {
         super.addInformation(is, player, arraylist, flag);
-        
+
         NBTTagCompound tag = is.getTagCompound();
-        
+
         if(tag != null && tag.hasKey(CoinHelper.TagName_Key))
         {
             int weight = CoinHelper.getCoinWeight(is);
             String weightText = CoinHelper.getWeightText(weight);
-            
+
             //arraylist.add(EnumChatFormatting.GOLD + "Key: " + tag.getString(CoinHelper.TagName_Key));
             arraylist.add(EnumChatFormatting.GOLD + CoinHelper.getCoinName(is) + " " + EnumChatFormatting.GRAY + weightText);
         }

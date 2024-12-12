@@ -18,25 +18,25 @@ public class TESRStorageRack extends TESRBase
     public TESRStorageRack()
     {
     }
-    
+
     public void renderAt(TileEntityStorageRack te, double x, double y, double z, float f)
     {
         if (te.getWorldObj() == null || !RenderManager.instance.options.fancyGraphics)
             return;
-        
+
         ItemStack itemStack = te.getStackInSlot(0);
-        
+
         if(itemStack == null)
             return;
-        
+
         EntityItem customitem = new EntityItem(field_147501_a.field_147550_f); //tileEntityRenderer.worldObj
         customitem.hoverStart = 0f;
-        
+
         float blockScale = itemStack.getItem() instanceof ItemWoodDoor ? 1f: 2f;
         float itemY = (float)y + (float)(RenderStall.VoxelSizeScaled * 3);
 
         GL11.glPushMatrix(); //start
-        
+
         if(itemStack.getItem() instanceof ItemAnvil)
         {
             GL11.glTranslatef((float)x + 0.25f, itemY - 0.25f, (float)z + 0.25F);
@@ -48,7 +48,7 @@ public class TESRStorageRack extends TESRBase
             GL11.glTranslatef((float)x + 0.5F, itemY, (float)z + 0.5F);
             GL11.glRotatef(timeD, 0.0F, 1.0F, 0.0F);
         }
-        
+
         GL11.glScalef(blockScale, blockScale, blockScale);
         customitem.setEntityItemStack(itemStack);
         itemRenderer.doRender(customitem, 0, 0, 0, 0, 0);

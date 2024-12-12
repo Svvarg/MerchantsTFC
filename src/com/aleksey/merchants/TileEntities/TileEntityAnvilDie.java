@@ -25,29 +25,29 @@ public class TileEntityAnvilDie extends NetworkTileEntity implements IInventory
     public static final int FlanSlot = 2;
     public static final int AnvilDieSlot = 3;
     public static final int CoinSlot = 4;
-    
+
     private static final byte _actionId_Mint = 0;
     private static final int _maxCoinStackSize = 64;
-    
+
     private ItemStack[] _storage;
     private int _metalWeightInHundreds;//100 = 1oz
     private int _metalMeta;
-    
+
     public int getMetalWeightInHundreds()
     {
         return _metalWeightInHundreds;
     }
-    
+
     public int getMetalMeta()
     {
         return _metalMeta;
     }
-    
+
     public TileEntityAnvilDie()
     {
         _storage = new ItemStack[5];
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox()
@@ -72,12 +72,12 @@ public class TileEntityAnvilDie extends NetworkTileEntity implements IInventory
                 _storage[i] = null;
                 return is;
             }
-            
+
             ItemStack isSplit = _storage[i].splitStack(j);
-            
+
             if (_storage[i].stackSize == 0)
                 _storage[i] = null;
-            
+
             return isSplit;
         }
         else
@@ -152,7 +152,7 @@ public class TileEntityAnvilDie extends NetworkTileEntity implements IInventory
     public void writeToNBT(NBTTagCompound nbt)
     {
         super.writeToNBT(nbt);
-        
+
         nbt.setInteger("MetalWeight", _metalWeightInHundreds);
         nbt.setInteger("MetalMeta", _metalMeta);
 
@@ -178,7 +178,7 @@ public class TileEntityAnvilDie extends NetworkTileEntity implements IInventory
     public void readFromNBT(NBTTagCompound nbt)
     {
         super.readFromNBT(nbt);
-        
+
         _metalWeightInHundreds = nbt.getInteger("MetalWeight");
         _metalMeta = nbt.getInteger("MetalMeta");
 
@@ -199,7 +199,7 @@ public class TileEntityAnvilDie extends NetworkTileEntity implements IInventory
     {
         _metalWeightInHundreds = nbt.hasKey("MetalWeight") ? nbt.getInteger("MetalWeight"): 0;
         _metalMeta = nbt.hasKey("MetalMeta") ? nbt.getInteger("MetalMeta"): 0;
-        
+
         this.worldObj.func_147479_m(xCoord, yCoord, zCoord);
     }
 
@@ -230,7 +230,7 @@ public class TileEntityAnvilDie extends NetworkTileEntity implements IInventory
     public void updateEntity()
     {
     }
-    
+
     //Send action to server
     public void actionMint()
     {
@@ -250,99 +250,99 @@ public class TileEntityAnvilDie extends NetworkTileEntity implements IInventory
         int coinWeight = (int)(CoinHelper.getWeightOz(coinWeightIndex) * 100);
         int metalTotalWeight = getMetalTotalWeight();
         int coinQuantity = Math.min(coinWeightIndex, metalTotalWeight / coinWeight);
-        
+
         ItemStack coinStack = _storage[CoinSlot];
         int coinStackSize = coinStack != null ? coinStack.stackSize: 0;
-        
+
         if(coinQuantity + coinStackSize > _maxCoinStackSize)
             coinQuantity = _maxCoinStackSize - coinStackSize;
-        
+
         if(coinStack == null)
             _storage[CoinSlot] = getResultCoin(coinQuantity);
         else
             coinStack.stackSize += coinQuantity;
-        
+
         decrMetalTotalWeight(coinQuantity * coinWeight);
-        
+
         damageHammer();
-        
+
         this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     }
-    
+
     public boolean canMint()
     {
         ItemStack trusselStack = _storage[TrusselSlot];
-        
+
         if(_storage[HammerSlot] == null || trusselStack == null)
             return false;
-        
+
         ItemStack coinStack = _storage[CoinSlot];
         ItemStack resultStack = getResultCoin(1);
-        
+
         if(coinStack != null && (coinStack.stackSize >= _maxCoinStackSize || !ItemHelper.areItemEquals(coinStack, resultStack)))
             return false;
-        
+
         DieInfo trusselInfo = Constants.Dies[trusselStack.getItemDamage()];
         DieInfo anvilDieInfo = Constants.Dies[_storage[AnvilDieSlot].getItemDamage()];
         CoinInfo resultInfo = Constants.Coins[resultStack.getItemDamage()];
-        
+
         if(trusselInfo.Level <= resultInfo.Level || anvilDieInfo.Level <= resultInfo.Level)
             return false;
-        
+
         int coinWeightIndex = CoinHelper.getCoinWeight(trusselStack);
         int coinWeight = (int)(CoinHelper.getWeightOz(coinWeightIndex) * 100);
-        
+
         return coinWeight <= getMetalTotalWeight();
     }
-    
+
     private void decrMetalTotalWeight(int value)
     {
         ItemStack flanStack = _storage[FlanSlot];
-        
+
         if(flanStack != null && flanStack.getItemDamage() != _metalMeta)
         {
             _metalWeightInHundreds = 0;
             _metalMeta = flanStack.getItemDamage();
         }
-        
+
         if(_metalWeightInHundreds >= value)
         {
             _metalWeightInHundreds -= value;
             return;
         }
-        
+
         _metalWeightInHundreds += CoinHelper.MaxFlanWeightInHundreds;
         _metalWeightInHundreds -= value;
-        
+
         _storage[FlanSlot] = null;
     }
-    
+
     private int getMetalTotalWeight()
     {
         ItemStack flanStack = _storage[FlanSlot];
         int totalWeight = flanStack == null || flanStack.getItemDamage() == _metalMeta ? _metalWeightInHundreds: 0;
-        
+
         if(flanStack != null)
             totalWeight += CoinHelper.MaxFlanWeightInHundreds;
-        
+
         return totalWeight;
     }
-    
+
     private ItemStack getResultCoin(int quantity)
     {
         ItemStack flanStack = _storage[FlanSlot];
         int coinMeta = flanStack != null ? flanStack.getItemDamage(): _metalMeta;
         ItemStack coinStack = new ItemStack(ItemList.Coin, quantity, coinMeta);
-        
+
         CoinHelper.copyDie(_storage[TrusselSlot], coinStack);
-        
+
         return coinStack;
     }
-    
+
     private void damageHammer()
     {
         _storage[HammerSlot].setItemDamage(_storage[HammerSlot].getItemDamage() + 1);
-        
+
         if(_storage[HammerSlot].getItemDamage() == _storage[HammerSlot].getMaxDamage())
             _storage[HammerSlot] = null;
     }

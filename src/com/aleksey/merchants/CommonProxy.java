@@ -22,19 +22,19 @@ public class CommonProxy
     public void registerRenderInformation()
     {
     }
-    
+
     public void registerTileEntities()
     {
         registerServerTileEntities();
         registerCommonTileEntities();
     }
-    
+
     protected void registerServerTileEntities()
     {
         GameRegistry.registerTileEntity(TileEntityStall.class, "TileEntityStall");
         GameRegistry.registerTileEntity(TileEntityStorageRack.class, "TileEntityStorageRack");
     }
-    
+
     protected void registerCommonTileEntities()
     {
         GameRegistry.registerTileEntity(TileEntityWarehouse.class, "TileEntityWarehouse");
@@ -45,17 +45,17 @@ public class CommonProxy
     {
         NetworkRegistry.INSTANCE.registerGuiHandler(MerchantsMod.instance, new GuiHandler());
     }
-        
+
     public void registerTickHandler()
     {
         FMLCommonHandler.instance().bus().register(new ServerTickHandler());
     }
-    
+
 	public void registerWailaClasses()
 	{
 		FMLInterModComms.sendMessage("Waila", "register", "com.aleksey.merchants.WAILA.WAILAData.callbackRegister");
 	}
-	
+
 	public void hideNEIItems()
 	{
 	}
