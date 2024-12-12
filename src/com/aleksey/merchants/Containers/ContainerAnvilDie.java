@@ -45,7 +45,7 @@ public class ContainerAnvilDie extends ContainerTFC
     public ItemStack transferStackInSlotTFC(EntityPlayer entityplayer, int slotNumber)
     {
         Slot slot = (Slot)inventorySlots.get(slotNumber);
-        
+
         if(slot != null && slot.getHasStack())
         {
             ItemStack itemstack1 = slot.getStack();
@@ -66,7 +66,7 @@ public class ContainerAnvilDie extends ContainerTFC
             else
                 slot.onSlotChanged();
         }
-        
+
         return null;
     }
 }

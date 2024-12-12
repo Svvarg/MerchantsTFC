@@ -33,9 +33,9 @@ public class ContainerStallLimit extends ContainerTFC
     {
         if(slotNumber < 2)
             return null;
-        
+
         Slot slot = (Slot)inventorySlots.get(slotNumber);
-        
+
         if(slot != null && slot.getHasStack())
         {
             ItemStack itemstack1 = slot.getStack();
@@ -48,7 +48,7 @@ public class ContainerStallLimit extends ContainerTFC
             else
                 slot.onSlotChanged();
         }
-        
+
         return null;
     }
 }

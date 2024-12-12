@@ -31,7 +31,7 @@ public class ContainerTrussel extends ContainerTFC
 
         PlayerInventory.buildInventoryLayout(this, inventoryplayer, 8, GuiTrussel.WindowHeight - 1 + 5, true, true);
     }
-    
+
     @Override
     public void onContainerClosed(EntityPlayer entityplayer)
     {
@@ -41,10 +41,10 @@ public class ContainerTrussel extends ContainerTFC
         {
             ItemStack itemStack1 = _inventory.getStackInSlotOnClosing(0);
             ItemStack itemStack2 = _inventory.getStackInSlotOnClosing(1);
-            
+
             if (itemStack1 != null)
                 entityplayer.entityDropItem(itemStack1, 0);
-            
+
             if (itemStack2 != null)
                 entityplayer.entityDropItem(itemStack2, 0);
         }
@@ -60,7 +60,7 @@ public class ContainerTrussel extends ContainerTFC
     public ItemStack transferStackInSlotTFC(EntityPlayer entityplayer, int slotNumber)
     {
         Slot slot = (Slot)inventorySlots.get(slotNumber);
-        
+
         if(slot != null && slot.getHasStack())
         {
             ItemStack itemstack1 = slot.getStack();
@@ -81,23 +81,23 @@ public class ContainerTrussel extends ContainerTFC
             else
                 slot.onSlotChanged();
         }
-        
+
         return null;
     }
-    
+
     public boolean copyTrussel()
     {
         ItemStack itemStack1 = _inventory.getStackInSlotOnClosing(0);
         ItemStack itemStack2 = _inventory.getStackInSlotOnClosing(1);
-        
+
         if(itemStack1 == null || itemStack1.stackSize == 0 || itemStack2 != null)
             return false;
-        
+
         CoinHelper.copyDie(_inventoryplayer.getCurrentItem(), itemStack1);
-        
+
         _inventory.setInventorySlotContents(0, null);
         _inventory.setInventorySlotContents(1, itemStack1);
-        
+
         return true;
     }
 }

@@ -26,7 +26,7 @@ public class ContainerWarehouse extends ContainerTFC
 
         PlayerInventory.buildInventoryLayout(this, inventoryplayer, 8, GuiWarehouse.WindowHeight - 1 + 5, false, true);
     }
-    
+
     @Override
     public void onContainerClosed(EntityPlayer entityplayer)
     {
@@ -46,7 +46,7 @@ public class ContainerWarehouse extends ContainerTFC
     public ItemStack transferStackInSlotTFC(EntityPlayer entityplayer, int slotNumber)
     {
         Slot slot = (Slot)inventorySlots.get(slotNumber);
-        
+
         if(slot != null && slot.getHasStack())
         {
             ItemStack itemstack1 = slot.getStack();
@@ -67,7 +67,7 @@ public class ContainerWarehouse extends ContainerTFC
             else
                 slot.onSlotChanged();
         }
-        
+
         return null;
     }
 }

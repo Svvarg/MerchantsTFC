@@ -12,10 +12,10 @@ public class SlotStallBook extends Slot
     {
         super(iinventory, slotIndex, x, y);
     }
-    
+
     @Override
     public boolean isItemValid(ItemStack itemstack)
-    {       
-        return itemstack.getItem() instanceof ItemWarehouseBook; 
+    {
+        return itemstack.getItem() instanceof ItemWarehouseBook;
     }
 }

@@ -25,7 +25,7 @@ public class SlotStorageRack extends Slot
     public boolean isItemValid(ItemStack itemstack)
     {
         Item item = itemstack.getItem();
-        
+
         return item instanceof ItemAnvil
                 || item instanceof ItemBellows
                 || item instanceof ItemCrucible
@@ -35,6 +35,6 @@ public class SlotStorageRack extends Slot
                 || item instanceof ItemGrill
                 || item instanceof ItemSluice
                 || ExtendedLogic.isValidItemForStorageRack(item)
-                ; 
+                ;
     }
 }

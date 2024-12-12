@@ -11,13 +11,13 @@ public class BlockCustomAnvilDie2 extends BlockCustomAnvilDie
     {
         super(info);
     }
-    
+
     @Override
     protected int getLogsMetadata(int metadata)
     {
         return 16 + metadata;
     }
-    
+
     @Override
     public Block getLogBlock()
     {

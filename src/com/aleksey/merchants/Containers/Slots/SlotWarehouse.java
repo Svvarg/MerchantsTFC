@@ -18,7 +18,7 @@ public class SlotWarehouse extends Slot
     public boolean isItemValid(ItemStack itemstack)
     {
         Item item = itemstack.getItem();
-        
-        return item instanceof ItemWritableBook || item instanceof ItemWarehouseBook; 
+
+        return item instanceof ItemWritableBook || item instanceof ItemWarehouseBook;
     }
 }

@@ -36,13 +36,13 @@ public class BlockWarehouse extends BlockTerraContainer
     {
         return _startWoodIndex;
     }
-    
+
     public BlockWarehouse(int startWoodIndex)
     {
         super(Material.wood);
         this.setCreativeTab(MerchantsTabs.MainTab);
         this.setBlockBounds(0, 0, 0, 1, 1, 1);
-        
+
         _startWoodIndex = startWoodIndex;
     }
 
@@ -53,13 +53,13 @@ public class BlockWarehouse extends BlockTerraContainer
             ? TFCBlocks.planks.getIcon(side, meta)
             : TFCBlocks.planks2.getIcon(side, meta);
     }
-    
+
     @SideOnly(Side.CLIENT)
     @Override
     public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List list)
     {
         int len = _startWoodIndex == 0 ? 16: Global.WOOD_ALL.length - _startWoodIndex;
-        
+
         for(int i = 0; i < len; i++)
             list.add(new ItemStack(this, 1, i));
     }
@@ -89,11 +89,11 @@ public class BlockWarehouse extends BlockTerraContainer
     }
 
     @Override
-    public void onBlockPreDestroy(World world, int x, int y, int z, int meta) 
+    public void onBlockPreDestroy(World world, int x, int y, int z, int meta)
     {
         if (world.isRemote)
             return;
-        
+
         EntityItem ei = new EntityItem(world, x, y, z, new ItemStack(Item.getItemFromBlock(this), 1, meta));
         world.spawnEntityInWorld(ei);
     }
@@ -105,16 +105,16 @@ public class BlockWarehouse extends BlockTerraContainer
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack is)
     {
         super.onBlockPlacedBy(world, x, y, z, player, is);
-        
+
         TileEntity te = world.getTileEntity(x, y, z);
-        
+
         if (te == null || !(te instanceof TileEntityWarehouse))
             return;
 
         TileEntityWarehouse warehouse = (TileEntityWarehouse)te;
 
         warehouse.initKey();
-        
+
         world.setBlockMetadataWithNotify(x, y, z, is.getItemDamage(), 2);
         world.markBlockForUpdate(x, y, z);
     }
@@ -145,7 +145,7 @@ public class BlockWarehouse extends BlockTerraContainer
     {
         if(player.isSneaking())
             return false;
-        
+
         if (world.isRemote)
         {
             world.markBlockForUpdate(x, y, z);
@@ -156,14 +156,14 @@ public class BlockWarehouse extends BlockTerraContainer
 
         if(te == null || !(te instanceof TileEntityWarehouse))
             return false;
-        
+
         TileEntityWarehouse warehouse = (TileEntityWarehouse)te;
-        
+
         player.openGui(MerchantsMod.instance, GuiHandler.GuiWarehouse, world, x, y, z);
 
         return true;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockAccess par1iBlockAccess, int par2, int par3, int par4, int par5)

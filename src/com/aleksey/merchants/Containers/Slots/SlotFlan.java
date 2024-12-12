@@ -15,7 +15,7 @@ public class SlotFlan extends Slot
 
     @Override
     public boolean isItemValid(ItemStack itemstack)
-    {       
+    {
         return itemstack.getItem() instanceof ItemFlan;
     }
 }

@@ -15,7 +15,7 @@ public class SlotStall extends Slot
 
     @Override
     public boolean isItemValid(ItemStack itemstack)
-    {       
+    {
         return true;
     }
 

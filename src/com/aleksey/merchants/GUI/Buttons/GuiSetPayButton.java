@@ -10,19 +10,19 @@ import net.minecraft.util.StatCollector;
  */
 
 
-public class GuiSetPayButton extends GuiButton 
+public class GuiSetPayButton extends GuiButton
 {
-    private static final int _colorDefaultText = 0x555555;    
+    private static final int _colorDefaultText = 0x555555;
     public static final int _setPayItemWeight = 8;
-  
-    
+
+
     public void setText(String text, FontRenderer fontRenderer)
     {
         this.width = fontRenderer.getStringWidth(text);
         this.height = fontRenderer.FONT_HEIGHT;
         this.displayString = text;
     }
-    
+
     public GuiSetPayButton(int index, int xPos, int yPos)
     {
         super(index, xPos, yPos, 8, _setPayItemWeight, "-");//StatCollector.translateToLocal("gui.Stall.Tooltip.LimitButton"));

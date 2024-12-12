@@ -42,7 +42,7 @@ public class BlockStorageRack extends BlockTerraContainer
         this.setBlockBounds(0, 0, 0, 1, 1, 1);
         this.setHardness(2.0F);
         this.setStepSound(Block.soundTypeWood);
-        
+
         _startWoodIndex = startWoodIndex;
     }
 
@@ -59,7 +59,7 @@ public class BlockStorageRack extends BlockTerraContainer
     public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List list)
     {
         int len = _startWoodIndex == 0 ? 16: Global.WOOD_ALL.length - _startWoodIndex;
-        
+
         for(int i = 0; i < len; i++)
             list.add(new ItemStack(this, 1, i));
     }
@@ -81,13 +81,13 @@ public class BlockStorageRack extends BlockTerraContainer
     {
         return false;
     }
-    
+
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ)
     {
         if(player.isSneaking())
             return false;
-        
+
         if (world.isRemote)
         {
             world.markBlockForUpdate(x, y, z);
@@ -98,21 +98,21 @@ public class BlockStorageRack extends BlockTerraContainer
 
         if(te == null || !(te instanceof TileEntityStorageRack))
             return false;
-        
+
         TileEntityStorageRack storageRack = (TileEntityStorageRack)te;
-        
+
         player.openGui(MerchantsMod.instance, GuiHandler.GuiStorageRack, world, x, y, z);
 
         return true;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockAccess par1iBlockAccess, int par2, int par3, int par4, int par5)
     {
         return true;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public boolean addDestroyEffects(World world, int x, int y, int z, int meta, EffectRenderer effectRenderer)
@@ -132,7 +132,7 @@ public class BlockStorageRack extends BlockTerraContainer
     {
         return BlockList.StorageRackRenderId;
     }
-    
+
     @Override
     public TileEntity createNewTileEntity(World world, int metadata)
     {

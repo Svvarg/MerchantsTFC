@@ -10,7 +10,7 @@ public abstract interface IWarehouseContainer
 {
 	//returns - true if tile entity could be used as container for trade
 	public abstract boolean isValid(TileEntity tileEntity);
-	
+
 	//Search goods item
 	//
 	//tileEntity - tile entity where to search item
@@ -25,7 +25,7 @@ public abstract interface IWarehouseContainer
 	        int requiredQuantity,
 	        ArrayList<ItemTileEntity> resultList
 	        );
-		
+
 	//Search free space to put payment
 	//
 	//tileEntity - tile entity where to search free space
@@ -43,7 +43,7 @@ public abstract interface IWarehouseContainer
             int maxY,
             ArrayList<ItemTileEntity> resultList
             );
-    
+
     //Search free space in small vessels to put payment
     //
     //tileEntity - tile entity where to search free space
@@ -58,14 +58,14 @@ public abstract interface IWarehouseContainer
             int requiredQuantity,
             ArrayList<ItemTileEntity> resultList
             );
-    
+
     //Takes goods from the container
     public abstract void confirmTradeGoods(
     		World world,
     		ItemTileEntity goodTileEntity,
     		ItemStack goodItemStack
     		);
-    
+
     //Put payment into the container
     //
     //newContainers - coordinates of new containers if such were added (for example as for ingot piles and log piles)

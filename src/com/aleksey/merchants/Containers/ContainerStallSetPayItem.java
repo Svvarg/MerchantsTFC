@@ -18,11 +18,11 @@ import com.bioxx.tfc.Core.Player.PlayerInventory;
  * @author Swarg
  */
 public class ContainerStallSetPayItem extends ContainerTFC
-{    
+{
     public ContainerStallSetPayItem(InventoryPlayer inventoryplayer, TileEntityStall stall, World world, int x, int y, int z)
     {
         addSlotToContainer(new SlotForShowOnly(stall, stall.getActivePriceSlotIndex(), GuiStallSetPayItem.PriceSlotX, GuiStallSetPayItem.PriceSlotY));
-        
+
         PlayerInventory.buildInventoryLayout(this, inventoryplayer, 8, GuiStallSetPayItem.WindowHeight - 1 + 5, false, true);
     }
 
@@ -37,9 +37,9 @@ public class ContainerStallSetPayItem extends ContainerTFC
     {
         if(slotNumber < 2)
             return null;
-        
+
         Slot slot = (Slot)inventorySlots.get(slotNumber);
-        
+
         if(slot != null && slot.getHasStack())
         {
             ItemStack itemstack1 = slot.getStack();
@@ -52,7 +52,7 @@ public class ContainerStallSetPayItem extends ContainerTFC
             else
                 slot.onSlotChanged();
         }
-        
+
         return null;
     }
 }

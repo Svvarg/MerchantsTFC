@@ -15,7 +15,7 @@ public class SlotTrusselWithoutDie extends Slot
     }
     @Override
     public boolean isItemValid(ItemStack itemstack)
-    {       
+    {
         return itemstack.getItem() instanceof ItemTrussel
                 && (!itemstack.hasTagCompound() || !itemstack.getTagCompound().hasKey(CoinHelper.TagName_Key))
                 ;

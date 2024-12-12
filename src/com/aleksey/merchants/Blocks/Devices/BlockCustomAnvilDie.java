@@ -30,19 +30,19 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class BlockCustomAnvilDie extends BlockTerraContainer
 {
     private DieInfo _info;
-    
+
     @SideOnly(Side.CLIENT)
     private IIcon _topIcon;
-    
+
     @SideOnly(Side.CLIENT)
     private IIcon _sideIcon;
-    
+
     public BlockCustomAnvilDie(DieInfo info)
     {
         super(Material.iron);
-        
+
         _info = info;
-        
+
         //this.setCreativeTab(TFCTabs.TFCDevices);
         this.setBlockBounds(0, 0, 0, 1, 1, 1);
         this.setHardness(4.0F);
@@ -113,7 +113,7 @@ public class BlockCustomAnvilDie extends BlockTerraContainer
     {
         if(player.isSneaking())
             return false;
-        
+
         if (world.isRemote)
         {
             world.markBlockForUpdate(x, y, z);
@@ -124,12 +124,12 @@ public class BlockCustomAnvilDie extends BlockTerraContainer
 
         if(te == null || !(te instanceof TileEntityAnvilDie))
             return false;
-        
+
         player.openGui(MerchantsMod.instance, GuiHandler.GuiAnvilDie, world, x, y, z);
 
         return true;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockAccess par1iBlockAccess, int par2, int par3, int par4, int par5)
@@ -156,7 +156,7 @@ public class BlockCustomAnvilDie extends BlockTerraContainer
     {
         return true;
     }
-    
+
     @Override
     public void breakBlock(World world, int x, int y, int z, Block block, int metadata)
     {
@@ -168,12 +168,12 @@ public class BlockCustomAnvilDie extends BlockTerraContainer
 
         super.breakBlock(world, x, y, z, block, metadata);
     }
-    
+
     protected int getLogsMetadata(int metadata)
     {
         return metadata;
     }
-    
+
     public Block getLogBlock()
     {
         return TFCBlocks.woodVert;

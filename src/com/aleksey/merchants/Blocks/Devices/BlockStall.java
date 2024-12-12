@@ -33,22 +33,22 @@ public class BlockStall extends BlockTerraContainer
 {
     @SideOnly(Side.CLIENT)
     private IIcon _topIcon;
-    
+
     @SideOnly(Side.CLIENT)
     private IIcon _topEmptyIcon;
-    
+
     private int _woodIndex;
     public int getWoodIndex()
     {
         return _woodIndex;
     }
-    
+
     public BlockStall(int woodIndex)
     {
         super(Material.wood);
         this.setCreativeTab(MerchantsTabs.MainTab);
         this.setBlockBounds(0, 0, 0, 1, (float)(RenderStall.VoxelSizeScaled * 10), 1);
-        
+
         _woodIndex = woodIndex;
     }
 
@@ -65,7 +65,7 @@ public class BlockStall extends BlockTerraContainer
     {
         return meta == 0 || Minecraft.isFancyGraphicsEnabled() ? _topEmptyIcon : _topIcon;
     }
-    
+
     @Override
     public int damageDropped(int meta)
     {
@@ -91,13 +91,13 @@ public class BlockStall extends BlockTerraContainer
     }
 
     @Override
-    public void onBlockPreDestroy(World world, int x, int y, int z, int meta) 
+    public void onBlockPreDestroy(World world, int x, int y, int z, int meta)
     {
         if (world.isRemote)
             return;
 
         TileEntityStall te = (TileEntityStall)world.getTileEntity(x, y, z);
-        
+
         if (te == null)
             return;
 
@@ -105,17 +105,17 @@ public class BlockStall extends BlockTerraContainer
         NBTTagCompound nbt = writeStallToNBT(te);
         is.setTagCompound(nbt);
         EntityItem ei = new EntityItem(world, x, y, z, is);
-        
+
         world.spawnEntityInWorld(ei);
 
         for(int s = 0; s < te.getSizeInventory(); ++s)
             te.setInventorySlotContents(s, null);
     }
-    
+
     private NBTTagCompound writeStallToNBT(TileEntityStall te)
     {
         NBTTagCompound nbt = new NBTTagCompound();
-        
+
         te.writeStallToNBT(nbt);
 
         return nbt;
@@ -128,9 +128,9 @@ public class BlockStall extends BlockTerraContainer
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack is)
     {
         super.onBlockPlacedBy(world, x, y, z, player, is);
-        
+
         TileEntity te = world.getTileEntity(x, y, z);
-        
+
         if (te == null || !is.hasTagCompound() || !(te instanceof TileEntityStall))
             return;
 
@@ -138,10 +138,10 @@ public class BlockStall extends BlockTerraContainer
         NBTTagCompound tag = is.getTagCompound();
 
         stall.readStallFromNBT(tag);
-        
+
         if(tag.hasKey("Items"))
             world.setBlockMetadataWithNotify(x, y, z, 1, 2);
-        
+
         world.markBlockForUpdate(x, y, z);
     }
 
@@ -179,20 +179,20 @@ public class BlockStall extends BlockTerraContainer
 
         if(te == null || !(te instanceof TileEntityStall))
             return false;
-        
+
         TileEntityStall stall = (TileEntityStall)te;
-        
+
         stall.calculateQuantitiesInWarehouse();
-        
-        boolean isOwnerMode = !stall.getIsOwnerSpecified() || (!player.isSneaking() && stall.isOwner(player)); 
-                
-        int guiId = isOwnerMode ? GuiHandler.GuiOwnerStall: GuiHandler.GuiBuyerStall; 
+
+        boolean isOwnerMode = !stall.getIsOwnerSpecified() || (!player.isSneaking() && stall.isOwner(player));
+
+        int guiId = isOwnerMode ? GuiHandler.GuiOwnerStall: GuiHandler.GuiBuyerStall;
 
         player.openGui(MerchantsMod.instance, guiId, world, x, y, z);
 
         return true;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockAccess par1iBlockAccess, int par2, int par3, int par4, int par5)
